@@ -1,0 +1,47 @@
+syntax = "proto2";
+
+package prga.bitchain;
+
+import "common.proto";
+
+message SetValueAction {
+  required uint64 offset = 1;
+  required uint32 width = 2;
+  required uint32 value = 3;
+}
+
+message CopyValueAction {
+  required uint64 offset = 1;
+  required uint32 width = 2;
+  required uint32 begin = 3;
+}
+
+message Ext {
+  extend prga.common.BitConnection.ConnectionAction {
+    repeated SetValueAction connection_actions = 1;
+  }
+
+  extend prga.common.Mode.ModeAction {
+    repeated SetValueAction mode_actions = 1;
+  }
+
+  extend prga.common.Instance.InstanceAction {
+    repeated CopyValueAction lut_actions = 1;
+  }
+
+  extend prga.common.Block.BlockAction {
+    optional uint32 config_size = 1;
+  }
+
+  extend prga.common.Placement.PlacementAction {
+    repeated CopyValueAction placement_actions = 1;
+  }
+
+  extend prga.common.RoutingEdge.RoutingAction {
+    repeated SetValueAction edge_actions = 1;
+  }
+
+  extend prga.common.Header.HeaderAction {
+    optional uint64 total_size = 1;
+  }
+}

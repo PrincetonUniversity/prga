@@ -1,0 +1,6 @@
+[submodule "libblifparse"]
+	path = bitgen/third_party/libblifparse
+	url = https://github.com/leon575777642/libblifparse.git
+[submodule "spdlog"]
+	path = bitgen/third_party/spdlog
+	url = https://github.com/gabime/spdlog.git

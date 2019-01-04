@@ -1,0 +1,13 @@
+**/*.pyc
+**/.*
+**/*.copy.*
+**/*.bk.*
+**/*_pb2.py
+!.gitignore
+build/*
+
+docs/_build
+docs/prga/prga._configcircuitry.bitchain.proto.*
+
+examples/**/build/*
+!examples/**/build/Makefile
