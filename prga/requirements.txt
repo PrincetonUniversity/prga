@@ -17,7 +17,6 @@ enum34==1.1.6
 epydoc==3.0.1
 fire==0.1.3
 fuzzyfinder==2.1.0
-GDAL==1.11.4
 guppy==0.1.10
 idna==2.7
 imagesize==1.1.0
@@ -37,8 +36,8 @@ mailer==0.8.0
 MarkupSafe==1.0
 matplotlib==1.2.0
 memory-profiler==0.54.0
-mercurial==2.6.2
-mistune==0.5.1
+mercurial~>4.1.3
+mistune~>0.8.1
 mmh3==2.5.1
 netifaces==0.10.4
 networkx==2.1
@@ -74,7 +73,7 @@ python-linux-procfs==0.4.9
 pytz==2016.10
 pyudev==0.15
 pyxattr==0.5.1
-PyYAML==3.10
+PyYAML~>4.2b1
 pyzmq==14.3.1
 rencode==1.0.5
 repoze.lru==0.4
