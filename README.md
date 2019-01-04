@@ -33,8 +33,7 @@ Note that PRGA contains sub-modules. Run the following commands after cloning
 this project to download the sub-modules:
 
 ```bash
-git submodule init
-git submodule update
+git submodule update --init --recursive
 ```
 
 Some part of the PRGA needs compilation. Run the following commands:
