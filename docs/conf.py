@@ -185,14 +185,14 @@ epub_exclude_files = ['search.html']
 # -- Extension configuration -------------------------------------------------
 default_role = 'any'
 
-autodoc_member_order = 'bysource'
-
 autodoc_default_options = {
         'member-order': 'bysource',
         'private-members': None,
         'ignore-module-all': None,
         'exclude-members': '_abc_cache,_abc_negative_cache,_abc_negative_cache_version,_abc_registry',
         }
+autodoc_mock_imports = ['prga._configcircuitry.bitchain.proto.common_pb2',
+        'prga._configcircuitry.bitchain.proto.bitchain_pb2']
 
 # Napoleon settings
 napoleon_google_docstring = True
