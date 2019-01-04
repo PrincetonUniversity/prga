@@ -6,25 +6,18 @@ It's reconfigurable outside Princeton, too!
 
 PRGA depends on the following libraries, tools, and Python modules:
 
-### Libraries
-- [Boost Graph
-  Library](https://www.boost.org/doc/libs/1_69_0/libs/graph/doc/index.html)
-- [Expat](https://libexpat.github.io/)
-
-### Tools
-- [Google Proto Buffer](https://developers.google.com/protocol-buffers/)
-- [Yosys](http://www.clifford.at/yosys/)
-- [Verilog-to-Routing](https://verilogtorouting.org/)
-- [Icarus Verilog](http://iverilog.icarus.com/)
-
-### Python modules
-- [networkx](https://networkx.github.io/)
-- [jinja2](http://jinja.pocoo.org/docs/2.10/)
-- [mmh3](https://pypi.org/project/mmh3/)
-- [lxml](https://lxml.de/)
-
-### Optional
-- [Sphinx](http://www.sphinx-doc.org/en/master/examples.html) for building the
+- **Libraries**: [Boost Graph
+  Library](https://www.boost.org/doc/libs/1_69_0/libs/graph/doc/index.html), 
+  [Expat](https://libexpat.github.io/)
+- **Tools**: [Google Proto Buffer](https://developers.google.com/protocol-buffers/),
+  [Yosys](http://www.clifford.at/yosys/),
+  [Verilog-to-Routing](https://verilogtorouting.org/),
+  [Icarus Verilog](http://iverilog.icarus.com/)
+- **Python modules**: [networkx](https://networkx.github.io/),
+  [jinja2](http://jinja.pocoo.org/docs/2.10/),
+  [mmh3](https://pypi.org/project/mmh3/),
+  [lxml](https://lxml.de/)
+- **Optional**: [Sphinx](http://www.sphinx-doc.org/en/master/examples.html) for building the
   docs
 
 ## Installation
