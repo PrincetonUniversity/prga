@@ -14,16 +14,16 @@ def run():
     #   ArchitectureContext is the entrance to all architecture description APIs, and the container of all data of a
     #   custom FPGA
     width, height = 4, 4
-    arch = ArchitectureContext(width = width, height = height)
+    ctx = ArchitectureContext(width = width, height = height)
     
     # Create some wire segments
-    arch.create_segment(name = 'L1', width = 2, length = 1)
+    ctx.create_segment(name = 'L1', width = 2, length = 1)
     
     # Create a global wire
-    clk = arch.create_global(name = 'clk', is_clock = True)
+    clk = ctx.create_global(name = 'clk', is_clock = True)
     
     # Create one CLB type
-    clb = arch.create_logic_block(name = 'CLB')
+    clb = ctx.create_logic_block(name = 'CLB')
     # Add ports to this CLB
     clb.add_input (name = 'I',   width = 2, side = Side.left)
     clb.add_output(name = 'O',   width = 1, side = Side.right)
@@ -51,7 +51,7 @@ def run():
     
     # Create some IOBs
     for side in Side.all():
-        io = arch.create_io_block(name = 'IO_{}'.format(side.name.upper()), capacity = 1)
+        io = ctx.create_io_block(name = 'IO_{}'.format(side.name.upper()), capacity = 1)
         # Add ports to this IOB
         io.add_input (name = 'GPO', width = 1, side = side.opposite)
         io.add_output(name = 'GPI', width = 1, side = side.opposite)
@@ -64,28 +64,28 @@ def run():
                 sinks = io.ports['GPI'])
     
     # Create FPGA layout by placing blocks
-    arch.array.place_blocks(block = 'CLB',       x = 1,         y = 1,          endx = width - 1, endy = height - 1)
-    arch.array.place_blocks(block = 'IO_LEFT',   x = 0,         y = 1,                            endy = height - 1)
-    arch.array.place_blocks(block = 'IO_RIGHT',  x = width - 1, y = 1,                            endy = height - 1)
-    arch.array.place_blocks(block = 'IO_BOTTOM', x = 1,         y = 0,          endx = width - 1                   )
-    arch.array.place_blocks(block = 'IO_TOP',    x = 1,         y = height - 1, endx = width - 1                   )
+    ctx.array.place_blocks(block = 'CLB', x = 1, endx = width - 1, y = 1, endy = height - 1)
+    ctx.array.place_blocks(block = 'IO_LEFT', x = 0, y = 1, endy = height - 1)
+    ctx.array.place_blocks(block = 'IO_RIGHT', x = width - 1, y = 1, endy = height - 1)
+    ctx.array.place_blocks(block = 'IO_BOTTOM', x = 1, endx = width - 1, y = 0)
+    ctx.array.place_blocks(block = 'IO_TOP', x = 1, y = height - 1, endx = width - 1)
 
     # Bind global wire to a specific IOB
-    clk.bind(x = 0, y = 1, subblock = 0)
+    ctx.globals['clk'].bind(x = 0, y = 1, subblock = 0)
     
     # Automatically populate the routing channels using the segments defined above
-    arch.array.populate_routing_channels()
+    ctx.array.populate_routing_channels()
 
     # Automatically populates connections blocks and switch blocks
     #   FC value describes the connectivity between block ports and wire segments
-    arch.array.populate_routing_switches(default_fc = (0.25, 0.5))
+    ctx.array.populate_routing_switches(default_fc = (0.25, 0.5))
 
     ##########################################################################
     ##                          Run PRGA Builder Flow                       ##
     ##########################################################################
 
     # Create a Flow that operates on the architecture context
-    flow = Flow(context = arch)
+    flow = Flow(context = ctx)
 
     # Add passes
     #   There are no "required" passes, but dependences, conflicts, and/or ordering constraints may exist between
@@ -116,8 +116,8 @@ def run():
 
     # For real FPGAs, users may want to stop here and start the ASIC flow. In this case, the ArchitectureContext can
     # be serialized and dumped onto disk using Python's pickle module, then deserialized and resumed 
-    #   arch.pickle(filename = "arch.pickled")
-    #   arch = ArchitectureContext.unpickle(filename = "archdef.pickled")
+    #   ctx.pickle(f = open("ctx.pickled", 'w'))
+    #   ctx = ArchitectureContext.unpickle(f = open("archdef.pickled"))
 
     # 8. RandomTimingEngine: generate random fake timing values for the FPGA
     flow.add_pass(RandomTimingEngine(max = (100e-12, 250e-12)))
@@ -133,7 +133,8 @@ def run():
     # 11. launch the flow
     flow.run()
 
-    arch.pickle('arch.pickled')
+    # pickle the architecture context
+    ctx.pickle('ctx.pickled')
 
 if __name__ == '__main__':
     run()
