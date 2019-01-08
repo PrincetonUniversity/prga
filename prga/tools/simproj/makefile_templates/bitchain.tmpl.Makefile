@@ -32,7 +32,7 @@ LOGIC_SIM_LOG = $(LOGIC_SIM).log
 IMPLEMENTATION_SIM := isim
 IMPLEMENTATION_SIM_LOG := $(IMPLEMENTATION_SIM).log
 
-.PHONY: default
+.PHONY: default synth pack pnr bitgen verify clean disp
 default: verify
 
 synth: $(BLIF)
@@ -49,6 +49,11 @@ clean:
 	rm -rf $(BLIF) $(VPR_PACK) $(VPR_PACK_REMAPPED) $(VPR_PNR) $(BITSTREAM) *.rpt *.log
 	rm -rf $(LOGIC_SIM) $(LOGIC_SIM_LOG) $(IMPLEMENTATION_SIM) $(IMPLEMENTATION_SIM_LOG)
 	rm -rf csrc *.daidir ucli.key
+
+disp: $(VPR_PNR)
+	vpr $(VPR_ARCHDEF) $(BLIF) --net_file $(VPR_PACK_REMAPPED) --place_file $(VPR_PLACE) \
+		--route_file $(VPR_ROUTE) --route_chan_width $(VPR_CHAN_WIDTH) --read_rr_graph $(VPR_RRGRAPH) \
+		--analysis --disp on
 
 $(BLIF): $(TARGET_SRC) $(YOSYS_SCRIPT)
 	yosys -o $@ $^

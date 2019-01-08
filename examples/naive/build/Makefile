@@ -26,3 +26,7 @@ $(FPGA_FILES): ../build.py
 $(SIM_PROJ): $(FPGA_FILES)
 	python -m prga.tools.simproj $(PICKLED_CONTEXT) $(TARGET_SRC) $(HOST_SRC) $(IO_BINDINGS) \
 		-m $(SIM_MAKEFILE)
+
+%:
+	if [ -f $(SIM_MAKEFILE) ]; then make -f $(SIM_MAKEFILE) $@; \
+		else echo "make: *** No rule to make target '$@'.  Stop." && exit 1; fi
