@@ -6,6 +6,5 @@ else
     DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. >/dev/null && pwd )"
 
     export PYTHONPATH=$DIR
-    export VTR_ROOT=/home/prga/Desktop/vtr
-    export PATH=$VTR_ROOT/vpr:/home/prga/Desktop/prga/build/bin:$PATH
+    export PATH=$VTR_ROOT/vpr:$DIR/bin:$PATH
 fi

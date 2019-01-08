@@ -127,8 +127,7 @@ class PortOrPinBit(_AbstractPortOrPin):
             if self.is_physical:
                 return self
             else:
-                raise PRGAInternalError("'{}' does not have a physical counterpart"
-                        .format(self))
+                return None
 
     @_physical_cp.setter
     def _physical_cp(self, cp):
@@ -159,8 +158,7 @@ class PortOrPinBit(_AbstractPortOrPin):
             if self.is_logical:
                 return self
             else:
-                raise PRGAInternalError("'{}' does not have a logical counterpart"
-                        .format(self))
+                return None
 
     @_logical_cp.setter
     def _logical_cp(self, cp):
@@ -186,8 +184,8 @@ class PortOrPinBit(_AbstractPortOrPin):
     def _physical_source(self):
         """Physical source of this bit.
         
-        You can assign None or `ConstNet` or `PortOrPinBit` or :obj:`Sequence` [`PortOrPinBit` ] or a physical source
-        port to to this property. If obj:`Sequence` [`PortOrPinBit` ] or a physical source port is used, the number of
+        You can assign None or `ConstNet` or `PortOrPinBit` or :obj:`list` [`PortOrPinBit` ] or a physical source
+        port to to this property. If :obj:`list` [`PortOrPinBit` ] or a physical source port is used, the number of
         bits must be 1.
         """
         if not self.is_physical_sink:

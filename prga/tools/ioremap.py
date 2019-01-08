@@ -1,3 +1,7 @@
+# -*- encoding: ascii -*-
+
+"""Remap IO block type in VPR's packing result to match the IO bindings."""
+
 from xmltodict import parse, unparse
 import sys
 import argparse

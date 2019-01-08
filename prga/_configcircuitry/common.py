@@ -2,13 +2,21 @@
 
 """Common classes and helpers for configuration circuitry generator/serializer."""
 
-__all__ = ['AbstractConfigProtoSerializer']
+__all__ = ['ConfigurationCircuitryType', 'AbstractConfigProtoSerializer']
 
 import logging
 _logger = logging.getLogger(__name__)
 
 import struct
 from abc import ABCMeta, abstractmethod
+from enum import Enum
+
+# ----------------------------------------------------------------------------
+# -- Configuration Circuitry Type --------------------------------------------
+# ----------------------------------------------------------------------------
+class ConfigurationCircuitryType(Enum):
+    """Configuration circuitry types."""
+    bitchain = 0
 
 # ----------------------------------------------------------------------------
 # -- AbstractConfigProtoSerializer -------------------------------------------

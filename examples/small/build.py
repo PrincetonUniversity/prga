@@ -17,8 +17,7 @@ def run():
     arch = ArchitectureContext(width = width, height = height)
     
     # Create some wire segments
-    arch.create_segment(name = 'L1', width = 8, length = 1)
-    arch.create_segment(name = 'L2', width = 2, length = 2)
+    arch.create_segment(name = 'L1', width = 12, length = 1)
     
     # Create a global wire
     clk = arch.create_global(name = 'clk', is_clock = True)
@@ -112,11 +111,7 @@ def run():
     flow.add_pass(DisableExtioDuringConfigOptimization())
 
     # 6. VerilogGenerator: generate Verilog for the FPGA
-    try:
-        os.mkdir('rtl')
-    except OSError:
-        pass
-    flow.add_pass(VerilogGenerator(output_dir = 'rtl'))
+    flow.add_pass(VerilogGenerator())
 
     # 7. launch the flow
     flow.run()
@@ -130,16 +125,18 @@ def run():
     flow.add_pass(RandomTimingEngine(max = (100e-12, 250e-12)))
 
     # 9. VPRArchdefGenerator, VPRRRGraphGenerator: generates VPR input files
-    flow.add_pass(VPRArchdefGenerator(f = open('archdef.vpr.xml', 'w')))
-    flow.add_pass(VPRRRGraphGenerator(f = open('rrgraph.vpr.xml', 'w'),
-        switches = [100e-12, 150e-12, 200e-12]))
+    flow.add_pass(VPRArchdefGenerator())
+    flow.add_pass(VPRRRGraphGenerator(switches = [100e-12, 150e-12, 200e-12]))
 
     # 10. BitchainConfigProtoSerializer: generate a database of the configuration circuitry that will be used by the
     #   bitgen
-    flow.add_pass(BitchainConfigProtoSerializer(open('config.pb', 'w')))
+    flow.add_pass(BitchainConfigProtoSerializer())
 
     # 11. launch the flow
     flow.run()
+
+    # pickle the architecture context
+    arch.pickle('arch.pickled')
 
 if __name__ == '__main__':
     run()

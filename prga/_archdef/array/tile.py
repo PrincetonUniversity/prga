@@ -62,7 +62,7 @@ class BlockPin(Pin, AbstractRoutingNode):
 # -- BlockInstance -----------------------------------------------------------
 # ----------------------------------------------------------------------------
 class _DynamicInstancePins(Mapping):
-    """A helper class for `BlockInstance::_pins` property."""
+    """A helper class for `BlockInstance._pins` property."""
     def __init__(self, instance):
         self.__instance = instance
 
@@ -160,7 +160,7 @@ class BlockInstance(AbstractInstance):
         """A mapping from name to pins.
 
         Note that objects returned by this mapping might be transient. See
-        `_AbstractInstance::_get_or_create_pin` for more detail.
+        `BlockInstance._get_or_create_pin` for more detail.
         """
         return _DynamicInstancePins(self)
 

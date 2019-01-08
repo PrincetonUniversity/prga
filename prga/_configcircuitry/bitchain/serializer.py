@@ -36,10 +36,10 @@ class BitchainConfigProtoSerializer(AbstractPass):
     """Bitchain style configuration circuitry protobuf message serializer.
     
     Args:
-        f (file-like object): the output stream
+        filename (:obj:`str`, default='config.db'): the name of the output file
     """
-    def __init__(self, f):
-        self._f = f
+    def __init__(self, filename = 'config.db'):
+        self._filename = filename
 
     @property
     def key(self):
@@ -180,7 +180,7 @@ class BitchainConfigProtoSerializer(AbstractPass):
 
     def run(self, context):
         vpr_ext, cfg_ext = context._vpr_extension, context._config_extension
-        with _BitchainConfigProtoSerializer(self._f) as ds:
+        with _BitchainConfigProtoSerializer(open(self._filename, 'w')) as ds:
             with ds.add_header() as header:
                 header.signature = 0xaf27dbd3ad76bbdd # first 64 bits of sha1("bitchain")
                 header.width = context.array.width

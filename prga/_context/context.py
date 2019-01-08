@@ -374,19 +374,19 @@ class ArchitectureContext(object):
     # ------------------------------------------------------------------------
 
     # -- exposed API ---------------------------------------------------------
-    def pickle(self, f):
-        """Pickle the architecture context into a file-like object.
+    def pickle(self, filename):
+        """Pickle the architecture context into a file.
 
         Args:
-            f (file-like object):
+            filename (:obj:`str`): the name of the output file
         """
-        pickle.dump(self, f, 2)
+        pickle.dump(self, open(filename, 'w'), 2)
 
     @staticmethod
-    def unpickle(f):
+    def unpickle(filename):
         """Unpickle a pickled architecture context.
 
         Args:
-            f (file-like object):
+            filename (:obj:`str`): the name of the pickled file
         """
-        return pickle.load(f)
+        return pickle.load(open(filename))

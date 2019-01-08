@@ -4,6 +4,7 @@
 
 __all__ = ['BitchainConfigGenerator']
 
+from ..common import ConfigurationCircuitryType
 from ..._archdef.common import BlockType
 from ..._archdef.portpin.port import PhysicalInputPort, PhysicalOutputPort
 from ..._archdef.model.physical import AbstractConfigModel
@@ -99,6 +100,11 @@ class _BitchainConfigExtension(object):
             for _ in xrange(context.array.height)] for _ in xrange(context.array.width)]
         self.__width = width
         self._bitstream_size = 0
+
+    @property
+    def type(self):
+        """The type of this configuration circuitry."""
+        return ConfigurationCircuitryType.bitchain
 
     @property
     def context(self):

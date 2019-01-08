@@ -22,10 +22,10 @@ class VPRArchdefGenerator(AbstractPass):
     """VPR's archdef.xml generation tool.
 
     Args:
-        f (file-like object): the output stream
+        filename (:obj:`str`, default='archdef.vpr.xml'): the name of the output file
     """
-    def __init__(self, f):
-        self.__f = f
+    def __init__(self, filename = 'archdef.vpr.xml'):
+        self._filename = filename
 
     @property
     def key(self):
@@ -208,7 +208,7 @@ class VPRArchdefGenerator(AbstractPass):
                                         'out_port': self.__bit_name_with_parent(logical_sink)})
 
     def run(self, context):
-        with XMLGenerator(self.__f) as xg, xg.element('architecture'):
+        with XMLGenerator(open(self._filename, 'w')) as xg, xg.element('architecture'):
             xg.element_leaf('switchlist', {'@switch': {'type': 'mux', 'name': 'default_mux', 'R': 0,
                     'Cout': 0, 'Cin': 0, 'Tdel': 1e-11, 'mux_trans_size': 0, 'buf_size': 0}})
             xg.element_leaf('device', {

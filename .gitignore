@@ -5,6 +5,7 @@
 **/*_pb2.py
 !.gitignore
 build/*
+bin/*
 
 docs/_build
 docs/prga/prga._configcircuitry.bitchain.proto.*

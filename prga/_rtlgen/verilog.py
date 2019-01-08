@@ -24,14 +24,12 @@ class VerilogGenerator(AbstractPass):
     """Verilog generator.
     
     Args:
-        output_dir (:obj:`str`): the directory where all generated verilog files will be put in
+        output_dir (:obj:`str`, default='rtl'): the directory where all generated verilog files will be put in
 
     Raises:
         `PRGAAPIError`:
     """
-    def __init__(self, output_dir):
-        if not os.path.isdir(output_dir):
-            raise PRGAAPIError("'{}' is not a valid output directory".format(output_dir))
+    def __init__(self, output_dir = 'rtl'):
         self.__output_dir = output_dir
         self.__env = None
 
@@ -277,6 +275,8 @@ class VerilogGenerator(AbstractPass):
         f.write(self.__env.get_template('moduleend.top.tmpl.v').render({}).encode('ascii'))
 
     def run(self, context):
+        if not os.path.isdir(self.__output_dir):
+            os.mkdir(self.__output_dir)
         search_paths = context._verilog_template_search_paths
         search_paths.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'verilog_templates'))
         self.__env = jj.Environment(loader=jj.FileSystemLoader(search_paths))

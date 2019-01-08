@@ -13,11 +13,11 @@ Tools
 
 PRGA is dependent on the following third-party tools:
 
-* `CMake <https://cmake.org/>`_
+* `CMake <https://cmake.org/>`_ >= 3.5
 * `Google Proto Buffer <https://developers.google.com/protocol-buffers/>`_
 * `Verilog-to-Routing <https://verilogtorouting.org/>`_
-* *[optional]* `Yosys <http://www.clifford.at/yosys/>`_
-* *[optional]* `Icarus Verilog <http://iverilog.icarus.com/>`_
+* `Yosys <http://www.clifford.at/yosys/>`_
+* `Icarus Verilog <http://iverilog.icarus.com/>`_
 
 Python
 ^^^^^^
@@ -26,9 +26,12 @@ PRGA works with Python 2.7.x. Required Python modules are:
 
 * `networkx <https://networkx.github.io/>`_
 * `jinja2 <http://jinja.pocoo.org/docs/2.10/>`_
+* `protobuf <http:https://pypi.org/project/protobuf/>`_
 * `mmh3 <https://pypi.org/project/mmh3/>`_
 * `lxml <https://lxml.de/>`_
-* `enum <https://pypi.org/project/enum34/>`_
+* `enum34 <https://pypi.org/project/enum34/>`_
+* `xmltodict <https://github.com/martinblech/xmltodict>`_
+* `hdlparse <https://kevinpt.github.io/hdlparse/>`_
 
 Libraries
 ^^^^^^^^^
@@ -47,30 +50,43 @@ cloning the git repo to download the sub-modules:
 
 .. code-block:: bash
 
-    cd /path/to/prga            # cd to the root folder of PRGA
-    git submodule init && git submodule update
+    cd /path/to/prga                        # cd to the root folder of PRGA
+    git submodule update --init --recursive # fetch sub-modules
 
 After downloading the sub-modules and meeting the prerequisites, run the
 following commands to build PRGA:
 
 .. code-block:: bash
     
-    cd /path/to/prga            # cd to the root folder of PRGA
-    mkdir build && cd build     # that's where we will build everything
-    cmake3 ..                   # run CMake (>= 2.8.12)
-    make                        # run Make
+    cd /path/to/prga                        # cd to the root folder of PRGA
+    mkdir build && cd build                 # that's where we will build everything
+    cmake3 ..                               # run CMake
+    make                                    # run Make
 
-Run Examples
-------------
+Examples
+--------
 
-Examples are provided in the ``examples/`` directory. Follow the commands below
-to run an example:
+Examples are provided in the ``examples/`` directory. Each example is a
+complete use case of PRGA, including building a custom FPGA, running
+Verilog-to-bitstream flow for a target design, then verifying the implemented
+target design by simulating the RTL of the FPGA with the generated bitstream.
+Each example is organized in the following hierarchy:
+
+* ``build.py``: the Python script for building the FPGA
+* ``{example}.v``: the target design
+* ``{example}_host.v``: the test host for the target design
+* ``io.pads``: the IO binding file
+* ``build/``:
+    * ``Makefile``: the Make script
+
+Follow the commands below to run an example:
 
 .. code-block:: bash
     
-    cd /path/to/prga            # cd to the root folder of PRGA
-    cd examples/small/build     # cd to the `build` folder of one example
-    make                        # this will run all the way to post-implementation simulation
+    cd /path/to/prga                        # cd to the root folder of PRGA
+    source envscr/general.settings.sh       # set up environment
+    cd examples/small/build                 # cd to one of the example directories
+    make                                    # this will run all the way to post-implementation simulation
 
 PRGA Builder
 ------------

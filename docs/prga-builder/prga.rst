@@ -20,6 +20,7 @@ High Level API
    prga.context
    prga.flow
    prga.exception
+   prga.tools
    
 Low Level API
 -------------

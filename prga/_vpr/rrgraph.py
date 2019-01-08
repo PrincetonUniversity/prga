@@ -22,13 +22,13 @@ class VPRRRGraphGenerator(AbstractPass):
     """VPR's rrgraph.xml generation tool.
 
     Args:
-        f (file-like object): the output stream
+        filename (:obj:`str`, default='rrgraph.vpr.xml'): the name of the output file
         switches (:obj:`list` [:obj:`float` ], default=None): an ascending list of values for quantilizing routing
             edge delays. All switches will be classified into ``len(switches) + 2`` classes: delay == 0, 0 < delay <=
             switches[0], ..., switches[i] < delay <= switches[i+1], ..., switches[-1] < delay <= max-delay
     """
-    def __init__(self, f, switches = None):
-        self.__f = f
+    def __init__(self, filename = 'rrgraph.vpr.xml', switches = None):
+        self._filename = filename
         switches = uno(switches, [])
         self._switches = [0.0] + switches + [0.0 if len(switches) == 0 else switches[-1]]
 
@@ -66,7 +66,7 @@ class VPRRRGraphGenerator(AbstractPass):
                             '@pin': {'ptc': ptc + i, '#text': '{}[{}].{}[{}]'.format(block.name, sub, port.name, i)}})
 
     def run(self, context):
-        with XMLGenerator(self.__f) as xg, xg.element('rr_graph'):
+        with XMLGenerator(open(self._filename, 'w')) as xg, xg.element('rr_graph'):
             ext = context._vpr_extension
             # 1. print channels
             with xg.element('channels'):

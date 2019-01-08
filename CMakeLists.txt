@@ -34,7 +34,7 @@ endif()
 enable_testing()
 
 # executable output path
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 
 ##############################################################################
 ##                          Sub-directories set up                          ##
@@ -47,15 +47,15 @@ add_subdirectory(bitgen)
 ##                             Integration Tests                            ##
 ##############################################################################
 add_test(NAME naive
-    COMMAND make
+    COMMAND ${CMAKE_MAKE_PROGRAM}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/naive/build)
 
 add_test(NAME small
-    COMMAND make
+    COMMAND ${CMAKE_MAKE_PROGRAM}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/small/build)
 
 add_test(NAME longsegment
-    COMMAND make
+    COMMAND ${CMAKE_MAKE_PROGRAM}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/longsegment/build)
 
 ##############################################################################
@@ -63,4 +63,6 @@ add_test(NAME longsegment
 ##############################################################################
 add_custom_target(cleanall
     COMMAND ${CMAKE_MAKE_PROGRAM} clean
-    COMMAND ${CMAKE_MAKE_PROGRAM} -C ${CMAKE_SOURCE_DIR}/examples clean)
+    COMMAND ${CMAKE_MAKE_PROGRAM} -C ${CMAKE_SOURCE_DIR}/examples/naive/build clean
+    COMMAND ${CMAKE_MAKE_PROGRAM} -C ${CMAKE_SOURCE_DIR}/examples/small/build clean
+    COMMAND ${CMAKE_MAKE_PROGRAM} -C ${CMAKE_SOURCE_DIR}/examples/longsegment/build clean)
