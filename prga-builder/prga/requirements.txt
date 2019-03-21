@@ -1,0 +1,9 @@
+hdlparse==1.0.4
+Jinja2==2.10
+jsonschema==2.6.0
+lxml==4.2.5
+mmh3==2.5.1
+networkx==2.2
+protobuf==3.7.0
+Sphinx==1.8.2
+xmltodict==0.12.0
