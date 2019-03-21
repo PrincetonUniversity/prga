@@ -47,25 +47,14 @@ make                                    # run Make
 
 ## Examples
 
-Examples are provided in the `examples/` directory. Each example is a complete
-use case of PRGA, including building a custom FPGA, running
-Verilog-to-bitstream flow for a target design, then verifying the implemented
-target design by simulating the RTL of the FPGA with the generated bitstream.
-Each example is organized in the following hierarchy:
-
-* `build.py`: the Python script for building the FPGA
-* `{example}.v`: the target design
-* `{example}_host.v`: the test host for the target design
-* `io.pads`: the IO binding file
-* `build/`:
-    * `Makefile`: the Make script
-
-Follow the commands below to run an example:
+Examples are provided in the `examples/` directory. FPGA building examples are
+provided in the `fpga/` directory, and FPGA using examples are provided in the
+`target/` directory. Follow the commands below to run an example:
 
 ```bash
 cd /path/to/prga                        # cd to the root folder of PRGA
 source envscr/general.settings.sh       # set up environment
-cd examples/small/build                 # cd to one of the example directories
+cd examples/bcd2bin/k4_N2_8x8           # cd to one of the using example directories
 make                                    # this will run all the way to post-implementation simulation
 ```
 

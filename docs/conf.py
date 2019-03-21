@@ -15,6 +15,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'vprgen')))
 
 
 # -- Project information -----------------------------------------------------
@@ -24,9 +25,9 @@ copyright = u'2018, Ang Li'
 author = u'Ang Li'
 
 # The short X.Y version
-version = u'0.1'
+version = u'0.2'
 # The full version, including alpha/beta/rc tags
-release = u'0.1 alpha'
+release = u'0.2 alpha'
 
 
 # -- General configuration ---------------------------------------------------
@@ -191,8 +192,8 @@ autodoc_default_options = {
         'ignore-module-all': None,
         'exclude-members': '_abc_cache,_abc_negative_cache,_abc_negative_cache_version,_abc_registry',
         }
-autodoc_mock_imports = ['prga._configcircuitry.bitchain.proto.common_pb2',
-        'prga._configcircuitry.bitchain.proto.bitchain_pb2']
+autodoc_mock_imports = ['common_pb2',
+        'bitchain_pb2']
 
 # Napoleon settings
 napoleon_google_docstring = True
