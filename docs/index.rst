@@ -44,7 +44,7 @@ PRGA Documentation
    :maxdepth: 2
    
    intro
-   prga-builder/prga
+   prga-builder/modules
 
 Indices and tables
 ==================

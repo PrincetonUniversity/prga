@@ -1,17 +1,12 @@
 prga.\_configcircuitry.bitchain package
 =======================================
 
-Subpackages
------------
-
-.. toctree::
-
 Submodules
 ----------
 
 .. toctree::
 
-   prga._configcircuitry.bitchain.generator
+   prga._configcircuitry.bitchain.injector
    prga._configcircuitry.bitchain.serializer
 
 Module contents

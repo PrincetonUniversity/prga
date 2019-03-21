@@ -6,10 +6,11 @@ Submodules
 
 .. toctree::
 
-   prga._archdef.routing.abstractblock
+   prga._archdef.routing.block
+   prga._archdef.routing.common
    prga._archdef.routing.connectionblock
    prga._archdef.routing.port
-   prga._archdef.routing.resource
+   prga._archdef.routing.routingblock
    prga._archdef.routing.switchblock
 
 Module contents

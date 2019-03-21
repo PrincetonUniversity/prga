@@ -1,4 +1,5 @@
 **/*.pyc
+**/__pycache__
 **/.*
 **/*.copy.*
 **/*.bk.*
@@ -8,7 +9,10 @@ build/*
 bin/*
 
 docs/_build
-docs/prga/prga._configcircuitry.bitchain.proto.*
 
-examples/**/build/*
-!examples/**/build/Makefile
+examples/fpga/*/*/*
+!examples/fpga/*/*/build.py
+!examples/fpga/*/*/Makefile
+examples/target/*/*/*
+!examples/target/*/*/Makefile
+!examples/target/*/*/io.pads

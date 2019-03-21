@@ -7,7 +7,7 @@ Submodules
 .. toctree::
 
    prga._archdef.array.array
-   prga._archdef.array.tile
+   prga._archdef.array.instance
 
 Module contents
 ---------------

@@ -8,9 +8,9 @@ Subpackages
 
     prga._archdef.array
     prga._archdef.block
-    prga._archdef.model
     prga._archdef.moduleinstance
     prga._archdef.portpin
+    prga._archdef.primitive
     prga._archdef.routing
 
 Submodules

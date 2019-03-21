@@ -5,7 +5,8 @@ else
     # get the directory of this script
     DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. >/dev/null && pwd )"
 
-    export PYTHONPATH=$DIR
+    export PYTHONPATH=$DIR/prga-builder:$DIR/prga-builder/vprgen
     export PATH=$DIR/bin:$PATH
-fi
 
+    export PRGA_SETTINGS_DONE=TRUE
+fi

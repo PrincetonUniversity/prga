@@ -1,4 +1,4 @@
-Module: prga.tools
+prga.tools package
 ==================
 
 Subpackages

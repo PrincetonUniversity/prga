@@ -28,6 +28,24 @@ include(FindProtobuf)
 find_package(Protobuf REQUIRED)
 if(NOT ${PROTOBUF_FOUND})
     message(FATAL_ERROR "Protobuf not found")
+elseif(Protobuf_VERSION VERSION_LESS 3.7)
+    message(FATAL_ERROR "Protobuf version must be at least 3.7!")
+endif()
+
+# find Python
+include(FindPython)
+find_package(Python REQUIRED)
+if(NOT ${Python_FOUND})
+    message(FATAL_ERROR "Python not found")
+elseif(Python_VERSION VERSION_LESS 3.0)
+    if(Protobuf_VERSION VERSION_GREATER 3.7 OR
+            Protobuf_VERSION VERSION_EQUAL 3.7)
+        message(FATAL_ERROR "Python 2 is not compatible with Protobuf 3.7+")
+    endif()
+elseif(Python_VERSION VERSION_GREATER 3.0)
+    if(Protobuf_VERSION VERSION_LESS 3.7)
+        message(FATAL_ERROR "Python 3 requires Protobuf 3.7+")
+    endif()
 endif()
 
 # tests:
@@ -40,29 +58,56 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 ##                          Sub-directories set up                          ##
 ##############################################################################
 # set sub-projects
-add_subdirectory(prga/_configcircuitry/bitchain/proto)
-add_subdirectory(bitgen)
+add_subdirectory(prga-builder/proto)
+add_subdirectory(prga-bitgen)
 
 ##############################################################################
 ##                             Integration Tests                            ##
 ##############################################################################
-add_test(NAME naive
+add_test(NAME naive-fpga
     COMMAND ${CMAKE_MAKE_PROGRAM}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/naive/build)
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/fpga/naive/naive)
 
-add_test(NAME small
+add_test(NAME naive-longsegment
     COMMAND ${CMAKE_MAKE_PROGRAM}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/small/build)
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/fpga/naive/naive_L2)
 
-add_test(NAME longsegment
+add_test(NAME small-fpga
     COMMAND ${CMAKE_MAKE_PROGRAM}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/longsegment/build)
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/fpga/small/k4_N2_8x8)
 
-##############################################################################
-##                             Custom clean-up                              ##
-##############################################################################
-add_custom_target(cleanall
-    COMMAND ${CMAKE_MAKE_PROGRAM} clean
-    COMMAND ${CMAKE_MAKE_PROGRAM} -C ${CMAKE_SOURCE_DIR}/examples/naive/build clean
-    COMMAND ${CMAKE_MAKE_PROGRAM} -C ${CMAKE_SOURCE_DIR}/examples/small/build clean
-    COMMAND ${CMAKE_MAKE_PROGRAM} -C ${CMAKE_SOURCE_DIR}/examples/longsegment/build clean)
+add_test(NAME small-fpga-longsegment
+    COMMAND ${CMAKE_MAKE_PROGRAM}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/fpga/small/k4_N2_8x8_L2)
+
+add_test(NAME small-fpga-hier
+    COMMAND ${CMAKE_MAKE_PROGRAM}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/fpga/small/k4_N2_8x8_hier)
+
+add_test(NAME naive-target
+    COMMAND ${CMAKE_MAKE_PROGRAM}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/target/xor/naive_naive)
+
+add_test(NAME naive-target-longsegment
+    COMMAND ${CMAKE_MAKE_PROGRAM}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/target/xor/naive_naive_L2)
+
+add_test(NAME naive-target-fakeprog
+    COMMAND ${CMAKE_MAKE_PROGRAM}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/target/xor/naive_naive_fakeprog)
+
+add_test(NAME small-target
+    COMMAND ${CMAKE_MAKE_PROGRAM}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/target/bcd2bin/small_k4_N2_8x8)
+
+add_test(NAME small-target-longsegment
+    COMMAND ${CMAKE_MAKE_PROGRAM}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/target/bcd2bin/small_k4_N2_8x8_L2)
+
+add_test(NAME small-target-fakeprog
+    COMMAND ${CMAKE_MAKE_PROGRAM}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/target/bcd2bin/small_k4_N2_8x8_fakeprog)
+
+add_test(NAME small-target-hier
+    COMMAND ${CMAKE_MAKE_PROGRAM}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/target/bcd2bin/small_k4_N2_8x8_hier)

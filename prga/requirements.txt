@@ -1,7 +1,0 @@
-enum34==1.1.6
-Jinja2==2.10
-lxml==4.2.5
-mmh3==2.5.1
-networkx==2.1
-protobuf==3.5.1
-xmltodict==0.11.0

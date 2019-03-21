@@ -1,6 +1,7 @@
-Module: prga.exception
-======================
+prga.exception module
+=====================
 
 .. automodule:: prga.exception
-   :members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:

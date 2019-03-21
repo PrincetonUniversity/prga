@@ -1,0 +1,41 @@
+{%- if verilog_includes or verilog_defines %}
+setup:
+    {%- for inc in verilog_includes %}
+    verilog_defaults -I{{ inc }}
+    {%- endfor %}
+    {%- for macro in verilog_defines %}
+    verilog_defaults -D{{ macro }}
+    {%- endfor %}
+
+{% endif -%}
+read_sources:
+    {%- for source in verilog_sources %}
+    read_verilog {{ source }}
+    {%- endfor %}
+{% if verilog_parameters %}
+parameter:
+    {%- for k, v in verilog_parameters.iteritems() %}
+    chparam -set {{ k }} {{ v }}
+    {%- endfor %}
+{% endif %}
+begin:
+    hierarchy -check -top {{ verilog_top }}
+
+coarse:
+    proc;; flatten;; opt_expr;; opt_clean;; check
+    wreduce;; alumacc;; share;; opt
+    fsm;; opt -fast;; memory -nomap;; opt_clean
+
+fine:
+    opt -fast -full
+    memory_map
+    opt -full
+    techmap
+    opt -fast
+    abc -lut {{ max_lut_size }}
+    opt -fast
+
+check:
+    hierarchy -check
+    stat
+    check

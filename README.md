@@ -21,6 +21,8 @@ PRGA depends on the following libraries, tools, and Python modules:
   [enum34](https://pypi.org/project/enum34/),
   [xmltodict](https://github.com/martinblech/xmltodict),
   [hdlparse](https://kevinpt.github.io/hdlparse/)
+  [future](https://pypi.org/project/future/)
+  [pytest](https://pytest.org)
 - **Optional**: [Sphinx](http://www.sphinx-doc.org/en/master/examples.html) for building the
   docs
 

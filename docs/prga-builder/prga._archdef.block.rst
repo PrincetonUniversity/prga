@@ -6,10 +6,9 @@ Submodules
 
 .. toctree::
 
-   prga._archdef.block.abstractblock
-   prga._archdef.block.ioblock
-   prga._archdef.block.logicblock
+   prga._archdef.block.block
    prga._archdef.block.port
+   prga._archdef.block.slice
 
 Module contents
 ---------------

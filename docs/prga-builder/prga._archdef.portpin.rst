@@ -6,9 +6,11 @@ Submodules
 
 .. toctree::
 
+   prga._archdef.portpin.bit
+   prga._archdef.portpin.bus
    prga._archdef.portpin.common
+   prga._archdef.portpin.pin
    prga._archdef.portpin.port
-   prga._archdef.portpin.reference
 
 Module contents
 ---------------

@@ -15,6 +15,8 @@ PRGA is dependent on the following third-party tools:
 
 * `CMake <https://cmake.org/>`_ >= 3.5
 * `Google Proto Buffer <https://developers.google.com/protocol-buffers/>`_
+  * Use Protobuf 3.7 if Python 3 is used
+  * Use Protobuf 2.5 if Python 2 is used
 * `Verilog-to-Routing <https://verilogtorouting.org/>`_
 * `Yosys <http://www.clifford.at/yosys/>`_
 * `Icarus Verilog <http://iverilog.icarus.com/>`_
@@ -22,7 +24,7 @@ PRGA is dependent on the following third-party tools:
 Python
 ^^^^^^
 
-PRGA works with Python 2.7.x. Required Python modules are:
+PRGA works with Python 2.7.x and Python 3.7.x. Required Python modules are:
 
 * `networkx <https://networkx.github.io/>`_
 * `jinja2 <http://jinja.pocoo.org/docs/2.10/>`_
@@ -66,26 +68,15 @@ following commands to build PRGA:
 Examples
 --------
 
-Examples are provided in the ``examples/`` directory. Each example is a
-complete use case of PRGA, including building a custom FPGA, running
-Verilog-to-bitstream flow for a target design, then verifying the implemented
-target design by simulating the RTL of the FPGA with the generated bitstream.
-Each example is organized in the following hierarchy:
-
-* ``build.py``: the Python script for building the FPGA
-* ``{example}.v``: the target design
-* ``{example}_host.v``: the test host for the target design
-* ``io.pads``: the IO binding file
-* ``build/``:
-    * ``Makefile``: the Make script
-
-Follow the commands below to run an example:
+Examples are provided in the ``examples/`` directory. FPGA building examples are
+provided in the ``fpga/`` directory, and FPGA using examples are provided in the
+``target/`` directory. Follow the commands below to run an example:
 
 .. code-block:: bash
     
     cd /path/to/prga                        # cd to the root folder of PRGA
     source envscr/general.settings.sh       # set up environment
-    cd examples/small/build                 # cd to one of the example directories
+    cd examples/bcd2bin/k4_N2_8x8           # cd to one of the using example directories
     make                                    # this will run all the way to post-implementation simulation
 
 PRGA Builder
@@ -105,11 +96,9 @@ a single ``ArchitectureContext`` object is enough. However, using multiple
 
 .. code-block:: python
     
-    from prga.context import *
+    from prga import *
 
-    width = 12
-    height = 12
-    ctx = ArchitectureContext(width = width, height = height)
+    ctx = ArchitectureContext()
 
 After creating the ``ArchitectureContext``, we can start to describe our desired
 FPGA. The first step is to describe the routing resources in the desired FPGA.
@@ -118,7 +107,7 @@ Use ``ctx.create_segment`` to create routing wire segments. Use
 
 .. code-block:: python
     
-    ctx.create_segment(name = 'L1', width = 10, length = 1)
+    ctx.create_segment(name = 'L1', width = 8, length = 1)
     ctx.create_segment(name = 'L2', width = 2, length = 2)
 
     ctx.create_global(name = 'clk', is_clock = True)
@@ -141,42 +130,43 @@ are on.
 .. code-block:: python
 
     # Add ports to this CLB
-    clb.add_input (name = 'I',   width = 2, side = Side.left)
-    clb.add_output(name = 'O',   width = 1, side = Side.right)
+    clb.add_input (name = 'I',   width = 8, side = Side.left)
+    clb.add_output(name = 'O',   width = 2, side = Side.right)
     clb.add_clock (name = 'CLK',            side = Side.bottom, global_ = 'clk')
 
-    # Add logic elements (primitives) to this CLB
-    clb.add_instance(name = 'LUT', model = 'lut2')
-    clb.add_instance(name = 'FF',  model = 'flipflop')
+    for i in range(2):
+        # Add logic elements (primitives) to this CLB
+        clb.add_instance(name = 'LUT'+str(i), model = ctx.primitives['lut4'])
+        clb.add_instance(name = 'FF'+str(i),  model = ctx.primitives['flipflop'])
 
-    # Add configurable intra-block connections to this CLB
-    clb.add_connections(
-            sources = clb.instances['LUT'].pins['out'],
-            sinks = clb.instances['FF'].pins['D'],
-            pack_pattern = True)
-    clb.add_connections(
-            sources = clb.instances['LUT'].pins['out'],
-            sinks = clb.ports['O'])
-    clb.add_connections(
-            sources = clb.ports['CLK'],
-            sinks = clb.instances['FF'].pins['clk'])
-    clb.add_connections(
-            sources = clb.instances['FF'].pins['Q'],
-            sinks = clb.ports['O'])
+        # Add configurable intra-block connections to this CLB
+        clb.add_connections(
+                sources = clb.instances['LUT'+str(i)].pins['out'],
+                sinks = clb.instances['FF'+str(i)].pins['D'],
+                pack_pattern = True)
+        clb.add_connections(
+                sources = clb.instances['LUT'+str(i)].pins['out'],
+                sinks = clb.ports['O'][i])
+        clb.add_connections(
+                sources = clb.ports['CLK'],
+                sinks = clb.instances['FF'+str(i)].pins['clk'])
+        clb.add_connections(
+                sources = clb.instances['FF'+str(i)].pins['Q'],
+                sinks = clb.ports['O'][i])
+
     clb.add_connections(
             sources = clb.ports['I'],
-            sinks = clb.instances['LUT'].pins['in'])
+            sinks = [clb.instances['LUT0'].pins['in'], clb.instances['LUT1'].pins['in']])
 
-Similar to creating CLBs, use ``ctx.create_io_block`` to create IOBs.
+Similar to creating CLBs, use ``ctx.create_io_block`` to create ``IOBlock``.
 Typically, four types of IOBs are needed on four sides of the top-level gate
 array.
 
 .. code-block:: python
-
+    
     # Create some IOBs
     for side in Side.all():
-        io = ctx.create_io_block(name = 'IO_{}'.format(side.name.upper()),
-                capacity = 1)
+        io = ctx.create_io_block(name = 'IO_{}'.format(side.name.upper()), capacity = 2)
 
         # Add ports to this IOB
         io.add_input (name = 'GPO', width = 1, side = side.opposite)
@@ -190,39 +180,48 @@ array.
                 sources = io.instances['extio'].pins['inpad'],
                 sinks = io.ports['GPI'])
 
-After creating the CLB/IOBs, use ``ctx.array.place_blocks`` to place the blocks
-into the array.
+After creating the CLB/IOBs, use ``ctx.create_array`` to create top-level or
+sub-arrays. The method returns an ``Array`` object. Use ``Array.add_block``
+to place blocks or sub-arrays into an array. Be careful when the same sub-array
+is placed into different locations in an array: either make the sub-array
+**NOT** including the routing channels around it (which is the default
+behavior), or make sure all blocks/sub-arrays adjacent to each instance of the
+same sub-array are exactly the same.
 
 .. code-block:: python
-    
-    # Create FPGA layout by placing blocks
-    ctx.array.place_blocks(block = 'CLB', x = 1, endx = width - 1, y = 1, endy = height - 1)
-    ctx.array.place_blocks(block = 'IO_LEFT', x = 0, y = 1, endy = height - 1)
-    ctx.array.place_blocks(block = 'IO_RIGHT', x = width - 1, y = 1, endy = height - 1)
-    ctx.array.place_blocks(block = 'IO_BOTTOM', x = 1, endx = width - 1, y = 0)
-    ctx.array.place_blocks(block = 'IO_TOP', x = 1, y = height - 1, endx = width - 1)
 
-After creating the layout, use ``{global wire}.bind`` to bind the global wire to
+    mt_width, mt_height = 3, 3      # macro-tile width and height
+    mt_count_x, mt_count_y = 2, 2   # number of macro-tiles
+
+    macro = ctx.create_array(name = "macrotile", width = mt_width, height = mt_height)
+    for x in range(mt_width):
+        for y in range(mt_height):
+            macro.add_block(clb, x, y)
+    
+    width, height = mt_width * mt_count_x + 2, mt_height * mt_count_y + 2
+    top = ctx.create_array(name = 'top', width = width, height = height, replace_top = True)
+    for y in range(1, height - 1):
+        top.add_block(block = ctx.blocks["IO_LEFT"],   x = 0,         y = y)
+        top.add_block(block = ctx.blocks["IO_RIGHT"],  x = width - 1, y = y)
+    for x in range(1, width - 1):
+        top.add_block(block = ctx.blocks["IO_BOTTOM"], x = x,         y = 0)
+        top.add_block(block = ctx.blocks["IO_TOP"],    x = x,         y = height - 1)
+    for x in range(1, width - 2, mt_width):
+        for y in range(1, height - 2, mt_height):
+            top.add_block(block = macro,               x = x,         y = y)
+
+After creating the layout, use ``ctx.bind_global`` to bind the global wire to
 a specific IOB.
 
 .. code-block:: python
 
     # Bind global wire to a specific IOB
-    ctx.globals['clk'].bind(x = 0, y = 1, subblock = 0)
+    ctx.bind_global('clk', (0, 1))
 
-Use ``ctx.array.populate_routing_channels`` to populate all the routing channels
-using the routing resources described above. Then use
-``ctx.array.populate_routing_switches`` to create switches in all the connection
-blocks and switch blocks.
-
-.. code-block:: python
-    
-    # Automatically populate the routing channels using the segments defined above
-    ctx.array.populate_routing_channels()
-
-    # Automatically populates connections blocks and switch blocks
-    #   FC value describes the connectivity between block ports and wire segments
-    ctx.array.populate_routing_switches(default_fc = (0.25, 0.5))
+This concludes the description of an FPGA in a **logical** level. No routing
+channels, switches, or configuration circuitry are added to it yet. It's
+possible to add all these manually, but various automatic completion procedures
+are available as ``Pass`` es in the building flow. 
 
 Building Flow
 ^^^^^^^^^^^^^
@@ -243,52 +242,30 @@ The building flow is organized as ``Pass`` es. A ``Pass`` may modify
 ``ArchitectureContext``, add some annotations to ``ArchitectureContext``, or
 generate files based on the data stored in the ``ArchitectureContext``.
 
-The following ``Pass`` es are required to enable mapping target RTLs onto the
-custom FPGA:
-
-* ``ArchitectureFinalization``: automatically create configurable muxes,
-  validate CLB structures, etc.
-* ``VPRExtension``: forward computation of some VPR-related data
-* ``{C}ConfigGenerator``: automatically insert ``{C}``-type configuration
-  circuitry to the custom FPGA. Currently the only configuration circuitry type
-  supported is ``Bitchain``, which is simply a long chain of flipflops
-* ``VerilogGenerator``: automatically generate Verilog files for the custom FPGA
-* ``{T}TimingEngine``: ``{T}``-type timing engine. Currently the only available
-  timing engine is a random value generator
-* ``VPRArchdefGenerator``: automatically generate VPR's architecture description
-  XML
-* ``VPRRRGraphGenerator``: automatically generate VPR's routing resource graph
-  XML
-* ``{C}ConfigProtoSerializer``: dump ``{C}``-type configuration database
-
-Besides these ``Pass`` es, there are optional optimization ``Pass`` es such as
-``InsertOpenMuxForLutInputOptimization``,
-``DisableExtioDuringConfigOptimization``, etc.
-
 .. code-block:: python
 
-    import os
+    # Create a Flow that operates on the architecture context
+    flow = Flow(context = ctx)
 
-    # 1. ArchitectureFinalization: automatically creates configurable muxes,
-    #   validate CLB structures, etc.
-    flow.add_pass(ArchitectureFinalization())
+    # Add passes
+    #   There are no "required" passes, but dependences, conflicts, and/or ordering constraints may exist between
+    #   passes. The Flow reports missing dependences or conflicting passes, and orders the passes in a correct order
 
-    # 2. [optional] InsertOpenMuxForLutInputOptimization: add one additional
-    #   connection from logic zero (ground) to LUT inputs. This is useful when
-    #   some LUTs are used as smaller LUTs
+    # 1. RoutingResourceCompleter: automatically create and place routing blocks
+    flow.add_pass(RoutingResourceCompleter((0.25, 0.5)))
+
+    # 2. PhysicalCompleter: automatically create and place muxes
+    flow.add_pass(PhysicalCompleter())
+
+    # 3. [optional] InsertOpenMuxForLutInputOptimization: add one additional connection from logic zero (ground) to
+    #   LUT inputs. This is useful when some LUTs are used as smaller LUTs
     flow.add_pass(InsertOpenMuxForLutInputOptimization())
 
-    # 3. VPRExtension: Forward declaration of some VPR-related data
-    flow.add_pass(VPRExtension())
+    # 4. VPRIDGenerator: Forward declaration of some VPR-related data
+    flow.add_pass(VPRIDGenerator())
 
-    # 4. BitchainConfigGenerator: generate flip-flop style configuration
-    #   circuitry
-    flow.add_pass(BitchainConfigGenerator(width = 1))
-
-    # 5. [optional] DisableExtioDuringConfigOptimization: insert buffers before
-    #   chip-level outputs. These buffers are disabled while the FPGA is being
-    #   programmed
-    flow.add_pass(DisableExtioDuringConfigOptimization())
+    # 5. BitchainConfigInjector: generate flip-flop style configuration circuitry
+    flow.add_pass(BitchainConfigInjector())
 
     # 6. VerilogGenerator: generate Verilog for the FPGA
     flow.add_pass(VerilogGenerator())
@@ -296,27 +273,22 @@ Besides these ``Pass`` es, there are optional optimization ``Pass`` es such as
     # 7. launch the flow
     flow.run()
 
-    # For real FPGAs, users may want to stop here and start the ASIC flow. In
-    # this case, the ArchitectureContext can be serialized and dumped onto disk
-    # using Python's pickle module. After ASIC flow, the pickled file can be
-    # unpickled, and the building flow can be resumed by creating a new Flow.
-    #
-    #   ctx.pickle(f = open("arch.pickled", 'w'))
-    #   ctx = ArchitectureContext.unpickle(f = open("archdef.pickled"))
+    # For real FPGAs, users may want to stop here and start the ASIC flow. In this case, the ArchitectureContext can
+    # be serialized and dumped onto disk using Python's pickle module, then deserialized and resumed 
 
-    # 8. RandomTimingEngine: generate random fake timing values for the FPGA
-    flow.add_pass(RandomTimingEngine(max = (100e-12, 250e-12)))
+    # 9. VPRXMLGenerator: generates VPR input files
+    flow.add_pass(VPRXMLGenerator())
 
-    # 9. VPRArchdefGenerator, VPRRRGraphGenerator: generates VPR input files
-    flow.add_pass(VPRArchdefGenerator())
-    flow.add_pass(VPRRRGraphGenerator(switches = [100e-12, 150e-12, 200e-12]))
-
-    # 10. BitchainConfigProtoSerializer: generate a database of the
-    #   configuration circuitry that will be used by the bitgen
+    # 10. BitchainConfigProtoSerializer: generate a database of the configuration circuitry that will be used by the
+    #   bitgen
     flow.add_pass(BitchainConfigProtoSerializer())
 
     # 11. launch the flow
     flow.run()
+
+The ``ArchitectureContext`` can be serialized and stored by calling
+``ctx.pickle``, and deserialized later by calling
+``ArchitectureContext.unpickle()``.
 
 PRGA Tool Chain
 ---------------

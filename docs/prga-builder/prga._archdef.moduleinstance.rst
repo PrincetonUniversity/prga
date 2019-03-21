@@ -7,6 +7,7 @@ Submodules
 .. toctree::
 
    prga._archdef.moduleinstance.common
+   prga._archdef.moduleinstance.configurable
    prga._archdef.moduleinstance.instance
    prga._archdef.moduleinstance.module
 
