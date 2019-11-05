@@ -19,3 +19,8 @@ python:
   install:
     - method: setuptools
       path: prga.py
+
+# include submoduls for building the docs
+submodules:
+  include:
+    - prga.py
