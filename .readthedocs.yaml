@@ -16,6 +16,6 @@ formats: all
 # your docs
 python:
   version: 3.7
-    install:
-        - method: setuptools
-          path: prga.py
+  install:
+    - method: setuptools
+      path: prga.py
