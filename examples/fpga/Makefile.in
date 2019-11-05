@@ -1,0 +1,10 @@
+PICKLED_CTX := ctx.pickled
+
+.PHONY: all clean
+all: $(PICKLED_CTX)
+
+clean:
+	rm -rf $(PICKLED_CTX) rtl syn vpr
+
+$(PICKLED_CTX): build.py
+	python $<

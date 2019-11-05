@@ -1,2 +1,9 @@
 docs/build
 docs/.eggs
+
+examples/fpga/*/*/*
+!examples/fpga/*/*/build.py
+!examples/fpga/*/*/Makefile
+examples/target/*/*/*
+!examples/target/*/*/io.partial
+!examples/target/*/*/Makefile
