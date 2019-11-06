@@ -39,6 +39,7 @@ To build an FPGA, run the following commands:
 .. code-block:: bash
 
     cd /path/to/prga/                           # cd to the root 
+    source envscr/settings.sh                   # set up the environment
     cd examples/fpga/tiny/k4_N2_8x8             # choose one FPGA building example
     make                                        # build the FPGA!
 
@@ -48,5 +49,6 @@ following commands:
 .. code-block:: bash
 
     cd /path/to/prga/                           # cd to the root 
+    source envscr/settings.sh                   # set up the environment
     cd examples/target/bcd2bin/tiny_k4_N2_8x8   # choose one design and one FPGA
     make                                        # run all the way to verification
