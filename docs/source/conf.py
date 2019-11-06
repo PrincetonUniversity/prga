@@ -9,11 +9,10 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
 
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../../prga.py'))
 
 # -- Project information -----------------------------------------------------
 
@@ -23,7 +22,6 @@ author = 'Ang Li'
 
 # The full version, including alpha/beta/rc tags
 release = 'Alpha 0.3'
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -56,10 +54,12 @@ html_theme = 'alabaster'
 
 html_theme_options = {
         'logo': 'images/logo.png',
+        'display_github': True,
         'github_user': 'PrincetonUniversity',
         'github_repo': 'prga',
+        'github_version': 'release',
         'fixed_sidebar': True,
-        'page_width': "75%",
+        'page_width': "80%",
         }
 
 # Add any paths that contain custom static files (such as style sheets) here,
