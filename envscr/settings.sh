@@ -1,7 +1,7 @@
 function find_binary() {
     binary="$1"
     shift
-    $binary -h 2>&1 >/dev/null
+    /usr/bin/env $binary -h 2>&1 >/dev/null
     if [ "$?" != 0 ]; then
         echo "[Error] Binary not found: $binary"
         echo $@

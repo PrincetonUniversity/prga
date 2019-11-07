@@ -10,9 +10,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-import os
-import sys
-sys.path.insert(0, os.path.abspath('../../prga.py'))
+# import os
+# import sys
+# sys.path.insert(0, os.path.abspath('../../prga.py'))
 
 # -- Project information -----------------------------------------------------
 
@@ -50,16 +50,20 @@ master_doc = "index"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
-
+html_theme = 'sphinx_materialdesign_theme'
+html_logo = '_static/images/logo.png'
 html_theme_options = {
-        'logo': 'images/logo.png',
-        'display_github': True,
-        'github_user': 'PrincetonUniversity',
-        'github_repo': 'prga',
-        'github_version': 'release',
-        'fixed_sidebar': True,
-        'page_width': "80%",
+        'header_links' : [
+            ('Home', 'index', False, 'home'),
+            ('Github', "https://github.com/PrincetonUniversity/prga", True, 'link'),
+            ], 
+        'fixed_drawer': True,
+        'fixed_header': True,
+        'header_waterfall': True,
+        'header_scroll': False,
+        'show_header_title': False,
+        'show_drawer_title': True,
+        'show_footer': True,
         }
 
 # Add any paths that contain custom static files (such as style sheets) here,
