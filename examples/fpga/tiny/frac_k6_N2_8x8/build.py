@@ -15,20 +15,11 @@ def run():
     # 2. create IOB
     iob = context.create_io_block('iob')
     while True:
-        clkport = iob.create_global(clk)
         outpad = iob.create_input('outpad', 1)
         inpad = iob.create_output('inpad', 1)
         ioinst = iob.instances['io']
-        iff = iob.instantiate(context.primitives['flipflop'], 'iff')
-        off = iob.instantiate(context.primitives['flipflop'], 'off')
-        iob.connect(clkport, iff.pins['clk'])
-        iob.connect(ioinst.pins['inpad'], iff.pins['D'])
-        iob.connect(iff.pins['Q'], inpad)
         iob.connect(ioinst.pins['inpad'], inpad)
-        iob.connect(clkport, off.pins['clk'])
-        iob.connect(off.pins['Q'], ioinst.pins['outpad'])
         iob.connect(outpad, ioinst.pins['outpad'])
-        iob.connect(outpad, off.pins['D'])
         break
 
     # 3. create tile
