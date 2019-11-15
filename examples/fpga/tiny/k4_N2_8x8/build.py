@@ -14,7 +14,7 @@ def run():
     context.create_segment('L1', 12, 1)
 
     # 2. create IOB
-    iob = context.create_io_block('iob')
+    iob = context.create_io_block('iob', 4)
     while True:
         outpad = iob.create_input('outpad', 1)
         inpad = iob.create_output('inpad', 1)
@@ -29,7 +29,7 @@ def run():
         if orientation.is_auto:
             continue
         iotiles[orientation] = context.create_tile(
-                'io_tile_{}'.format(orientation.name), iob, 4, orientation)
+                'io_tile_{}'.format(orientation.name), iob, orientation)
 
     # 4. create cluster
     cluster = context.create_cluster('cluster')

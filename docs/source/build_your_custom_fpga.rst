@@ -53,8 +53,8 @@ hierarchical description of CLB/IOB structures. Use
 
 .. code-block:: python
     
-    # create IOB
-    iob = context.create_io_block('iob')
+    # create IOB:                 block name, capacity (#blocks per tile)
+    iob = context.create_io_block('iob',      8)
 
     # create ports of the IOB
     clkport = iob.create_global(clk)
@@ -93,7 +93,6 @@ of tile encapsulates an IOB/CLB and the connection boxes around it.
         iotiles[orientation] = context.create_tile(
                 'io_tile_{}'.format(orientation.name),  # name of the tile
                 iob,            # IOB/CLB in the tile
-                8,              # number of IOBs in the tile
                 orientation)    # on which side of the FPGA the tile can be placed
 
 `Orientation` is an enum with 5 values: `Orientation.north`, `Orientation.east`,

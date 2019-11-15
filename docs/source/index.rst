@@ -10,6 +10,9 @@ Princeton Reconfigurable Gate Array (PRGA) is a customizable, scalable,
 versatile, extensible open-source framework for building and using custom
 FPGAs.
 
+Visit PRGA's github repo: `github.com/PrincetonUniversity/prga
+<https://github.com/PrincetonUniversity/prga>`_
+
 Features
 --------
 * Highly customizable FPGA structures: bring your own IP cores, design your
