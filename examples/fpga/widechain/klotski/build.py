@@ -1,4 +1,5 @@
 # -*- encoding: ascii -*-
+from prga.compatible import *
 
 from prga.api.context import *
 from prga.api.flow import *
@@ -6,116 +7,82 @@ from prga.api.config import *
 
 from itertools import chain, product
 
-class MyHelper(WidechainInjectionHelper):
+class MyGuide(ConfigWidechainInjectionGuide):
 
     def __init__(self, M, N, m, n):
-        # array = 2M x (2N + 1) regions
-        # region = m x (2n + 1) tiles
+        # array = M x N regions
+        # region = m x n tiles
         self.M = M
         self.N = N
         self.m = m
         self.n = n
 
-    def inject_fifo(self, module):
-        return module.name.startswith("region")
-
-    def inject_chain(self, module):
-        return module.module_class.is_tile or module.module_class.is_array
-
-    def __iterate_row(self, module, y, inc_dir):
-        if inc_dir:
-            for x in range(module.width):
-                tile = module.element_instances.get((x, y))
-                if tile is not None:
-                    yield tile
-                sbox = module.sbox_instances.get((x, y - 1))
-                if sbox is not None:
-                    yield sbox
-        else:
-            for x in reversed(range(module.width)):
-                sbox = module.sbox_instances.get((x, y - 1))
-                if sbox is not None:
-                    yield sbox
-                tile = module.element_instances.get((x, y))
-                if tile is not None:
-                    yield tile
-
-    def iterate_instances(self, module):
-        if module.name in ("region_A", "region_B"):
-            # Region A/B: m x (2n + 1)
-            #           channel coverage: east, west, south
-            #           config chain: northeast in, southeast out
-            for y in reversed(range(module.height)):
-                for x in reversed(range(module.width)):
-                    tile = module.element_instances.get((x, y))
-                    if tile is not None:
-                        yield tile
-                for x in range(-1, module.width):
-                    sbox = module.sbox_instances.get((x, y - 1))
-                    if sbox is not None:
-                        yield tile
-        elif module.name in ("region_C1", "region_D1"):
-            # Region C1/D1: m x (2n + 1)
-            #           channel coverage: east, south
-            #           config chain: southwest in, northeast out
+    def __iterate_region_column(self, module, x, sbox = False):
+        if sbox:
             for y in range(module.height):
-                for m in self.__iterate_row(module, y, y % 2 == 0):
-                    yield m
-        elif module.name in ("region_C2", "region_D2"):
-            # Region C2/D2: m x (2n + 1)
-            #           channel coverage: east, south
-            #           config chain: northwest in, southeast out
-            for y in reversed(range(module.height)):
-                for m in self.__iterate_row(module, y, y % 2 == 0):
-                    yield m
-        elif module.name == "region_C3":
-            # Region C3: m x (2n + 1)
-            #           channel coverage: east, south
-            #           config chain: southeast in, northwest out
-            for y in range(module.height):
-                for m in self.__iterate_row(module, y, y % 2 == 1):
-                    yield m
-        elif module.name == "region_C4":
-            # Region C4: m x (2n + 1)
-            #           channel coverage: east, south
-            #           config chain: northeast in, southwest out
-            for y in reversed(range(module.height)):
-                for m in self.__iterate_row(module, y, y % 2 == 1):
-                    yield m
-        elif module.name == "top":
-            M, N, m, n = self.M, self.N, self.m, self.n
-            region_width, region_height = m, 2 * n + 1
-            # 1. region A
-            yield module.element_instances[1, 2 * N * region_height + 1]
-            # 2. region B
-            for y in reversed(range(2 * N)):
-                yield module.element_instances[1, y * region_height + 1]
-            # 3. region C1, C2, C3, C4
-            for y in range(N):
-                for x in range(1, 2 * M):
-                    yield module.element_instances[x * m + 1, 2 * y * region_height + 1]
-                for x in range(2 * M - 1, 0, -1):
-                    yield module.element_instances[x * m + 1, (2 * y + 1) * region_height + 1]
-            # 4. region D1, D2
-            for x in range(1, 2 * M):
-                yield module.element_instances[x * m + 1, 2 * N * region_height + 1]
+                sbox = module.sbox_instances.get( (x, y - 1) )
+                if sbox is not None:
+                    yield None, sbox
         else:
-            return None
+            for y in reversed(range(module.height)):
+                tile = module.element_instances.get( (x, y) )
+                if tile is not None:
+                    yield None, tile
+                if x > 0 or not module.channel_coverage.west:
+                    continue
+                sbox = module.sbox_instances.get( (-1, y - 1) )
+                if sbox is not None:
+                    yield None, sbox
+
+    def __iterate_top(self, module):
+        for X, x in product(range(self.M), range(self.m)):
+            for Y in reversed(range(self.N)):
+                pos = (1 + X * self.m, 1 + Y * self.n)
+                instance = module.element_instances.get( pos )
+                if instance is not None:
+                    yield 2 * x, instance
+            for Y in range(self.N):
+                pos = (1 + X * self.m, 1 + Y * self.n)
+                instance = module.element_instances.get( pos )
+                if instance is not None:
+                    yield 2 * x + 1, instance
+
+    def chain_groups(self, module):
+        if module.module_class.is_array:
+            if module.name.startswith("region"):
+                for x in range(module.width):
+                    yield 2 * x, self.__iterate_region_column(module, x)
+                    yield 2 * x + 1, self.__iterate_region_column(module, x, True)
+            else:
+                assert module.name == "top"
+                yield None, self.__iterate_top(module)
+        else:
+            yield None, iter( (None, instance) for instance in itervalues(module.logical_instances))
+
+    def injection_level(self, module):
+        if module.module_class.is_array:
+            if module.name.startswith("region"):
+                return 1
+            else:
+                assert module.name == "top"
+                return 2
+        else:
+            return 0
 
 def run():
-    M, N, m, n = 2, 2, 6, 3
-    region_width, region_height = m, 2 * n + 1
-    width, height = 2 * M * region_width + 2, (2 * N + 1) * region_height + 1
-    context = ArchitectureContext('top', width, height, WidechainConfigCircuitryDelegate)
+    M, N, m, n = 3, 3, 2, 2
+    region_width, region_height = m, n
+    width, height = M * m + 2, N * n + 1
+    context = ArchitectureContext('top', width, height, WidechainConfigCircuitryDelegate, config_width = 4)
 
     # 1. routing stuff
     clk = context.create_global('clk', is_clock = True, bind_to_position = (1, height - 1))
-    context.create_segment('L1', 48, 1)
+    context.create_segment('L1', 16, 1)
     # context.create_segment('L2', 16, 2)
     # context.create_segment('L4', 8, 4)
 
     # 2. create IOB
-    iob = context.create_io_block('iob', 8)
+    iob = context.create_io_block('iob', 4)
     while True:
         outpad = iob.create_input('outpad', 1)
         inpad = iob.create_output('inpad', 1)
@@ -159,55 +126,86 @@ def run():
     clbtile = context.create_tile('clb_tile', clb)
 
     # 7. regions
-    coverage_AB = ChannelCoverage(south = True, east = True, west = True)
-    coverage_CD = ChannelCoverage(south = True, west = True)
-    region_A = context.create_array("region_A", region_width, region_height, coverage_AB)
-    region_B = context.create_array("region_B", region_width, region_height, coverage_AB)
-    region_C1 = context.create_array("region_C1", region_width, region_height, coverage_CD)
-    region_C2 = context.create_array("region_C2", region_width, region_height, coverage_CD)
-    region_C3 = context.create_array("region_C3", region_width, region_height, coverage_CD)
-    region_C4 = context.create_array("region_C4", region_width, region_height, coverage_CD)
-    region_D1 = context.create_array("region_D1", region_width, region_height, coverage_CD)
-    region_D2 = context.create_array("region_D2", region_width, region_height, coverage_CD)
+    coverage_wes = ChannelCoverage(south = True, east = True, west = True)
+    coverage_es = ChannelCoverage(south = True, east = True)
+    regions = {
+            "A": context.create_array("region_A", region_width, region_height, coverage_wes, coverage_wes),
+            "B": context.create_array("region_B", region_width, region_height, coverage_wes),
+            "C": context.create_array("region_C", region_width, region_height, coverage_wes),
+            "D": context.create_array("region_D", region_width, region_height, coverage_es, coverage_wes),
+            "E": context.create_array("region_E", region_width, region_height, coverage_es),
+            "F": context.create_array("region_F", region_width, region_height, coverage_es),
+            "G": context.create_array("region_G", region_width, region_height, coverage_es, coverage_wes),
+            "H": context.create_array("region_H", region_width, region_height, coverage_es),
+            "I": context.create_array("region_I", region_width, region_height, coverage_es),
+            }
 
-    # 7.1 region A, D:
-    for x in range(region_width):
-        region_A.instantiate_element(iotile, (x, region_height - 1))
-        region_D1.instantiate_element(iotile, (x, region_height - 1))
-        region_D2.instantiate_element(iotile, (x, region_height - 1))
-    for pos in product(range(region_width), range(region_height - 1)):
-        region_A.instantiate_element(clbtile, pos)
-        region_D1.instantiate_element(clbtile, pos)
-        region_D2.instantiate_element(clbtile, pos)
+    # 7.1 region A, D, F:
+    for r in ("A", "D", "G"):
+        for x in range(region_width):
+            regions[r].instantiate_element(iotile, (x, region_height - 1))
+        for pos in product(range(region_width), range(region_height - 1)):
+            regions[r].instantiate_element(clbtile, pos)
 
-    # 7.2 region B, C:
-    for pos in product(range(region_width), range(region_height)):
-        region_B.instantiate_element(clbtile, pos)
-        region_C1.instantiate_element(clbtile, pos)
-        region_C2.instantiate_element(clbtile, pos)
-        region_C3.instantiate_element(clbtile, pos)
-        region_C4.instantiate_element(clbtile, pos)
+    # 7.2 other regions:
+    for r in ("B", "C", "E", "F", "H", "I"):
+        for pos in product(range(region_width), range(region_height)):
+            regions[r].instantiate_element(clbtile, pos)
 
     # 8. fill top-level array
-    context.top.instantiate_element(region_A, (1, 2 * N * region_height + 1))
-    for y in range(2 * N):
-        context.top.instantiate_element(region_B, (1, y * region_height + 1))
-    for x, y in product(range(1, 2 * M), range(2 * N)):
-        if y % 2 == 0:
-            if x % 2 == 1:
-                context.top.instantiate_element(region_C1, (x * region_width + 1, y * region_height + 1))
+    for x, y in product(range(M), range(N)):
+        if x == 0:
+            if y == 0:
+                context.top.instantiate_element(regions["C"], (x * m + 1, y * n + 1))
+            elif y == N - 1:
+                context.top.instantiate_element(regions["A"], (x * m + 1, y * n + 1))
             else:
-                context.top.instantiate_element(region_C2, (x * region_width + 1, y * region_height + 1))
-        else:
-            if x % 2 == 0:
-                context.top.instantiate_element(region_C3, (x * region_width + 1, y * region_height + 1))
+                context.top.instantiate_element(regions["B"], (x * m + 1, y * n + 1))
+        elif x == M - 1:
+            if y == 0:
+                context.top.instantiate_element(regions["I"], (x * m + 1, y * n + 1))
+            elif y == N - 1:
+                context.top.instantiate_element(regions["G"], (x * m + 1, y * n + 1))
             else:
-                context.top.instantiate_element(region_C4, (x * region_width + 1, y * region_height + 1))
-    for x in range(1, 2 * M):
-        if x % 2 == 1:
-            context.top.instantiate_element(region_D1, (x * region_width + 1, 2 * N * region_height + 1))
+                context.top.instantiate_element(regions["H"], (x * m + 1, y * n + 1))
         else:
-            context.top.instantiate_element(region_D2, (x * region_width + 1, 2 * N * region_height + 1))
+            if y == 0:
+                context.top.instantiate_element(regions["F"], (x * m + 1, y * n + 1))
+            elif y == N - 1:
+                context.top.instantiate_element(regions["D"], (x * m + 1, y * n + 1))
+            else:
+                context.top.instantiate_element(regions["E"], (x * m + 1, y * n + 1))
+    # context.top.instantiate_element(regions["A"], (1, (2 * N - 1) * region_height + 1))
+    # for y in range(1, 2 * N - 1):
+    #     context.top.instantiate_element(regions["B"], (1, y * region_height + 1))
+    # context.top.instantiate_element(regions["C"], (1, 1))
+    # for x in range(1, 2 * M - 1):
+    #     if x % 2 == 1:
+    #         context.top.instantiate_element(regions["D"], (x * region_width + 1, 1))
+    #     else:
+    #         context.top.instantiate_element(regions["E"], (x * region_width + 1, 1))
+    #     for y in range(1, 2 * N - 1):
+    #         if y % 2 == 1:
+    #             if x % 2 == 1:
+    #                 context.top.instantiate_element(regions["I"], (x * region_width + 1, y * region_height + 1))
+    #             else:
+    #                 context.top.instantiate_element(regions["H"], (x * region_width + 1, y * region_height + 1))
+    #         else:
+    #             if x % 2 == 1:
+    #                 context.top.instantiate_element(regions["J"], (x * region_width + 1, y * region_height + 1))
+    #             else:
+    #                 context.top.instantiate_element(regions["K"], (x * region_width + 1, y * region_height + 1))
+    #     if x % 2 == 1:
+    #         context.top.instantiate_element(regions["O"], (x * region_width + 1, (2 * N - 1) * region_height + 1))
+    #     else:
+    #         context.top.instantiate_element(regions["N"], (x * region_width + 1, (2 * N - 1) * region_height + 1))
+    # context.top.instantiate_element(regions["F"], ((2 * M - 1) * region_width + 1, 1))
+    # for y in range(1, 2 * N - 1):
+    #     if y % 2 == 1:
+    #         context.top.instantiate_element(regions["G"], ((2 * M - 1) * region_width + 1, y * region_height + 1))
+    #     else:
+    #         context.top.instantiate_element(regions["L"], ((2 * M - 1) * region_width + 1, y * region_height + 1))
+    # context.top.instantiate_element(regions["M"], ((2 * M - 1) * region_width + 1, (2 * N - 1) * region_height + 1))
 
     # 12. flow
     flow = Flow((
@@ -216,7 +214,7 @@ def run():
         CompleteConnection(),
         GenerateVerilog('rtl'),
         # InjectBitchainConfigCircuitry(),
-        InjectWidechainConfigCircuitry(MyHelper(M, N, m, n)),
+        InjectWidechainConfigCircuitry(MyGuide(M, N, m, n)),
         # GenerateVPRXML('vpr'),
         CompletePhysical(),
         # ZeroingBRAMWriteEnable(),
