@@ -135,7 +135,7 @@ cd ../..
 # build a virtualenv for prga.py
 info "Creating a virtual environment for prga.py"
 cd prga.py
-PIPENV_VENV_IN_PROJECT=1 pipenv install -e . || exit 1
+PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e . || exit 1
 cd ..
 info "Virtual environment created for prga.py"
 
