@@ -1,6 +1,10 @@
 docs/build
 docs/.eggs
 
+.python-version
+local
+pyenv
+
 examples/fpga/*/*/*
 !examples/fpga/*/*/build.py
 !examples/fpga/*/*/Makefile
