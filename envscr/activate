@@ -1,0 +1,46 @@
+function err() {
+    >&2 echo -e "\033[0;31m[ERROR]\033[0m" $@
+    exit 1
+}
+
+function info() {
+    echo -e "\033[0;34m[INFO]\033[0m" $@
+}
+
+if [ ! -z "${VIRTUAL_ENV}" ]; then
+    err "Already in a Python virtualenv"
+fi
+
+CWD=${PWD}
+OLD_PATH=$PATH
+cd "$( dirname "${BASH_SOURCE[0]}" )"/..    # move to PRGA_ROOT
+
+# choose the correct binaries
+info "Setting \$PATH"
+export PATH=${PWD}/local/bin:$PATH
+
+# activate pyenv
+if command -v pyenv 2>&1 >/dev/null; then
+    info "Active 'pyenv' found. Skipping installation/activation of 'pyenv'"
+else
+    info "Activating 'pyenv'"
+    export PYENV_ROOT=${PWD}/pyenv
+    export PATH=${PYENV_ROOT}/bin:$PATH
+    eval "$( pyenv init - )"
+    info "'pyenv' activated"
+fi
+
+# activate virtual env
+cd prga.py
+info "Entering virtual environment ..."
+PIPENV_VENV_IN_PROJECT=1 pipenv shell cd ${CWD}
+info "Leaving virtual environment ..."
+
+# roll back to the old state
+info "Reverting \$PATH"
+export PATH=$OLD_PATH
+cd $CWD
+
+info "Thanks for using PRGA. We look forward to your next use :)"
+
+# vim: set ft=sh:
