@@ -1,0 +1,12 @@
+diff --git a/utils/fasm/src/fasm.cpp b/utils/fasm/src/fasm.cpp
+index ee7c7cd..ca81beb 100644
+--- a/utils/fasm/src/fasm.cpp
++++ b/utils/fasm/src/fasm.cpp
+@@ -603,6 +603,7 @@ void FasmWriterVisitor::walk_routing() {
+ 
+     for(const auto &trace : route_ctx.trace) {
+       t_trace *head = trace.head;
++      if (!head) continue;
+       t_rt_node* root = traceback_to_route_tree(head);
+       walk_route_tree(root);
+       free_route_tree(root);

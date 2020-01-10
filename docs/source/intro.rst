@@ -13,19 +13,23 @@ Tools
 
 PRGA is dependent on the following third-party tools:
 
-* `Verilog-to-Routing <https://verilogtorouting.org/>`_
-* `Yosys <http://www.clifford.at/yosys/>`_
 * `Icarus Verilog <http://iverilog.icarus.com/>`_ or `Synopsys VCS
   <https://www.synopsys.com/verification/simulation/vcs.html>`_
 
-Python
-^^^^^^
+Installation
+------------
 
-PRGA works with Python 2.7.x and Python 3.7.x. However, Python 2.x will reach
-its end of life on `January 1st, 2020
-<https://www.python.org/doc/sunset-python-2/>`_ , so we recommend using Python
-3.7.x if possible.
+PRGA includes `Yosys <http://www.clifford.at/yosys/>`_ and `VTR
+<http://www.clifford.at/yosys/>`_ as submodules, 
+uses `pyenv <https://github.com/pyenv/pyenv>`_ and `pipenv
+<https://github.com/pypa/pipenv>`_ to manage Python interpretter and
+dependecies, and simplifies the installation with one single bash script that
+does not require root access:
 
+.. code-block:: bash
+
+    cd /path/to/prga/
+    ./envscr/install
 
 Examples
 --------
@@ -39,7 +43,7 @@ To build an FPGA, run the following commands:
 .. code-block:: bash
 
     cd /path/to/prga/                           # cd to the root 
-    source envscr/settings.sh                   # set up the environment
+    ./envscr/activate                           # activate the virtual environment
     cd examples/fpga/tiny/k4_N2_8x8             # choose one FPGA building example
     make                                        # build the FPGA!
 
@@ -49,6 +53,6 @@ following commands:
 .. code-block:: bash
 
     cd /path/to/prga/                           # cd to the root 
-    source envscr/settings.sh                   # set up the environment
+    ./envscr/activate                           # activate the virtual environment
     cd examples/target/bcd2bin/tiny_k4_N2_8x8   # choose one design and one FPGA
     make                                        # run all the way to verification
