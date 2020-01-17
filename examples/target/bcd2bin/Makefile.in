@@ -14,7 +14,7 @@ clean:
 	rm -rf $(SIM_MAKEFILE) $(TARGET)_host_wrapper.v synth.ys io.pads
 
 $(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../$(TARGET).v
-	python -m prga_tools.bitchain.simproj \
+	python -m prga_tools.$(CONFIG).simproj \
 		--fix_io $(PARTIAL_IOBINDING) \
 		-t ../$(TARGET)_host.v \
 		-m ../$(TARGET).v \
