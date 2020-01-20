@@ -32,6 +32,7 @@ Contents
    build_your_custom_fpga
    dev/arch
    prga.py/modules
+   faq
 
 
 Indices and tables
