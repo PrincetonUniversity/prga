@@ -24,6 +24,5 @@ $(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../
 $(PICKLED_CONTEXT):
 	make -C $(FPGA_DIR)
 
-%:
-	if [ -f $(SIM_MAKEFILE) ]; then make -f $(SIM_MAKEFILE) $@; \
-		else echo "Simulation project not built yet. Run 'make project' first" && exit 1; fi
+%: project
+	make -f $(SIM_MAKEFILE) $@
