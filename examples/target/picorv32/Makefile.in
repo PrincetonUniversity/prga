@@ -1,3 +1,4 @@
+CONFIG ?= bitchain
 TARGET := picorv32
 PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pickled
 SIM_MAKEFILE := Makefile.sim
@@ -14,7 +15,7 @@ clean:
 	rm -rf $(SIM_MAKEFILE) $(TARGET)_host_wrapper.v synth.ys io.pads
 
 $(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../$(TARGET).v
-	python -m prga_tools.bitchain.simproj \
+	python -m prga_tools.$(CONFIG).simproj \
 		--fix_io $(PARTIAL_IOBINDING) \
 		-t ../$(TARGET)_host.v --testbench_top picorv32_wrapper \
 		--testbench_plus_args firmware=../firmware.hex max_cycle=10000000 quiet \
@@ -26,6 +27,5 @@ $(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../
 $(PICKLED_CONTEXT):
 	make -C $(FPGA_DIR)
 
-%:
-	if [ -f $(SIM_MAKEFILE) ]; then make -f $(SIM_MAKEFILE) $@; \
-		else echo "Simulation project not built yet. Run 'make project' first" && exit 1; fi
+%: project
+	make -f $(SIM_MAKEFILE) $@
