@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function err() {
     >&2 echo -e "\033[0;31m[ERROR]\033[0m" $@
     exit 1
@@ -12,23 +14,12 @@ if [ ! -z "${VIRTUAL_ENV}" ]; then
 fi
 
 CWD=${PWD}
-OLD_PATH=$PATH
 cd "$( dirname "${BASH_SOURCE[0]}" )"/..    # move to PRGA_ROOT
 
 # choose the correct binaries
+OLD_PATH=$PATH
 info "Setting \$PATH"
 export PATH=${PWD}/local/bin:$PATH
-
-# activate pyenv
-if command -v pyenv 2>&1 >/dev/null; then
-    info "Active 'pyenv' found. Skipping installation/activation of 'pyenv'"
-else
-    info "Activating 'pyenv'"
-    export PYENV_ROOT=${PWD}/pyenv
-    export PATH=${PYENV_ROOT}/bin:$PATH
-    eval "$( pyenv init - )"
-    info "'pyenv' activated"
-fi
 
 # activate virtual env
 cd prga.py
