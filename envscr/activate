@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function err() {
     >&2 echo -e "\033[0;31m[ERROR]\033[0m" $@
     exit 1

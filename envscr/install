@@ -3,7 +3,7 @@
 # Choose your desired compiler
 COMP=gcc
 MAKE_JOBCOUNT=8
-PYTHON_VERSION=3.7.2
+PYTHON_VERSION=3.8.1
 
 # Do not modify below this line
 CWD=${PWD}
@@ -83,7 +83,7 @@ fi
 
 # install the desired python if it's not installed already
 if [ -z "${PYTHON_VERSION}" ]; then
-    PYTHON_VERSION=3.7.2
+    PYTHON_VERSION=3.8.1
 fi
 info "Installing Python ${PYTHON_VERSION} with 'pyenv'"
 pyenv install -s ${PYTHON_VERSION} || exit 1
@@ -135,7 +135,9 @@ cd ../..
 # build a virtualenv for prga.py
 info "Creating a virtual environment for prga.py"
 cd prga.py
-PIPENV_VENV_IN_PROJECT=1 pipenv install -e . || exit 1
+rm -rf Pipfile*
+pipenv --rm 2>&1 >/dev/null || exit 1
+PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e . || exit 1
 cd ..
 info "Virtual environment created for prga.py"
 
