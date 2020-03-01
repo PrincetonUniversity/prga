@@ -2,6 +2,7 @@ TARGET := bcd2bin
 PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pickled
 SIM_MAKEFILE := Makefile.sim
 PARTIAL_IOBINDING := io.partial
+COMPILER ?= vcs
 
 .PHONY: all project
 all: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
@@ -16,6 +17,7 @@ clean:
 $(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../$(TARGET).v
 	python -m prga_tools.bitchain.simproj \
 		--fix_io $(PARTIAL_IOBINDING) \
+		-c $(COMPILER) \
 		-t ../$(TARGET)_host.v \
 		-m ../$(TARGET).v \
 		--makefile $@ \
