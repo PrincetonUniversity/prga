@@ -112,7 +112,6 @@ mkdir -p local
 # build VTR
 info "Building VTR"
 cd vtr
-${GIT} apply ../envscr/69a8e95.patch 2>&1 >/dev/null
 ${MAKE} -j${MAKE_JOBCOUNT} CMAKE=${CMAKE} || exit 1
 cd ..
 info "VTR built successfully"
