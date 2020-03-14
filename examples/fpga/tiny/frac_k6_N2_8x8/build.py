@@ -1,100 +1,93 @@
-# -*- encoding: ascii -*-
+from prga.compatible import *
+from prga.core.common import *
+from prga.passes.translation import *
+from prga.passes.vpr import *
+from prga.passes.rtl import *
+from prga.passes.yosys import *
+from prga.cfg.scanchain.lib import ScanchainSwitchDatabase, Scanchain
+from prga.netlist.module.util import ModuleUtils
+from prga.netlist.net.util import NetUtils
 
-from prga.api.context import *
-from prga.api.flow import *
-from prga.api.config import *
+from itertools import product
+from pympler.asizeof import asizeof as size
 
-def run():
-    context = ArchitectureContext('top', 8, 8, BitchainConfigCircuitryDelegate)
+ctx = Scanchain.new_context(1)
+gbl_clk = ctx.create_global("clk", is_clock = True)
+gbl_clk.bind((0, 1), 0)
+l1 = ctx.create_segment('L1', 16, 1)
+l2 = ctx.create_segment('L4', 16, 4)
 
-    # 1. routing stuff
-    clk = context.create_global('clk', is_clock = True, bind_to_position = (0, 1))
-    context.create_segment('L1', 12, 1)
-    context.create_segment('L2', 4, 2)
+builder = ctx.create_cluster("cluster")
+clk = builder.create_clock("clk")
+i = builder.create_input("i", 6)
+o = builder.create_output("o", 2)
+lut = builder.instantiate(ctx.primitives["fraclut6"], "lut")
+ff = builder.instantiate(ctx.primitives["flipflop"], "ff")
+builder.connect(clk, ff.pins['clk'])
+builder.connect(i, lut.pins['in'])
+builder.connect(lut.pins['o5'], o[1])
+builder.connect(lut.pins['o6'], o[0])
+builder.connect(lut.pins['o6'], ff.pins['D'], pack_patterns = ('lut6_dff', 'lut5A_dff'))
+builder.connect(ff.pins['Q'], o[0])
+cluster = builder.commit()
 
-    # 2. create IOB
-    iob = context.create_io_block('iob', 4)
-    while True:
-        outpad = iob.create_input('outpad', 1)
-        inpad = iob.create_output('inpad', 1)
-        ioinst = iob.instances['io']
-        iob.connect(ioinst.pins['inpad'], inpad)
-        iob.connect(outpad, ioinst.pins['outpad'])
-        break
+builder = ctx.create_io_block("iob", 2)
+o = builder.create_input("outpad", 1)
+i = builder.create_output("inpad", 1)
+builder.connect(builder.instances['io'].pins['inpad'], i)
+builder.connect(o, builder.instances['io'].pins['outpad'])
+iob = builder.commit()
 
-    # 3. create tile
-    iotiles = {}
-    for orientation in iter(Orientation):
-        if orientation.is_auto:
-            continue
-        iotiles[orientation] = context.create_tile(
-                'io_tile_{}'.format(orientation.name), iob, orientation)
+iotiles = {}
+for ori in Orientation:
+    if ori.is_auto:
+        continue
+    builder = ctx.create_array('iotile_{}'.format(ori.name), 1, 1,
+            set_as_top = False, edge = OrientationTuple(False, **{ori.name: True}))
+    builder.instantiate(iob, (0, 0))
+    builder.fill( (0.5, 0.5) )
+    iotiles[ori] = builder.commit()
 
-    # 5. create CLB
-    clb = context.create_logic_block('clb')
-    while True:
-        clkport = clb.create_global(clk, Orientation.south)
-        ceport = clb.create_input('ce', 1, Orientation.south)
-        srport = clb.create_input('sr', 1, Orientation.south)
-        cin = clb.create_input('cin', 1, Orientation.north)
-        for i in range(2):
-            inst = clb.instantiate(context.primitives['fraclut6sffc'], 'cluster{}'.format(i))
-            clb.connect(clkport, inst.pins['clk'])
-            clb.connect(ceport, inst.pins['ce'])
-            clb.connect(srport, inst.pins['sr'])
-            clb.connect(clb.create_input('ia' + str(i), 6, Orientation.west), inst.pins['ia'])
-            clb.connect(clb.create_input('ib' + str(i), 1, Orientation.west), inst.pins['ib'])
-            clb.connect(cin, inst.pins['cin'], pack_pattern = 'carrychain')
-            cin = inst.pins['cout']
-            clb.connect(inst.pins['oa'], clb.create_output('oa' + str(i), 1, Orientation.east))
-            clb.connect(inst.pins['ob'], clb.create_output('ob' + str(i), 1, Orientation.east))
-            clb.connect(inst.pins['q'], clb.create_output('q' + str(i), 1, Orientation.east))
-        clb.connect(cin, clb.create_output('cout', 1, Orientation.south), pack_pattern = 'carrychain')
-        break
+builder = ctx.create_logic_block("clb")
+clk = builder.create_global(gbl_clk, Orientation.south)
+for i in range(2):
+    inst = builder.instantiate(cluster, "cluster{}".format(i))
+    builder.connect(clk, inst.pins['clk'])
+    builder.connect(builder.create_input("i{}".format(i), 6, Orientation.west), inst.pins['i'])
+    builder.connect(inst.pins['o'], builder.create_output("o{}".format(i), 2, Orientation.east))
+clb = builder.commit()
 
-    # 6. create direct inter-block tunnels
-    context.create_direct_tunnel('carrychain', clb.ports['cout'], clb.ports['cin'], (0, 1))
+builder = ctx.create_array('subarray', 4, 4, set_as_top = False)
+for pos in product(range(4), range(4)):
+    builder.instantiate(clb, pos)
+builder.fill( (0.25, 0.15), sbox_pattern = SwitchBoxPattern.span_limited)
+# builder.auto_connect()
+subarray = builder.commit()
 
-    # 7. create tile
-    clbtile = context.create_tile('clb_tile', clb)
+builder = ctx.create_array('top', 10, 10, hierarchical = True, set_as_top = True)
+for x, y in product(range(10), range(10)):
+    if (x in (0, 9) and 0 < y < 9) or (y in (0, 9) and 0 < x < 9):
+        builder.instantiate(iotiles[Orientation.west if x == 0 else
+            Orientation.east if x == 9 else Orientation.south if y == 0 else Orientation.north], (x, y))
+    elif x < 9 and y < 9 and x % 4 == 1 and y % 4 == 1:
+        builder.instantiate(subarray, (x, y))
+# builder.fill( (0.15, 0.1), channel_on_edge = OrientationTuple(False) )
+builder.auto_connect()
+top = builder.commit()
 
-    # 8. fill top-level array
-    for x in range(8):
-        for y in range(8):
-            if x == 0:
-                if y > 0 and y < 7:
-                    context.top.instantiate_element(iotiles[Orientation.west], (x, y))
-            elif x == 7:
-                if y > 0 and y < 7:
-                    context.top.instantiate_element(iotiles[Orientation.east], (x, y))
-            elif y == 0:
-                context.top.instantiate_element(iotiles[Orientation.south], (x, y))
-            elif y == 7:
-                context.top.instantiate_element(iotiles[Orientation.north], (x, y))
-            else:
-                context.top.instantiate_element(clbtile, (x, y))
+TranslationPass().run(ctx)
+# TranslationPass()._process_module(subarray, ctx)
 
-    # 9. flow
-    flow = Flow((
-        CompleteRoutingBox(BlockFCValue(BlockPortFCValue(0.25), BlockPortFCValue(0.5)),
-            {'clb': BlockFCValue(BlockPortFCValue(0.25), BlockPortFCValue(0.25),
-                {'cin': BlockPortFCValue(0), 'cout': BlockPortFCValue(0)})}),
-        CompleteSwitch(),
-        CompleteConnection(),
-        GenerateVerilog('rtl'),
-        InjectBitchainConfigCircuitry(),
-        GenerateVPRXML('vpr'),
-        CompletePhysical(),
-        ZeroingBRAMWriteEnable(),
-        ZeroingBlockPins(),
-        GenerateYosysResources('syn'),
-            ))
+Scanchain.complete_scanchain(ctx, ctx.database[ModuleView.logical, top.key])
 
-    # 10. run flow
-    flow.run(context)
+VPRInputsGeneration('vpr').run(ctx)
 
-    # 11. create a pickled version
-    context.pickle('ctx.pickled')
+r = Scanchain.new_renderer()
 
-if __name__ == '__main__':
-    run()
+VerilogCollection(r, 'rtl').run(ctx)
+
+YosysScriptsCollection(r, "syn").run(ctx)
+
+r.render()
+
+ctx.pickle("ctx.pickled")

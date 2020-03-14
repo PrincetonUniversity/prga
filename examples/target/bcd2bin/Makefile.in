@@ -2,6 +2,7 @@ TARGET := bcd2bin
 PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pickled
 SIM_MAKEFILE := Makefile.sim
 PARTIAL_IOBINDING := io.partial
+COMPILER ?= vcs
 
 .PHONY: all project
 all: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
@@ -11,13 +12,14 @@ project: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
 
 clean:
 	if [ -f $(SIM_MAKEFILE) ]; then make -f $(SIM_MAKEFILE) cleanall; fi
-	rm -rf $(SIM_MAKEFILE) $(TARGET)_host_wrapper.v synth.ys io.pads
+	rm -rf $(SIM_MAKEFILE) *.v synth.ys io.pads summary.pickled
 
 $(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../$(TARGET).v
 	python -m prga_tools.$(CONFIG).simproj \
 		--fix_io $(PARTIAL_IOBINDING) \
 		-t ../$(TARGET)_host.v \
 		-m ../$(TARGET).v \
+		-c $(COMPILER) \
 		--makefile $@ \
 		$(PICKLED_CONTEXT)
 
