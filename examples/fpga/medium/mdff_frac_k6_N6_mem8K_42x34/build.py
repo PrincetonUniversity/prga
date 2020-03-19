@@ -50,6 +50,8 @@ builder.connect(builder.instances['io'].pins['inpad'], i)
 builder.connect(o, builder.instances['io'].pins['outpad'])
 iob = builder.commit()
 
+pattern = SwitchBoxPattern.span_limited( max_span = 60 )
+
 iotiles = {}
 for ori in Orientation:
     if ori.is_auto:
@@ -57,7 +59,7 @@ for ori in Orientation:
     builder = ctx.create_array('iotile_{}'.format(ori.name), 1, 1,
             set_as_top = False, edge = OrientationTuple(False, **{ori.name: True}))
     builder.instantiate(iob, (0, 0))
-    builder.fill( (0.5, 0.5) )
+    builder.fill( (0.5, 0.5), sbox_pattern = pattern )
     iotiles[ori] = builder.commit()
 
 builder = ctx.create_logic_block("clb")
@@ -91,8 +93,7 @@ for x, y in product(range(builder.width), range(builder.height)):
             builder.instantiate(bram, (x, y))
     else:
         builder.instantiate(clb, (x, y))
-builder.fill( (0.25, 0.15), segments = (l4a, l1a, l4b, l1b),
-        sbox_pattern = SwitchBoxPattern.span_limited, max_span = 60)
+builder.fill( (0.25, 0.15), segments = (l4a, l1a, l4b, l1b), sbox_pattern = pattern )
 subarray = builder.commit()
 
 top_width = subarray_width * subarray_col + 2

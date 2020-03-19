@@ -81,7 +81,7 @@ for x, y in product(range(4), range(4)):
             builder.instantiate(bram, (x, y))
     else:
         builder.instantiate(clb, (x, y))
-builder.fill( (0.25, 0.15), sbox_pattern = SwitchBoxPattern.span_limited)
+builder.fill( (0.25, 0.15) )
 subarray = builder.commit()
 
 builder = ctx.create_array('top', 10, 10, hierarchical = True, set_as_top = True)

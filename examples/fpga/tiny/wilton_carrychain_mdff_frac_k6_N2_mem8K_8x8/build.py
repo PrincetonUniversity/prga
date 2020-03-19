@@ -7,9 +7,12 @@ from prga.passes.yosys import *
 from prga.cfg.scanchain.lib import ScanchainSwitchDatabase, Scanchain
 from prga.netlist.module.util import ModuleUtils
 from prga.netlist.net.util import NetUtils
+from prga.util import enable_stdout_logging
 
 from itertools import product
 from pympler.asizeof import asizeof as size
+
+enable_stdout_logging("prga")
 
 ctx = Scanchain.new_context(1)
 gbl_clk = ctx.create_global("clk", is_clock = True)
@@ -48,14 +51,14 @@ builder.connect(adder.pins["cout_fabric"], o[2])
 builder.connect(ffB.pins['Q'], o[2])
 cluster = builder.commit()
 
+pattern = SwitchBoxPattern.wilton(Corner.northeast)
+
 builder = ctx.create_io_block("iob", 2)
 o = builder.create_input("outpad", 1)
 i = builder.create_output("inpad", 1)
 builder.connect(builder.instances['io'].pins['inpad'], i)
 builder.connect(o, builder.instances['io'].pins['outpad'])
 iob = builder.commit()
-
-pattern = SwitchBoxPattern.span_limited(max_span = 40)
 
 iotiles = {}
 for ori in Orientation:
@@ -65,14 +68,48 @@ for ori in Orientation:
             set_as_top = False, edge = OrientationTuple(False, **{ori.name: True}))
     builder.instantiate(iob, (0, 0))
     builder.fill( (0.5, 0.5), sbox_pattern = pattern )
+    if ori.is_north:
+        # we have to do a bit of customization here
+        sbox = ctx.get_switch_box(Corner.southwest, identifier = "s_ex_s", dont_create = True)
+        if sbox is None:
+            sbox = ctx.get_switch_box(Corner.southwest, identifier = "s_ex_s")
+            sbox.fill(Orientation.south, drive_at_crosspoints = True, crosspoints_only = True,
+                    exclude_input_orientations = [Orientation.south], pattern = pattern)
+            sbox.commit()
+        builder.instantiate(sbox.module, (0, 0))
+    elif ori.is_east:
+        # we have to do a bit of customization here
+        sbox = ctx.get_switch_box(Corner.northwest, identifier = "w_ex_w", dont_create = True)
+        if sbox is None:
+            sbox = ctx.get_switch_box(Corner.northwest, identifier = "w_ex_w")
+            sbox.fill(Orientation.west, drive_at_crosspoints = True, crosspoints_only = True,
+                    exclude_input_orientations = [Orientation.west], pattern = pattern)
+            sbox.commit()
+        builder.instantiate(sbox.module, (0, 0))
     iotiles[ori] = builder.commit()
 
 cornertiles = {}
-for corner in Corner:
-    builder = ctx.create_array('cornertile_{}'.format(corner.name), 1, 1,
-            set_as_top = False, edge = OrientationTuple(False, **{ori.name: True for ori in corner.decompose()}))
-    builder.fill( (0.5, 0.5), sbox_pattern = pattern )
-    cornertiles[corner] = builder.commit()
+# southwest corner
+builder = ctx.create_array('cornertile_sw', 1, 1,
+        set_as_top = False, edge = OrientationTuple(False, west = True, south = True))
+builder.fill( (0.5, 0.5), sbox_pattern = pattern)
+cornertiles[Corner.southwest] = builder.commit()
+# southeast corner
+builder = ctx.create_array('cornertile_se', 1, 1,
+        set_as_top = False, edge = OrientationTuple(False, east = True, south = True))
+sbox = ctx.get_switch_box(Corner.northwest, identifier = "w_ex_nw")
+sbox.fill(Orientation.west, drive_at_crosspoints = True, crosspoints_only = True,
+        exclude_input_orientations = [Orientation.west, Orientation.north], pattern = pattern)
+builder.instantiate(sbox.commit(), (0, 0))
+cornertiles[Corner.southeast] = builder.commit()
+# northeast corner
+builder = ctx.create_array('cornertile_ne', 1, 1,
+        set_as_top = False, edge = OrientationTuple(False, east = True, north = True))
+sbox = ctx.get_switch_box(Corner.southwest, identifier = "s_ex_sw")
+sbox.fill(Orientation.south, drive_at_crosspoints = True, crosspoints_only = True,
+        exclude_input_orientations = [Orientation.west, Orientation.south], pattern = pattern)
+builder.instantiate(sbox.commit(), (0, 0))
+cornertiles[Corner.northeast] = builder.commit()
 
 builder = ctx.create_logic_block("clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
@@ -122,8 +159,6 @@ for x, y in product(range(10), range(10)):
         builder.instantiate(cornertiles[Corner.southwest], (x, y))
     elif x == 9 and y == 0:
         builder.instantiate(cornertiles[Corner.southeast], (x, y))
-    elif x == 0 and y == 9:
-        builder.instantiate(cornertiles[Corner.northwest], (x, y))
     elif x == 9 and y == 9:
         builder.instantiate(cornertiles[Corner.northeast], (x, y))
     elif (x in (0, 9) and 0 < y < 9) or (y in (0, 9) and 0 < x < 9):

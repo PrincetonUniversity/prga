@@ -7,9 +7,12 @@ from prga.passes.yosys import *
 from prga.cfg.scanchain.lib import ScanchainSwitchDatabase, Scanchain
 from prga.netlist.module.util import ModuleUtils
 from prga.netlist.net.util import NetUtils
+from prga.util import enable_stdout_logging
 
 from itertools import product
 from pympler.asizeof import asizeof as size
+
+enable_stdout_logging("prga")
 
 ctx = Scanchain.new_context(1)
 gbl_clk = ctx.create_global("clk", is_clock = True)
@@ -60,7 +63,7 @@ clb = builder.commit()
 builder = ctx.create_array('subarray', 4, 4, set_as_top = False)
 for pos in product(range(4), range(4)):
     builder.instantiate(clb, pos)
-builder.fill( (0.25, 0.15), sbox_pattern = SwitchBoxPattern.span_limited)
+builder.fill( (0.25, 0.15) )
 # builder.auto_connect()
 subarray = builder.commit()
 

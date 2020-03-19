@@ -64,7 +64,7 @@ clb = builder.commit()
 builder = ctx.create_array('subarray', 4, 4, set_as_top = False)
 for pos in product(range(4), range(4)):
     builder.instantiate(clb, pos)
-builder.fill( (0.25, 0.15), sbox_pattern = SwitchBoxPattern.span_limited)
+builder.fill( (0.25, 0.15) )
 # builder.auto_connect()
 subarray = builder.commit()
 
