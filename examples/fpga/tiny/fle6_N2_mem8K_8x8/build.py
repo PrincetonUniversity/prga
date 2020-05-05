@@ -14,24 +14,12 @@ from pympler.asizeof import asizeof as size
 ctx = Scanchain.new_context(1)
 gbl_clk = ctx.create_global("clk", is_clock = True)
 gbl_clk.bind((0, 1), 0)
-l1 = ctx.create_segment('L1', 16, 1)
-l2 = ctx.create_segment('L4', 16, 4)
+l1a = ctx.create_segment('L1A', 4, 1)
+l4a = ctx.create_segment('L4A', 4, 4)
+l1b = ctx.create_segment('L1B', 4, 1)
+l4b = ctx.create_segment('L4B', 4, 4)
 
 memory = ctx.create_memory("dpram_a10d8", 10, 8).commit()
-
-builder = ctx.create_cluster("cluster")
-o = builder.create_output("o", 2)
-lut = builder.instantiate(ctx.primitives["fraclut6"], "lut")
-ff = builder.instantiate(ctx.primitives["mdff"], "ff")
-builder.connect(builder.create_clock("clk"), ff.pins['clk'])
-builder.connect(builder.create_input("ce", 1), ff.pins["ce"])
-builder.connect(builder.create_input("sr", 1), ff.pins["sr"])
-builder.connect(builder.create_input("i", 6), lut.pins['in'])
-builder.connect(lut.pins['o5'], o[1])
-builder.connect(lut.pins['o6'], o[0])
-builder.connect(lut.pins['o6'], ff.pins['D'], pack_patterns = ('lut6_dff', 'lut5A_dff'))
-builder.connect(ff.pins['Q'], o[0])
-cluster = builder.commit()
 
 builder = ctx.create_io_block("iob", 2)
 o = builder.create_input("outpad", 1)
@@ -40,25 +28,31 @@ builder.connect(builder.instances['io'].pins['inpad'], i)
 builder.connect(o, builder.instances['io'].pins['outpad'])
 iob = builder.commit()
 
+pattern = SwitchBoxPattern.cycle_free
+
 iotiles = {}
 for ori in Orientation:
     builder = ctx.create_array('iotile_{}'.format(ori.name), 1, 1,
             set_as_top = False, edge = OrientationTuple(False, **{ori.name: True}))
     builder.instantiate(iob, (0, 0))
-    builder.fill( (0.5, 0.5), sbox_pattern = SwitchBoxPattern.cycle_free )
+    builder.fill( (0.5, 0.5), sbox_pattern = pattern )
     iotiles[ori] = builder.commit()
 
 builder = ctx.create_logic_block("clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
-ce = builder.create_input("ce", 1, Orientation.south)
-sr = builder.create_input("sr", 1, Orientation.south)
-for i, inst in enumerate(builder.instantiate(cluster, "cluster", vpr_num_pb = 2)):
+in_ = builder.create_input("in", 12, Orientation.west)
+out = builder.create_output("out", 4, Orientation.east)
+cin = builder.create_input("cin", 1, Orientation.south)
+for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"], "cluster", vpr_num_pb = 2)):
     builder.connect(clk, inst.pins['clk'])
-    builder.connect(ce, inst.pins['ce'])
-    builder.connect(sr, inst.pins['sr'])
-    builder.connect(builder.create_input("i{}".format(i), 6, Orientation.west), inst.pins['i'])
-    builder.connect(inst.pins['o'], builder.create_output("o{}".format(i), 2, Orientation.east))
+    builder.connect(in_[6 * i: 6 * (i + 1)], inst.pins['in'])
+    builder.connect(inst.pins['out'], out[2 * i: 2 * (i + 1)])
+    builder.connect(cin, inst.pins["cin"], pack_patterns = ["carrychain"])
+    cin = inst.pins["cout"]
+builder.connect(cin, builder.create_output("cout", 1, Orientation.north), pack_patterns = ["carrychain"])
 clb = builder.commit()
+
+ctx.create_tunnel("carrychain", clb.ports["cout"], clb.ports["cin"], (0, -1))
 
 builder = ctx.create_logic_block("bram", 1, 2)
 inst = builder.instantiate(ctx.primitives["dpram_a10d8"], "bram_inst")
@@ -78,14 +72,14 @@ for x, y in product(range(4), range(4)):
             builder.instantiate(bram, (x, y))
     else:
         builder.instantiate(clb, (x, y))
-builder.fill( (0.25, 0.15), sbox_pattern = SwitchBoxPattern.cycle_free)
+builder.fill( (0.25, 0.15), sbox_pattern = pattern )
 subarray = builder.commit()
 
 cornertiles = {}
 for corner in Corner:
-    builder = ctx.create_array("cornertile_{}".format(corner.case("ne", "nw", "se", "sw")), 1, 1,
+    builder = ctx.create_array('cornertile_{}'.format(corner.name), 1, 1,
             set_as_top = False, edge = OrientationTuple(False, **{ori.name: True for ori in corner.decompose()}))
-    builder.fill( (1., 1.), sbox_pattern = SwitchBoxPattern.cycle_free)
+    builder.fill( (0.5, 0.5), sbox_pattern = pattern )
     cornertiles[corner] = builder.commit()
 
 width, height = 10, 10
@@ -112,8 +106,23 @@ TranslationPass().run(ctx)
 Scanchain.complete_scanchain(ctx, ctx.database[ModuleView.logical, top.key])
 Scanchain.annotate_user_view(ctx)
 
-VPRArchGeneration('vpr/arch.xml').run(ctx)
+VPRArchGeneration("vpr/arch.xml").run(ctx)
 VPR_RRG_Generation("vpr/rrg.xml").run(ctx)
+
+scalable = VPRScalableDelegate(1.0)
+for ori in Orientation:
+    scalable.add_active_tile(iob, ori, (0.5, 0.5))
+scalable.add_active_tile(clb, fc = (0.25, 0.15))
+scalable.add_active_tile(bram, fc = (0.25, 0.15))
+scalable.add_layout_rule("fill", 0, clb)
+scalable.add_layout_rule("corners", 100, None)
+scalable.add_layout_rule("row", 2, iob, Orientation.south, starty = 0)
+scalable.add_layout_rule("row", 2, iob, Orientation.north, starty = "H - 1")
+scalable.add_layout_rule("col", 2, iob, Orientation.west, startx = 0)
+scalable.add_layout_rule("col", 2, iob, Orientation.east, startx = "W - 1")
+scalable.add_layout_rule("col", 1, bram, startx = 6, repeatx = 8)
+
+VPRScalableArchGeneration("vpr/arch.scal.xml", scalable).run(ctx)
 
 r = Scanchain.new_renderer()
 

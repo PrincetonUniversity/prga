@@ -34,7 +34,7 @@ builder.connect(lut.pins['o6'], ff.pins['D'], pack_patterns = ('lut6_dff', 'lut5
 builder.connect(ff.pins['Q'], o[0])
 cluster = builder.commit()
 
-builder = ctx.create_io_block("iob", 2)
+builder = ctx.create_io_block("iob", 4)
 o = builder.create_input("outpad", 1)
 i = builder.create_output("inpad", 1)
 builder.connect(builder.instances['io'].pins['inpad'], i)
@@ -43,18 +43,15 @@ iob = builder.commit()
 
 iotiles = {}
 for ori in Orientation:
-    if ori.is_auto:
-        continue
     builder = ctx.create_array('iotile_{}'.format(ori.name), 1, 1,
             set_as_top = False, edge = OrientationTuple(False, **{ori.name: True}))
     builder.instantiate(iob, (0, 0))
-    builder.fill( (0.5, 0.5) )
+    builder.fill( (0.5, 0.5), sbox_pattern = SwitchBoxPattern.cycle_free )
     iotiles[ori] = builder.commit()
 
 builder = ctx.create_logic_block("clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
-for i in range(2):
-    inst = builder.instantiate(cluster, "cluster{}".format(i))
+for i, inst in enumerate(builder.instantiate(cluster, "cluster", vpr_num_pb = 2)):
     builder.connect(clk, inst.pins['clk'])
     builder.connect(builder.create_input("i{}".format(i), 6, Orientation.west), inst.pins['i'])
     builder.connect(inst.pins['o'], builder.create_output("o{}".format(i), 2, Orientation.east))
@@ -63,18 +60,32 @@ clb = builder.commit()
 builder = ctx.create_array('subarray', 4, 4, set_as_top = False)
 for pos in product(range(4), range(4)):
     builder.instantiate(clb, pos)
-builder.fill( (0.25, 0.15) )
-# builder.auto_connect()
+builder.fill( (0.25, 0.15), sbox_pattern = SwitchBoxPattern.cycle_free )
 subarray = builder.commit()
 
-builder = ctx.create_array('top', 10, 10, hierarchical = True, set_as_top = True)
-for x, y in product(range(10), range(10)):
-    if (x in (0, 9) and 0 < y < 9) or (y in (0, 9) and 0 < x < 9):
+cornertiles = {}
+for corner in Corner:
+    builder = ctx.create_array("cornertile_{}".format(corner.case("ne", "nw", "se", "sw")), 1, 1,
+            set_as_top = False, edge = OrientationTuple(False, **{ori.name: True for ori in corner.decompose()}))
+    builder.fill( (1., 1.), sbox_pattern = SwitchBoxPattern.cycle_free)
+    cornertiles[corner] = builder.commit()
+
+width, height = 10, 10
+builder = ctx.create_array('top', width, height, hierarchical = True, set_as_top = True)
+for x, y in product(range(width), range(height)):
+    if x == 0 and y == 0:
+        builder.instantiate(cornertiles[Corner.southwest], (x, y))
+    elif x == 0 and y == height - 1:
+        builder.instantiate(cornertiles[Corner.northwest], (x, y))
+    elif x == width - 1 and y == 0:
+        builder.instantiate(cornertiles[Corner.southeast], (x, y))
+    elif x == width - 1 and y == height - 1:
+        builder.instantiate(cornertiles[Corner.northeast], (x, y))
+    elif (x in (0, width - 1) and 0 < y < height - 1) or (y in (0, width - 1) and 0 < x < height - 1):
         builder.instantiate(iotiles[Orientation.west if x == 0 else
-            Orientation.east if x == 9 else Orientation.south if y == 0 else Orientation.north], (x, y))
-    elif x < 9 and y < 9 and x % 4 == 1 and y % 4 == 1:
+            Orientation.east if x == width - 1 else Orientation.south if y == 0 else Orientation.north], (x, y))
+    elif 0 < x < width - 1 and 0 < y < height - 1 and x % 4 == 1 and y % 4 == 1:
         builder.instantiate(subarray, (x, y))
-# builder.fill( (0.15, 0.1), channel_on_edge = OrientationTuple(False) )
 builder.auto_connect()
 top = builder.commit()
 
@@ -82,8 +93,10 @@ TranslationPass().run(ctx)
 # TranslationPass()._process_module(subarray, ctx)
 
 Scanchain.complete_scanchain(ctx, ctx.database[ModuleView.logical, top.key])
+Scanchain.annotate_user_view(ctx)
 
-VPRInputsGeneration('vpr').run(ctx)
+VPRArchGeneration('vpr/arch.xml').run(ctx)
+VPR_RRG_Generation("vpr/rrg.xml").run(ctx)
 
 r = Scanchain.new_renderer()
 

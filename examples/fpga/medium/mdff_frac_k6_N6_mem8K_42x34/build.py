@@ -12,7 +12,7 @@ from prga.util import enable_stdout_logging
 from itertools import product
 from pympler.asizeof import asizeof as size
 
-enable_stdout_logging(__name__)
+enable_stdout_logging("prga")
 
 K = 6
 N = 6
@@ -30,17 +30,29 @@ l4b = ctx.create_segment('L4B', 10, 4)
 memory = ctx.create_memory("dpram_a10d8", 10, 8).commit()
 
 builder = ctx.create_cluster("cluster")
-o = builder.create_output("o", 2)
+o = builder.create_output("o", 3)
 lut = builder.instantiate(ctx.primitives["fraclut6"], "lut")
-ff = builder.instantiate(ctx.primitives["mdff"], "ff")
-builder.connect(builder.create_clock("clk"), ff.pins['clk'])
-builder.connect(builder.create_input("ce", 1), ff.pins["ce"])
-builder.connect(builder.create_input("sr", 1), ff.pins["sr"])
-builder.connect(builder.create_input("i", 6), lut.pins['in'])
-builder.connect(lut.pins['o5'], o[1])
+(ffA, ffB) = builder.instantiate(ctx.primitives["mdff"], "ff", vpr_num_pb = 2)
+adder = builder.instantiate(ctx.primitives["adder"], "fa")
+builder.connect(builder.create_clock("clk"), [ffA.pins['clk'], ffB.pins['clk']], fully = True)
+builder.connect(builder.create_input("ce", 1), [ffA.pins["ce"], ffB.pins['ce']], fully = True)
+builder.connect(builder.create_input("sr", 1), [ffA.pins["sr"], ffB.pins['sr']], fully = True)
+builder.connect(builder.create_input("ia", 6), lut.pins['in'])
 builder.connect(lut.pins['o6'], o[0])
-builder.connect(lut.pins['o6'], ff.pins['D'], pack_patterns = ('lut6_dff', 'lut5A_dff'))
-builder.connect(ff.pins['Q'], o[0])
+builder.connect(lut.pins['o5'], o[2])
+builder.connect(lut.pins['o6'], ffA.pins['D'], pack_patterns = ['lut6_dff', 'lut5A_dff'])
+builder.connect(lut.pins['o5'], ffB.pins['D'], pack_patterns = ['lut5B_dff'])
+builder.connect(lut.pins['o6'], adder.pins['a']) 
+builder.connect(builder.create_input("ib", 1), adder.pins['b']) 
+builder.connect(builder.create_input("cin", 1), adder.pins["cin"], pack_patterns = ["carrychain"])
+builder.connect(builder.create_input("cin_fabric", 1), adder.pins["cin_fabric"])
+builder.connect(adder.pins["s"], ffA.pins["D"])
+builder.connect(adder.pins["s"], o[1])
+builder.connect(ffA.pins['Q'], o[1])
+builder.connect(adder.pins["cout"], builder.create_output("cout", 1), pack_patterns = ["carrychain"])
+builder.connect(adder.pins["cout_fabric"], ffB.pins["D"])
+builder.connect(adder.pins["cout_fabric"], o[2])
+builder.connect(ffB.pins['Q'], o[2])
 cluster = builder.commit()
 
 builder = ctx.create_io_block("iob", 8)
@@ -50,12 +62,10 @@ builder.connect(builder.instances['io'].pins['inpad'], i)
 builder.connect(o, builder.instances['io'].pins['outpad'])
 iob = builder.commit()
 
-pattern = SwitchBoxPattern.span_limited( max_span = 60 )
+pattern = SwitchBoxPattern.cycle_free
 
 iotiles = {}
 for ori in Orientation:
-    if ori.is_auto:
-        continue
     builder = ctx.create_array('iotile_{}'.format(ori.name), 1, 1,
             set_as_top = False, edge = OrientationTuple(False, **{ori.name: True}))
     builder.instantiate(iob, (0, 0))
@@ -66,14 +76,21 @@ builder = ctx.create_logic_block("clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
 ce = builder.create_input("ce", 1, Orientation.south)
 sr = builder.create_input("sr", 1, Orientation.south)
-for i in range(N):
-    inst = builder.instantiate(cluster, "cluster{}".format(i))
+cin = builder.create_input("cin", 1, Orientation.south)
+for i, inst in enumerate(builder.instantiate(cluster, "cluster", vpr_num_pb = 2)):
     builder.connect(clk, inst.pins['clk'])
     builder.connect(ce, inst.pins['ce'])
     builder.connect(sr, inst.pins['sr'])
-    builder.connect(builder.create_input("i{}".format(i), K, Orientation.west), inst.pins['i'])
-    builder.connect(inst.pins['o'], builder.create_output("o{}".format(i), 2, Orientation.east))
+    builder.connect(builder.create_input("ia{}".format(i), 6, Orientation.west), inst.pins['ia'])
+    builder.connect(builder.create_input("ib{}".format(i), 1, Orientation.west), inst.pins['ib'])
+    builder.connect(inst.pins['o'], builder.create_output("o{}".format(i), 3, Orientation.east))
+    builder.connect(builder.create_input("cin_fabric{}".format(i), 1, Orientation.west), inst.pins['cin_fabric'])
+    builder.connect(cin, inst.pins["cin"], pack_patterns = ["carrychain"])
+    cin = inst.pins["cout"]
+builder.connect(cin, builder.create_output("cout", 1, Orientation.north), pack_patterns = ["carrychain"])
 clb = builder.commit()
+
+ctx.create_tunnel("carrychain", clb.ports["cout"], clb.ports["cin"], (0, -1))
 
 builder = ctx.create_logic_block("bram", 1, 2)
 inst = builder.instantiate(ctx.primitives["dpram_a10d8"], "bram_inst")
@@ -82,8 +99,8 @@ for port in ("addr1", "we1", "data1"):
     builder.connect(builder.create_input(port, len(inst.pins[port]), Orientation.west, (0, 0)), inst.pins[port])
 for port in ("addr2", "we2", "data2"):
     builder.connect(builder.create_input(port, len(inst.pins[port]), Orientation.west, (0, 1)), inst.pins[port])
-builder.connect(inst.pins["out1"], builder.create_output("out1", len(inst.pins[port]), Orientation.east, (0, 0)))
-builder.connect(inst.pins["out2"], builder.create_output("out2", len(inst.pins[port]), Orientation.east, (0, 1)))
+builder.connect(inst.pins["out1"], builder.create_output("out1", len(inst.pins["out1"]), Orientation.east, (0, 0)))
+builder.connect(inst.pins["out2"], builder.create_output("out2", len(inst.pins["out2"]), Orientation.east, (0, 1)))
 bram = builder.commit()
 
 builder = ctx.create_array('subarray', subarray_width, subarray_height, set_as_top = False)
@@ -96,14 +113,29 @@ for x, y in product(range(builder.width), range(builder.height)):
 builder.fill( (0.25, 0.15), segments = (l4a, l1a, l4b, l1b), sbox_pattern = pattern )
 subarray = builder.commit()
 
+cornertiles = {}
+for corner in Corner:
+    builder = ctx.create_array("cornertile_{}".format(corner.case("ne", "nw", "se", "sw")), 1, 1,
+            set_as_top = False, edge = OrientationTuple(False, **{ori.name: True for ori in corner.decompose()}))
+    builder.fill( (0.5, 0.5), sbox_pattern = pattern )
+    cornertiles[corner] = builder.commit()
+
 top_width = subarray_width * subarray_col + 2
 top_height = subarray_height * subarray_row + 2
 builder = ctx.create_array('top', top_width, top_height, hierarchical = True, set_as_top = True)
 for x, y in product(range(top_width), range(top_height)):
-    if (x in (0, top_width - 1) and 0 < y < top_height - 1) or (y in (0, top_height) and 0 < x < top_width - 1):
+    if x == 0 and y == 0:
+        builder.instantiate(cornertiles[Corner.southwest], (x, y))
+    elif x == 0 and y == top_height - 1:
+        builder.instantiate(cornertiles[Corner.northwest], (x, y))
+    elif x == top_width - 1 and y == 0:
+        builder.instantiate(cornertiles[Corner.southeast], (x, y))
+    elif x == top_width - 1 and y == top_height - 1:
+        builder.instantiate(cornertiles[Corner.northeast], (x, y))
+    elif (x in (0, top_width - 1) and 0 < y < top_height - 1) or (y in (0, top_height) and 0 < x < top_width - 1):
         builder.instantiate(iotiles[Orientation.west if x == 0 else
             Orientation.east if x == top_width - 1 else Orientation.south if y == 0 else Orientation.north], (x, y))
-    elif x < top_width - 1 and y < top_height - 1 and x % subarray_width == 1 and y % subarray_height == 1:
+    elif 0 < x < top_width - 1 and 0 < y < top_height - 1 and x % subarray_width == 1 and y % subarray_height == 1:
         builder.instantiate(subarray, (x, y))
 builder.auto_connect()
 top = builder.commit()
@@ -111,8 +143,10 @@ top = builder.commit()
 TranslationPass().run(ctx)
 
 Scanchain.complete_scanchain(ctx, ctx.database[ModuleView.logical, top.key])
+Scanchain.annotate_user_view(ctx)
 
-VPRInputsGeneration('vpr').run(ctx)
+VPRArchGeneration('vpr/arch.xml').run(ctx)
+VPR_RRG_Generation("vpr/rrg.xml").run(ctx)
 
 r = Scanchain.new_renderer()
 
