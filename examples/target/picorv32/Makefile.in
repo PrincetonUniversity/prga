@@ -27,5 +27,7 @@ $(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../
 $(PICKLED_CONTEXT):
 	make -C $(FPGA_DIR)
 
+$(PARTIAL_IOBINDING):
+
 %: project
 	make -f $(SIM_MAKEFILE) $@
