@@ -1,9 +1,9 @@
 SIM = icarus
 TOPLEVEL_LANG = verilog
 
-VERILOG_SOURCES = $(PWD)/prga_fifo.v $(PWD)/prga_ram_1r1w.v
+VERILOG_SOURCES = $(PWD)/prga_fifo_tb_wrapper.v $(PWD)/prga_fifo.v $(PWD)/prga_ram_1r1w.v
 # TOPLEVEL is the name of the toplevel module in the Verilog or VHDL file_
-TOPLEVEL=prga_fifo
+TOPLEVEL=prga_fifo_tb_wrapper
 # MODULE is the name of the python testfile
 MODULE=prga_fifo_cocotb
 

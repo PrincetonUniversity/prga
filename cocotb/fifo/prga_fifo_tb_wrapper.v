@@ -1,51 +1,23 @@
-module prga_fifo_tb ();
+module prga_fifo_tb_wrapper ();
 
     localparam DATA_WIDTH = 8;
 
-    reg clk, rst;
+    input reg clk, rst;
 
-    reg [DATA_WIDTH - 1:0] src [0:1023];
-
-    initial begin
-        clk = 'b0;
-        rst = 'b0;
-
-        src[0] = 'h5A;
-        src[1] = 'hF6;
-        src[2] = 'h09;
-        src[3] = 'hC4;
-        src[4] = 'h81;
-        src[5] = 'hE2;
-        src[6] = 'hA0;
-        src[7] = 'h7A;
-
-        $dumpfile("dump.vcd");
-        $dumpvars;
-
-        #3;
-        rst = 'b1;
-        #10;
-        rst = 'b0;
-
-        #10000;
-        $display("[TIMEOUT]");
-        $finish;
-    end
-
-    always #5 clk = ~clk;
+    input reg [DATA_WIDTH - 1:0] src [0:1023];
 
     // A: non-lookahead
     // B: lookahead converted to non-lookahead
     // C: lookahead
     // D: non-lookahead converted to lookahead
 
-    wire A_full, A_empty, B_full, B_empty, C_full, C_empty, D_full, D_empty;
-    wire [DATA_WIDTH - 1:0] A_dout, B_dout, C_dout, D_dout;
-    reg A_valid, A_rd, B_valid, B_rd, C_rd, D_rd;
+    output wire A_full, A_empty, B_full, B_empty, C_full, C_empty, D_full, D_empty;
+    output wire [DATA_WIDTH - 1:0] A_dout, B_dout, C_dout, D_dout;
+    input reg A_valid, A_rd, B_valid, B_rd, C_rd, D_rd;
     integer A_wr_cnt, B_wr_cnt, C_wr_cnt, D_wr_cnt;
     integer A_rd_cnt, B_rd_cnt, C_rd_cnt, D_rd_cnt;
-    wire _B_empty, _B_rd, _D_empty, _D_rd;
-    wire [DATA_WIDTH - 1:0] _B_dout, _D_dout;
+    output wire _B_empty, _B_rd, _D_empty, _D_rd;
+    output wire [DATA_WIDTH - 1:0] _B_dout, _D_dout;
 
     prga_fifo #(
         .DATA_WIDTH                     (DATA_WIDTH)

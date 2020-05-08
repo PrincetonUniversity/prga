@@ -1,4 +1,4 @@
-module prga_fifo_tb ();
+ module prga_fifo_tb ();
 
     localparam DATA_WIDTH = 8;
 
