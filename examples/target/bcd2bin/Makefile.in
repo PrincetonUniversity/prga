@@ -2,7 +2,7 @@ TARGET := bcd2bin
 PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pickled
 SIM_MAKEFILE := Makefile.sim
 PARTIAL_IOBINDING := io.partial
-COMPILER ?= vcs
+COMPILER ?= iverilog
 
 .PHONY: all project
 all: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
