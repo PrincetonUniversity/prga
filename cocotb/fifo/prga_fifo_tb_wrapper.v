@@ -2,23 +2,27 @@ module prga_fifo_tb_wrapper ();
 
     localparam DATA_WIDTH = 8;
 
-    input reg clk, rst;
+    input clk, rst;
 
-    input reg [DATA_WIDTH - 1:0] src [0:1023];
-
+    input [DATA_WIDTH - 1:0] src [0:1023];
+  
     // A: non-lookahead
     // B: lookahead converted to non-lookahead
     // C: lookahead
     // D: non-lookahead converted to lookahead
 
-    output wire A_full, A_empty, B_full, B_empty, C_full, C_empty, D_full, D_empty;
-    output wire [DATA_WIDTH - 1:0] A_dout, B_dout, C_dout, D_dout;
-    input reg A_valid, A_rd, B_valid, B_rd, C_rd, D_rd;
+    output A_full, A_empty, B_full, B_empty, C_full, C_empty, D_full, D_empty;
+    output [DATA_WIDTH - 1:0] A_dout, B_dout, C_dout, D_dout;
+    input A_valid, A_rd, B_valid, B_rd, C_rd, D_rd;
     integer A_wr_cnt, B_wr_cnt, C_wr_cnt, D_wr_cnt;
     integer A_rd_cnt, B_rd_cnt, C_rd_cnt, D_rd_cnt;
-    output wire _B_empty, _B_rd, _D_empty, _D_rd;
-    output wire [DATA_WIDTH - 1:0] _B_dout, _D_dout;
+    output _B_empty, _B_rd, _D_empty, _D_rd;
+    output [DATA_WIDTH - 1:0] _B_dout, _D_dout;
 
+    initial begin
+        $dumpfile("test.vcd");
+        $dumpvars(1,prga_fifo_tb_wrapper);
+    end
     prga_fifo #(
         .DATA_WIDTH                     (DATA_WIDTH)
         ,.LOOKAHEAD                     (0)

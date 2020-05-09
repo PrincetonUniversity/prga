@@ -18,6 +18,7 @@ module prga_fifo #(
     output wire [DATA_WIDTH - 1:0] dout
     );
 
+
     // register reset signal for timing purpose
     reg rst_f;
 /////////////////

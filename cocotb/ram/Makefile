@@ -1,11 +1,11 @@
 SIM = icarus
 TOPLEVEL_LANG = verilog
 
-VERILOG_SOURCES = $(PWD)/prga_fifo_tb_wrapper.v $(PWD)/prga_fifo.v $(PWD)/prga_ram_1r1w.v $(PWD)/prga_fifo_lookahead_buffer.v
+VERILOG_SOURCES = $(PWD)/ram.v
 # TOPLEVEL is the name of the toplevel module in the Verilog or VHDL file_
-TOPLEVEL=prga_fifo_tb_wrapper
+TOPLEVEL=ram
 # MODULE is the name of the python testfile
-MODULE=prga_fifo_cocotb
+MODULE=ram_test
 
 include $(shell cocotb-config --makefiles)/Makefile.inc
 include $(shell cocotb-config --makefiles)/Makefile.sim
