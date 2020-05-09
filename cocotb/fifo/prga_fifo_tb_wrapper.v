@@ -14,8 +14,8 @@ module prga_fifo_tb_wrapper ();
     output A_full, A_empty, B_full, B_empty, C_full, C_empty, D_full, D_empty;
     output [DATA_WIDTH - 1:0] A_dout, B_dout, C_dout, D_dout;
     input A_valid, A_rd, B_valid, B_rd, C_rd, D_rd;
-    integer A_wr_cnt, B_wr_cnt, C_wr_cnt, D_wr_cnt;
-    integer A_rd_cnt, B_rd_cnt, C_rd_cnt, D_rd_cnt;
+    input A_wr_cnt, B_wr_cnt, C_wr_cnt, D_wr_cnt;
+    input A_rd_cnt, B_rd_cnt, C_rd_cnt, D_rd_cnt;
     output _B_empty, _B_rd, _D_empty, _D_rd;
     output [DATA_WIDTH - 1:0] _B_dout, _D_dout;
 
