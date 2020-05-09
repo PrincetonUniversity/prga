@@ -2,7 +2,11 @@ TARGET := bcd2bin
 PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pickled
 SIM_MAKEFILE := Makefile.sim
 PARTIAL_IOBINDING := io.partial
+<<<<<<< HEAD
 COMPILER ?= iverilog
+=======
+COMPILER ?= vcs
+>>>>>>> 426e3b57ab1411fed0fdf1ed43ad9f46c71b1db2
 
 .PHONY: all project
 all: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
@@ -17,6 +21,7 @@ clean:
 $(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../$(TARGET).v
 	python -m prga_tools.$(CONFIG).simproj \
 		--fix_io $(PARTIAL_IOBINDING) \
+		-c $(COMPILER) \
 		-t ../$(TARGET)_host.v \
 		-m ../$(TARGET).v \
 		-c $(COMPILER) \

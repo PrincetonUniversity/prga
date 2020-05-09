@@ -3,6 +3,7 @@ TARGET := picorv32
 PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pickled
 SIM_MAKEFILE := Makefile.sim
 PARTIAL_IOBINDING := io.partial
+COMPILER ?= vcs
 
 .PHONY: all project
 all: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
@@ -15,7 +16,12 @@ clean:
 	rm -rf $(SIM_MAKEFILE) $(TARGET)_host_wrapper.v synth.ys io.pads
 
 $(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../$(TARGET).v
+<<<<<<< HEAD
 	python -m prga_tools.$(CONFIG).simproj \
+=======
+	python -m prga_tools.bitchain.simproj \
+		-c $(COMPILER) \
+>>>>>>> 426e3b57ab1411fed0fdf1ed43ad9f46c71b1db2
 		--fix_io $(PARTIAL_IOBINDING) \
 		-t ../$(TARGET)_host.v --testbench_top picorv32_wrapper \
 		--testbench_plus_args firmware=../firmware.hex max_cycle=10000000 quiet \
