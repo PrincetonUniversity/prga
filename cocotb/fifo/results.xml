@@ -1,0 +1,8 @@
+<testsuites name="results">
+  <testsuite name="all" package="all" tests="0">
+    <property name="random_seed" value="1589034050" />
+    <testcase classname="prga_fifo_cocotb" name="prga_fifo_test" ratio_time="0.0" sim_time_ns="0.0" time="0.0">
+      <skipped />
+    </testcase>
+  </testsuite>
+</testsuites>
