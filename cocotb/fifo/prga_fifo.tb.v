@@ -46,7 +46,6 @@
     integer A_rd_cnt, B_rd_cnt, C_rd_cnt, D_rd_cnt;
     wire _B_empty, _B_rd, _D_empty, _D_rd;
     wire [DATA_WIDTH - 1:0] _B_dout, _D_dout;
-
     prga_fifo #(
         .DATA_WIDTH                     (DATA_WIDTH)
         ,.LOOKAHEAD                     (0)
