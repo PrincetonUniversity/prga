@@ -11,3 +11,8 @@ examples/fpga/*/*/*
 examples/target/*/*/*
 !examples/target/*/*/io.partial
 !examples/target/*/*/Makefile
+
+cocotb/fifo/__pycache__
+cocotb/fifo/test.vcd
+cocotb/fifo/build
+cocotb/fifo/sim_build

@@ -1,5 +1,5 @@
 $date
-	Tue May 12 20:00:43 2020
+	Tue May 12 21:05:36 2020
 $end
 $version
 	Icarus Verilog
@@ -9,153 +9,317 @@ $timescale
 $end
 $scope module prga_fifo_tb_wrapper $end
 $var wire 1 ! A_rd $end
-$var wire 1 " A_rd_cnt $end
+$var wire 8 " A_rd_cnt [0:7] $end
 $var wire 1 # A_valid $end
-$var wire 1 $ A_wr_cnt $end
+$var wire 8 $ A_wr_cnt [0:7] $end
 $var wire 1 % B_rd $end
-$var wire 1 & B_rd_cnt $end
+$var wire 8 & B_rd_cnt [0:7] $end
 $var wire 1 ' B_valid $end
-$var wire 1 ( B_wr_cnt $end
+$var wire 8 ( B_wr_cnt [0:7] $end
 $var wire 1 ) C_rd $end
-$var wire 1 * C_rd_cnt $end
-$var wire 1 + C_wr_cnt $end
+$var wire 8 * C_rd_cnt [0:7] $end
+$var wire 8 + C_wr_cnt [0:7] $end
 $var wire 1 , D_rd $end
-$var wire 1 - D_rd_cnt $end
-$var wire 1 . D_wr_cnt $end
+$var wire 8 - D_rd_cnt [0:7] $end
+$var wire 8 . D_wr_cnt [0:7] $end
 $var wire 1 / clk $end
 $var wire 1 0 rst $end
-$var wire 8 1 src [7:0] $end
-$var wire 1 2 _D_rd $end
-$var wire 1 3 _D_empty $end
-$var wire 8 4 _D_dout [7:0] $end
-$var wire 1 5 _B_rd $end
-$var wire 1 6 _B_empty $end
-$var wire 8 7 _B_dout [7:0] $end
-$var wire 1 8 D_full $end
-$var wire 1 9 D_empty $end
-$var wire 8 : D_dout [7:0] $end
-$var wire 1 ; C_full $end
-$var wire 1 < C_empty $end
-$var wire 8 = C_dout [7:0] $end
-$var wire 1 > B_full $end
-$var wire 1 ? B_empty $end
-$var wire 8 @ B_dout [7:0] $end
-$var wire 1 A A_full $end
-$var wire 1 B A_empty $end
-$var wire 8 C A_dout [7:0] $end
+$var wire 1 1 _D_rd $end
+$var wire 1 2 _D_empty $end
+$var wire 8 3 _D_dout [7:0] $end
+$var wire 1 4 _B_rd $end
+$var wire 1 5 _B_empty $end
+$var wire 8 6 _B_dout [7:0] $end
+$var wire 1 7 D_full $end
+$var wire 1 8 D_empty $end
+$var wire 8 9 D_dout [7:0] $end
+$var wire 1 : C_full $end
+$var wire 1 ; C_empty $end
+$var wire 8 < C_dout [7:0] $end
+$var wire 1 = B_full $end
+$var wire 1 > B_empty $end
+$var wire 8 ? B_dout [7:0] $end
+$var wire 1 @ A_full $end
+$var wire 1 A A_empty $end
+$var wire 8 B A_dout [7:0] $end
 $upscope $end
 $enddefinitions $end
 #0
 $dumpvars
-bx C
-xB
-xA
-bx @
-x?
-x>
-bx =
-x<
-x;
-bx :
-x9
-x8
-bx 7
-x6
-z5
-bx 4
-x3
-x2
-bz 1
+bx B
+1A
+1@
+bx ?
+1>
+1=
+bx <
+1;
+1:
+bx 9
+18
+17
+bx 6
+15
+z4
+bx 3
+12
+11
 10
-0/
-z.
-z-
+1/
+bz .
+bz -
 z,
-z+
-z*
+bz +
+bz *
 z)
-z(
+bz (
 z'
-z&
+bz &
 z%
-z$
+bz $
 z#
-z"
+bz "
 z!
 $end
 #5
-1A
-1B
-1?
-1>
-1;
-18
-13
-12
-16
-1<
-19
-1/
-#10
-00
 0/
+#10
+07
+0:
+0=
+0@
+00
+1/
 #15
-08
-0;
-0>
+0/
+#20
+1/
+#25
+0/
+#30
+1/
+#35
+0/
+#40
+1/
+#45
+0/
+#50
+1/
+#55
+0/
+#60
+1/
+#65
+0/
+#70
+1/
+#75
+0/
+#80
+1/
+#85
+0/
+#90
+1/
+#95
+0/
+#100
+04
+b0 $
+b0 (
+b0 +
+b0 .
+b0 "
+b0 &
+b0 *
+b0 -
+0#
+0!
+0'
+0%
+0)
+0,
+1/
+#105
+0/
+#110
+02
 0A
 1/
-#20
+#115
 0/
-#25
-0B
-03
+#120
+1@
+1=
+1:
+0>
+b1011010 6
+b1011010 <
+b1011010 9
+01
+b1011010 B
+05
+0;
+b1011010 3
+08
 1/
-#30
+#125
 0/
-#35
-1;
-1>
-1A
-b0x :
-x2
-b0x =
-b0x 7
-0?
-09
-b0x 4
-0<
-06
-b0x C
+#130
+17
+b1011010 ?
 1/
-#40
+#135
 0/
-#45
-18
-b0x @
+#140
 1/
-#50
+#145
 0/
-#55
+#150
 1/
-#60
+#155
 0/
-#65
+#160
 1/
-#70
+#165
 0/
-#75
+#170
 1/
-#80
+#175
 0/
-#85
+#180
 1/
-#90
+#185
 0/
-#95
+#190
 1/
-#100
+#195
 0/
-#105
+#200
 1/
-#106
+#205
+0/
+#210
+1/
+#215
+0/
+#220
+1/
+#225
+0/
+#230
+1/
+#235
+0/
+#240
+1/
+#245
+0/
+#250
+1/
+#255
+0/
+#260
+1/
+#265
+0/
+#270
+1/
+#275
+0/
+#280
+1/
+#285
+0/
+#290
+1/
+#295
+0/
+#300
+1/
+#305
+0/
+#310
+1/
+#315
+0/
+#320
+1/
+#325
+0/
+#330
+1/
+#335
+0/
+#340
+1/
+#345
+0/
+#350
+1/
+#355
+0/
+#360
+1/
+#365
+0/
+#370
+1/
+#375
+0/
+#380
+1/
+#385
+0/
+#390
+1/
+#395
+0/
+#400
+1/
+#405
+0/
+#410
+1/
+#415
+0/
+#420
+1/
+#425
+0/
+#430
+1/
+#435
+0/
+#440
+1/
+#445
+0/
+#450
+1/
+#455
+0/
+#460
+1/
+#465
+0/
+#470
+1/
+#475
+0/
+#480
+1/
+#485
+0/
+#490
+1/
+#495
+0/
+#500
+1/
+#505
+0/
+#510
+1/
+#511

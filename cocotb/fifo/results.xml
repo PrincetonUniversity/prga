@@ -1,8 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all" tests="0">
-    <property name="random_seed" value="1589293843" />
-    <testcase classname="prga_fifo_cocotb" name="prga_fifo_test" ratio_time="10748385649356.93" sim_time_ns="106000000000" time="0.009861946105957031">
-      <failure message="Test failed with random_seed=1589293843" stderr="" stdout="'src(GPI_REGISTER) contains no object at index 0'" />
-    </testcase>
+    <property name="random_seed" value="1589297736" />
+    <testcase classname="prga_fifo_cocotb" name="prga_fifo_test" ratio_time="25936508833922.26" sim_time_ns="511000000000" time="0.01970195770263672" />
   </testsuite>
 </testsuites>

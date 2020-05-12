@@ -2,22 +2,22 @@ module prga_fifo_tb_wrapper ();
 
     localparam DATA_WIDTH = 8;
     localparam BUS_WIDTH = 8;
-    input clk, rst;
+    input wire clk, rst;
 
-    input [DATA_WIDTH - 1:0] src [0:BUS_WIDTH-1];
+    input wire [DATA_WIDTH - 1:0] src [0:BUS_WIDTH-1];
   
     // A: non-lookahead
     // B: lookahead converted to non-lookahead
     // C: lookahead
     // D: non-lookahead converted to lookahead
 
-    output A_full, A_empty, B_full, B_empty, C_full, C_empty, D_full, D_empty;
-    output [DATA_WIDTH - 1:0] A_dout, B_dout, C_dout, D_dout;
-    input A_valid, A_rd, B_valid, B_rd, C_rd, D_rd;
-    input A_wr_cnt, B_wr_cnt, C_wr_cnt, D_wr_cnt;
-    input A_rd_cnt, B_rd_cnt, C_rd_cnt, D_rd_cnt;
-    output _B_empty, _B_rd, _D_empty, _D_rd;
-    output [DATA_WIDTH - 1:0] _B_dout, _D_dout;
+    output wire A_full, A_empty, B_full, B_empty, C_full, C_empty, D_full, D_empty;
+    output wire [DATA_WIDTH - 1:0] A_dout, B_dout, C_dout, D_dout;
+    input wire A_valid, A_rd, B_valid, B_rd, C_rd, D_rd;
+    input wire [0:BUS_WIDTH-1] A_wr_cnt, B_wr_cnt, C_wr_cnt, D_wr_cnt;
+    input wire [0:BUS_WIDTH-1] A_rd_cnt, B_rd_cnt, C_rd_cnt, D_rd_cnt;
+    output wire _B_empty, _B_rd, _D_empty, _D_rd;
+    output wire [DATA_WIDTH - 1:0] _B_dout, _D_dout;
 
     initial begin
         $dumpfile("test.vcd");
