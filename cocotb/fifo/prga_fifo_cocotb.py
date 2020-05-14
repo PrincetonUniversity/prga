@@ -62,7 +62,6 @@ def prga_fifo_test(dut):
 	
 	error=0
 
-	yield reset_thread.join()
 	
 	for _ in range(100):
 		yield Timer(20)
