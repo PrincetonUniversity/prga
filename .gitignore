@@ -15,4 +15,4 @@ examples/target/*/*/*
 cocotb/fifo/__pycache__
 cocotb/fifo/test.vcd
 cocotb/fifo/build
-cocotb/fifo/sim_build
+cocotb/fifo/sim_build/*
