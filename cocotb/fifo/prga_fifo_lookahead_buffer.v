@@ -7,7 +7,7 @@ module prga_fifo_lookahead_buffer #(
     parameter REVERSED = 0
 ) (
     input wire [0:0] clk,
-    input wire [0:0] rst,
+    input  [0:0] rst,
 
     input wire [0:0] empty_i,
     output reg [0:0] rd_i,

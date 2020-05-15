@@ -1,6 +1,8 @@
 <testsuites name="results">
   <testsuite name="all" package="all" tests="0">
-    <property name="random_seed" value="1589443683" />
-    <testcase classname="prga_fifo_cocotb" name="prga_fifo_test" ratio_time="24573362670544.742" sim_time_ns="2111000000000" time="0.0859060287475586" />
+    <property name="random_seed" value="1589541488" />
+    <testcase classname="prga_fifo_cocotb" name="prga_fifo_test" ratio_time="15172220747384.156" sim_time_ns="121000000000" time="0.007975101470947266">
+      <failure message="Test failed with random_seed=1589541488" stderr="" stdout="'Unable to resolve to binary &gt;xxxxxxxx&lt;'" />
+    </testcase>
   </testsuite>
 </testsuites>

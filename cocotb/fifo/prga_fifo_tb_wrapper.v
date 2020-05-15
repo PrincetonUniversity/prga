@@ -4,7 +4,7 @@ module prga_fifo_tb_wrapper ();
     localparam BUS_WIDTH = 8;
     input wire clk, rst;
 
-    input wire [DATA_WIDTH - 1:0] src [0:BUS_WIDTH-1];
+    input wire [DATA_WIDTH - 1:0] src [0:1023];
   
     // A: non-lookahead
     // B: lookahead converted to non-lookahead
@@ -24,13 +24,15 @@ module prga_fifo_tb_wrapper ();
         $dumpvars(1,prga_fifo_tb_wrapper);
     end
 
+    reg r_rst;
+    always @(*) r_rst =rst;
     
     prga_fifo #(
         .DATA_WIDTH                     (DATA_WIDTH)
         ,.LOOKAHEAD                     (0)
     ) A (
         .clk        (clk)
-        ,.rst       (rst)
+        ,.rst       (r_rst)
         ,.full      (A_full)
         ,.wr        (src[A_wr_cnt] !== {DATA_WIDTH{1'bx}})
         ,.din       (src[A_wr_cnt])
@@ -44,7 +46,7 @@ module prga_fifo_tb_wrapper ();
         ,.LOOKAHEAD                     (1)
     ) B (
         .clk        (clk)
-        ,.rst       (rst)
+        ,.rst       (r_rst)
         ,.full      (B_full)
         ,.wr        (src[B_wr_cnt] !== {DATA_WIDTH{1'bx}})
         ,.din       (src[B_wr_cnt])
@@ -58,7 +60,7 @@ module prga_fifo_tb_wrapper ();
         ,.REVERSED                      (1)
     ) B_buffer (
         .clk        (clk)
-        ,.rst       (rst)
+        ,.rst       (r_rst)
         ,.empty_i   (_B_empty)
         ,.rd_i      (_B_rd)
         ,.dout_i    (_B_dout)
@@ -72,7 +74,7 @@ module prga_fifo_tb_wrapper ();
         ,.LOOKAHEAD                     (1)
     ) C (
         .clk        (clk)
-        ,.rst       (rst)
+        ,.rst       (r_rst)
         ,.full      (C_full)
         ,.wr        (src[C_wr_cnt] !== {DATA_WIDTH{1'bx}})
         ,.din       (src[C_wr_cnt])
@@ -86,7 +88,7 @@ module prga_fifo_tb_wrapper ();
         ,.LOOKAHEAD                     (0)
     ) D (
         .clk        (clk)
-        ,.rst       (rst)
+        ,.rst       (r_rst)
         ,.full      (D_full)
         ,.wr        (src[D_wr_cnt] !== {DATA_WIDTH{1'bx}})
         ,.din       (src[D_wr_cnt])
@@ -100,7 +102,7 @@ module prga_fifo_tb_wrapper ();
         ,.REVERSED                      (0)
     ) D_buffer (
         .clk        (clk)
-        ,.rst       (rst)
+        ,.rst       (r_rst)
         ,.empty_i   (_D_empty)
         ,.rd_i      (_D_rd)
         ,.dout_i    (_D_dout)
