@@ -21,3 +21,4 @@ cocotb/fifo_non_lookahead/__pycache__
 cocotb/fifo_non_lookahead/dump.vcd
 cocotb/fifo_non_lookahead/build
 cocotb/fifo_non_lookahead/sim_build/*
+cocotb/fifo_non_lookahead/a.out
