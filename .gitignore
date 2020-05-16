@@ -13,6 +13,11 @@ examples/target/*/*/*
 !examples/target/*/*/Makefile
 
 cocotb/fifo/__pycache__
-cocotb/fifo/test.vcd
+cocotb/fifo/dump.vcd
 cocotb/fifo/build
 cocotb/fifo/sim_build/*
+
+cocotb/fifo_non_lookahead/__pycache__
+cocotb/fifo_non_lookahead/dump.vcd
+cocotb/fifo_non_lookahead/build
+cocotb/fifo_non_lookahead/sim_build/*
