@@ -66,10 +66,10 @@ module fifo #(
     end
 
 
-    assign full = rst_f || rd_ptr == {~wr_ptr[DEPTH_LOG2], wr_ptr[0 +: DEPTH_LOG2]};
+    assign full = (rst_f || (rd_ptr == {~wr_ptr[DEPTH_LOG2], wr_ptr[0 +: DEPTH_LOG2]}));
 
     assign rd_internal = rd;
     assign dout = ram_dout;
-    assign empty = rst_f || rd_ptr == wr_ptr;
+    assign empty = (rst_f || (rd_ptr == wr_ptr));
 
 endmodule
