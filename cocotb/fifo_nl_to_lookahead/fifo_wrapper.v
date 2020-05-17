@@ -1,20 +1,20 @@
- module fifo_wrapper ();
+ module fifo_wrapper (
+    input clk,
+    input rst,
+    output full,
+    input  wr,
+    input [DATA_WIDTH - 1:0] din,
+    output empty,
+    input rd,
+    output [DATA_WIDTH - 1:0] dout,
+     output [DATA_WIDTH - 1:0] _dout,
+     output _empty, _rd
+);
 
-    localparam DATA_WIDTH = 8;
+    localparam DATA_WIDTH = 32;
 
-    input wire [0:0] clk;
-    input  [0:0] rst;
 
-    output wire [0:0] full;
-    input wire [0:0] wr;
-    input wire [DATA_WIDTH - 1:0] din;
-
-    output wire [0:0] empty;
-    input wire [0:0] rd;
-    output wire [DATA_WIDTH - 1:0] dout;
-
-    wire _empty, _rd;
-    wire [DATA_WIDTH - 1:0] _dout;
+//    wire [DATA_WIDTH - 1:0] _dout;
 
     // initial begin
     //     $dumpfile("dump.vcd");
