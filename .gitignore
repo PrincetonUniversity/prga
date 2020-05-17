@@ -17,8 +17,14 @@ cocotb/fifo/dump.vcd
 cocotb/fifo/build
 cocotb/fifo/sim_build/*
 
-cocotb/fifo_non_lookahead/__pycache__
+cocotb/fifo_non_lookahead/__pycache__/*
 cocotb/fifo_non_lookahead/dump.vcd
 cocotb/fifo_non_lookahead/build
 cocotb/fifo_non_lookahead/sim_build/*
 cocotb/fifo_non_lookahead/a.out
+
+cocotb/fifo_nl_to_lookahead/__pycache__/*
+cocotb/fifo_nl_to_lookahead/dump.vcd
+cocotb/fifo_nl_to_lookahead/build
+cocotb/fifo_nl_to_lookahead/sim_build/*
+cocotb/fifo_nl_to_lookahead/a.out
