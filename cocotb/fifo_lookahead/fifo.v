@@ -2,7 +2,7 @@
 module fifo #(
     parameter DEPTH_LOG2 = 3,
     parameter DATA_WIDTH = 32,
-    parameter LOOKAHEAD = 0,
+    parameter LOOKAHEAD = 1,
     parameter ALLOW_RAM_UNREGISTERED_OUTPUT = 0
 ) (
     input wire [0:0] clk,
@@ -16,6 +16,12 @@ module fifo #(
     input wire [0:0] rd,
     output wire [DATA_WIDTH - 1:0] dout
     );
+
+
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(1,fifo);
+    end
 
 
     // register reset signal for timing purpose

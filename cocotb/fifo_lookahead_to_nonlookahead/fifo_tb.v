@@ -35,6 +35,8 @@ module fifo_tb();
     ); 
 
     initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(1,fifo_tb);
         // Initialize Inputs
         clk = 0;
         rst = 1'b1;
@@ -96,7 +98,7 @@ module fifo_tb();
                 rd_cnt <= rd_cnt + 1;
             end
 
-            rd <= $random() % 2 == 0;
+            rd = $urandom_range(0,1) ;
 
             if (src[rd_cnt] === {DATA_WIDTH{1'bx}}) begin
                 if (error) begin

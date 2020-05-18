@@ -16,10 +16,7 @@
 
 //    wire [DATA_WIDTH - 1:0] _dout;
 
-    // initial begin
-    //     $dumpfile("dump.vcd");
-    //     $dumpvars(1,fifo_tb);
-    // end
+
 
     fifo #(
         .DATA_WIDTH                     (DATA_WIDTH)
