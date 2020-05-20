@@ -86,7 +86,7 @@ if [ -z "${PYTHON_VERSION}" ]; then
     PYTHON_VERSION=3.8.1
 fi
 info "Installing Python ${PYTHON_VERSION} with 'pyenv'"
-pyenv install -s ${PYTHON_VERSION} || exit 1
+env PYTHON_CONFIGURE_OPTS="--enable-shared" CFLAGS="-fPIC" CXXFLAGS="-fPIC" pyenv install ${PYTHON_VERSION} || exit 1
 info "Python ${PYTHON_VERSION} installed with 'pyenv'"
 pyenv local ${PYTHON_VERSION} || exit 1
 if [[ $( python --version | cut -d " " -f 2 ) != "${PYTHON_VERSION}" ]]; then
@@ -132,13 +132,19 @@ ln -s -f ../../vtr/build/utils/fasm/genfasm genfasm
 cd ../..
 
 # build a virtualenv for prga.py
-info "Creating a virtual environment for prga.py"
 cd prga.py
-rm -rf Pipfile*
-pipenv --rm 2>&1 >/dev/null || exit 1
-PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e . || exit 1
+if [ ! -d ".venv" ]; then
+    info "Creating a virtual environment for prga.py"
+    PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e . || exit 1
+elif ["`PIPENV_VENV_IN_PROJECT=1 pipenv run python --version`" -ne "python ${PYTHON_VERSION}"]; then
+    info "Virtual environment exists but version doesn't match"
+    PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e . || exit 1
+else
+    info "Virtual environment exists. Run update"
+    PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} update || exit 1
+fi
 cd ..
-info "Virtual environment created for prga.py"
+info "Virtual environment setup completed for prga.py"
 
 info "Installation finished successfully"
 

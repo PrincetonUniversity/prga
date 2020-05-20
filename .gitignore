@@ -11,3 +11,4 @@ examples/fpga/*/*/*
 examples/target/*/*/*
 !examples/target/*/*/io.partial
 !examples/target/*/*/Makefile
+!examples/target/sha256/testbench/*.v

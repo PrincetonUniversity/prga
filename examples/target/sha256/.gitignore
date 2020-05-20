@@ -1,0 +1,6 @@
+!.gitignore
+!install
+!Makefile.in
+
+sha256
+testbench/build
