@@ -5,7 +5,19 @@ module prga_fifo_tb_wrapper ();
     input clk, rst;
 
     input [DATA_WIDTH - 1:0] src [0:1023];
-  
+
+    // initial begin
+      
+    //     src[0] = 'h5A;
+    //     src[1] = 'hF6;
+    //     src[2] = 'h09;
+    //     src[3] = 'hC4;
+    //     src[4] = 'h81;
+    //     src[5] = 'hE2;
+    //     src[6] = 'hA0;
+    //     src[7] = 'h7A;
+    // end
+
     // A: non-lookahead
     // B: lookahead converted to non-lookahead
     // C: lookahead
