@@ -1,5 +1,9 @@
 $date
+<<<<<<< HEAD
 	Mon May 11 15:54:58 2020
+=======
+	Fri May 15 16:48:08 2020
+>>>>>>> 15311bcaf0f8b49a069f91f5503fe2e10501211f
 $end
 $version
 	Icarus Verilog
@@ -9,6 +13,7 @@ $timescale
 $end
 $scope module prga_fifo_tb_wrapper $end
 $var wire 1 ! A_rd $end
+<<<<<<< HEAD
 $var wire 1 " A_rd_cnt $end
 $var wire 1 # A_valid $end
 $var wire 1 $ A_wr_cnt $end
@@ -43,10 +48,46 @@ $var wire 8 @ B_dout [7:0] $end
 $var wire 1 A A_full $end
 $var wire 1 B A_empty $end
 $var wire 8 C A_dout [7:0] $end
+=======
+$var wire 8 " A_rd_cnt [0:7] $end
+$var wire 1 # A_valid $end
+$var wire 8 $ A_wr_cnt [0:7] $end
+$var wire 1 % B_rd $end
+$var wire 8 & B_rd_cnt [0:7] $end
+$var wire 1 ' B_valid $end
+$var wire 8 ( B_wr_cnt [0:7] $end
+$var wire 1 ) C_rd $end
+$var wire 8 * C_rd_cnt [0:7] $end
+$var wire 8 + C_wr_cnt [0:7] $end
+$var wire 1 , D_rd $end
+$var wire 8 - D_rd_cnt [0:7] $end
+$var wire 8 . D_wr_cnt [0:7] $end
+$var wire 1 / clk $end
+$var wire 1 0 rst $end
+$var wire 1 1 _D_rd $end
+$var wire 1 2 _D_empty $end
+$var wire 8 3 _D_dout [7:0] $end
+$var wire 1 4 _B_rd $end
+$var wire 1 5 _B_empty $end
+$var wire 8 6 _B_dout [7:0] $end
+$var wire 1 7 D_full $end
+$var wire 1 8 D_empty $end
+$var wire 8 9 D_dout [7:0] $end
+$var wire 1 : C_full $end
+$var wire 1 ; C_empty $end
+$var wire 8 < C_dout [7:0] $end
+$var wire 1 = B_full $end
+$var wire 1 > B_empty $end
+$var wire 8 ? B_dout [7:0] $end
+$var wire 1 @ A_full $end
+$var wire 1 A A_empty $end
+$var wire 8 B A_dout [7:0] $end
+>>>>>>> 15311bcaf0f8b49a069f91f5503fe2e10501211f
 $upscope $end
 $enddefinitions $end
 #0
 $dumpvars
+<<<<<<< HEAD
 bx C
 xB
 xA
@@ -75,17 +116,64 @@ z+
 z*
 z)
 z(
+=======
+bx B
+1A
+1@
+bx ?
+1>
+1=
+bx <
+1;
+1:
+bx 9
+18
+17
+bx 6
+15
+z4
+bx 3
+12
+11
+10
+1/
+bz .
+bz -
+z,
+bz +
+bz *
+z)
+bz (
+>>>>>>> 15311bcaf0f8b49a069f91f5503fe2e10501211f
 z'
-z&
+bz &
 z%
-z$
+bz $
 z#
-z"
+bz "
 z!
 $end
 #5
 0/
 #10
+<<<<<<< HEAD
+=======
+04
+b0 $
+b0 (
+b0 +
+b0 .
+b0 "
+b0 &
+b0 *
+b0 -
+0#
+0!
+0'
+0%
+0)
+0,
+>>>>>>> 15311bcaf0f8b49a069f91f5503fe2e10501211f
 1/
 #15
 0/
@@ -122,14 +210,28 @@ $end
 #95
 0/
 #100
+<<<<<<< HEAD
+=======
+0@
+0=
+0:
+07
+00
+>>>>>>> 15311bcaf0f8b49a069f91f5503fe2e10501211f
 1/
 #105
 0/
 #110
+<<<<<<< HEAD
+=======
+02
+0A
+>>>>>>> 15311bcaf0f8b49a069f91f5503fe2e10501211f
 1/
 #115
 0/
 #120
+<<<<<<< HEAD
 1/
 #125
 0/
@@ -921,3 +1023,20 @@ b0x @
 #2000
 1/
 #2001
+=======
+1@
+1=
+1:
+0>
+b1011010 6
+b1011010 <
+b1011010 9
+01
+b1011010 B
+05
+0;
+b1011010 3
+08
+1/
+#121
+>>>>>>> 15311bcaf0f8b49a069f91f5503fe2e10501211f

@@ -2,7 +2,7 @@
 //
 // Convert a non-lookahead FIFO to a lookahead FIFO if REVERSED is 0
 // or, convert a lookahead FIFO to a non-lookahead FIFO if REVERSED is 1
-module prga_fifo_lookahead_buffer #(
+module fifo_lookahead_buffer #(
     parameter DATA_WIDTH = 32,
     parameter REVERSED = 0
 ) (
