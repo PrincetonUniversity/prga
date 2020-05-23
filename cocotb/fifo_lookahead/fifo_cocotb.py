@@ -11,7 +11,7 @@ valid = 0
 @cocotb.coroutine
 def reset_signal(dut):
     dut.rst <= 1
-    yield Timer(100)
+    yield Timer(10)
     dut.rst <= 0
 
 @cocotb.test()
@@ -45,22 +45,23 @@ def prga_fifo_test(dut):
 
     # Initialize src array
     src = random.sample(range(0, 2**data_width -1), len_src)
-    # src = [i for i in range(1,len_src+1)]
-    for i in range(len_src):
-        dut._log.info("src["+str(i)+"]="+str(src[i]))
+    src = [i for i in range(1,len_src+1)]
+    # for i in range(len_src):
+        # dut._log.info("src["+str(i)+"]="+str(src[i]))
 
     din <= 0
     wr <= 0
     rd <= 0
+    yield Timer(1)
 
     for index in range(100):
         yield RisingEdge(dut.clk)
-        # dut._log.info(str(dut.rst.value))
         if(int(dut.rst.value) == 1 ):
             curr_pos_rd = 0
             curr_pos_wr = 0
             valid = 0
             rd <= 0
+            error = 0
             din <= src[curr_pos_wr]
             dut.wr <= (curr_pos_wr < len_src)
             error = 0
@@ -69,9 +70,10 @@ def prga_fifo_test(dut):
                 curr_pos_wr += 1
                 dut.wr <= (curr_pos_wr < len_src)
                 din <= src[curr_pos_wr]
+            yield Timer(1)
 
             valid = (~int(empty.value) & int(rd.value))
-            
+
             if (valid):
                 dut._log.info(str(src[curr_pos_rd]))
                 dut._log.info("Inside Valid "+str(dout.value.integer))
@@ -80,8 +82,8 @@ def prga_fifo_test(dut):
                     dut._log.info("[ERROR] output No." +str(curr_pos_rd) + " "+ str(dout.value.integer)+ " != "+ str(src[curr_pos_rd]))
                     # raise TestFailure("[ERROR] output No." +str(curr_pos_rd) + " "+ str(dout.value.integer)+ " != "+ str(src[curr_pos_rd]))
                 curr_pos_rd += 1
-                
+            
             rd <= random.choice([0,1])
 
-            if(curr_pos_rd == len_src):
+            if(curr_pos_rd >= len_src):
                 break

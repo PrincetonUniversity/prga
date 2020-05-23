@@ -41,14 +41,22 @@ module fifo_tb;
         wr = 1;
         din = 0;
         rd = 0;
-        src[0] = 'h5A;
-        src[1] = 'hF6;
-        src[2] = 'h09;
-        src[3] = 'hC4;
-        src[4] = 'h81;
-        src[5] = 'hE2;
-        src[6] = 'hA0;
-        src[7] = 'h7A;
+        // src[0] = 'h5A;
+        // src[1] = 'hF6;
+        // src[2] = 'h09;
+        // src[3] = 'hC4;
+        // src[4] = 'h81;
+        // src[5] = 'hE2;
+        // src[6] = 'hA0;
+        // src[7] = 'h7A;
+        src[0] = 'h1;
+        src[1] = 'h2;
+        src[2] = 'h3;
+        src[3] = 'h4;
+        src[4] = 'h5;
+        src[5] = 'h6;
+        src[6] = 'h7;
+        src[7] = 'h8;
         clk =0;
         $display("src[0] = %d", src[0]); 
         $display("src[1] = %d", src[1]);
@@ -87,7 +95,7 @@ module fifo_tb;
 
             valid = !empty && rd;
 
-            if (valid) begin
+            if (valid && curr_pos_rd>1) begin
                 if (src[rd_cnt] !== dout) begin
                                     error <= 'b1;
                                      $display("s time is ",$stime); 

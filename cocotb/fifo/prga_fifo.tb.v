@@ -202,10 +202,17 @@
                 D_rd_cnt <= D_rd_cnt + 1;
             end
 
-            A_rd <= $random() % 3 == 0;
-            B_rd <= $random() % 3 == 0;
-            C_rd <= $random() % 3 == 0;
-            D_rd <= $random() % 3 == 0;
+            // A_rd <= $random() % 3 == 0;
+            // B_rd <= $random() % 3 == 0;
+            // C_rd <= $random() % 3 == 0;
+            // D_rd <= $random() % 3 == 0;
+            // 
+
+            A_rd = $urandom_range(0,1) ;
+            B_rd = $urandom_range(0,1) ;
+            C_rd = $urandom_range(0,1) ;
+            D_rd = $urandom_range(0,1) ;
+            
 
             if (src[A_rd_cnt] === {DATA_WIDTH{1'bx}} &&
                 src[B_rd_cnt] === {DATA_WIDTH{1'bx}} &&
