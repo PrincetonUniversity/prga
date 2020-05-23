@@ -35,6 +35,12 @@ cocotb/fifo_lookahead/build
 cocotb/fifo_lookahead/sim_build/*
 cocotb/fifo_lookahead/a.out
 
+cocotb/fifo_non_lookahead_to_lookahead/__pycache__/*
+cocotb/fifo_non_lookahead_to_lookahead/dump.vcd
+cocotb/fifo_non_lookahead_to_lookahead/build
+cocotb/fifo_non_lookahead_to_lookahead/sim_build/*
+cocotb/fifo_non_lookahead_to_lookahead/a.out
+
 cocotb/lut/__pycache__/*
 cocotb/lut/dump.vcd
 cocotb/lut/build
