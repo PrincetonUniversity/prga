@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all" tests="0">
-    <property name="random_seed" value="1590230661" />
-    <testcase classname="fifo_cocotb" name="prga_fifo_test" ratio_time="25746588826439.43" sim_time_ns="237000000000" time="0.009205102920532227" />
+    <property name="random_seed" value="1590318387" />
+    <testcase classname="fifo_cocotb" name="prga_fifo_test" ratio_time="27247443896767.02" sim_time_ns="257000000000" time="0.009432077407836914" />
   </testsuite>
 </testsuites>

@@ -87,7 +87,7 @@ module fifo_tb();
                 wr_cnt <= wr_cnt + 1;
             end
 
-            valid <= !empty && rd;
+            valid = !empty && rd;
 
             if (valid) begin
                 if (src[rd_cnt] !== dout) begin

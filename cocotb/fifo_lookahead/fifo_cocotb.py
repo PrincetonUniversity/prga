@@ -14,6 +14,14 @@ def reset_signal(dut):
     yield Timer(10)
     dut.rst <= 0
 
+@cocotb.coroutine
+def read_signal(dut):
+    dut.rd<= 0
+    yield Timer(20)
+    dut.rd <= 1
+    yield Timer(10)
+    dut.rd <= 0
+
 @cocotb.test()
 def prga_fifo_test(dut):
     """Test bench from scratch for non-lookahead buffer"""
@@ -25,6 +33,9 @@ def prga_fifo_test(dut):
     cocotb.fork(c.start(test_time//clock_period,start_high = False))
     
     cocotb.fork(reset_signal(dut))
+    
+    cocotb.fork(read_signal(dut))
+
     data_width = int(dut.DATA_WIDTH.value)
     
     # DECLARATIONS
@@ -52,7 +63,6 @@ def prga_fifo_test(dut):
     din <= 0
     wr <= 0
     rd <= 0
-    yield Timer(1)
 
     for index in range(100):
         yield RisingEdge(dut.clk)
@@ -68,8 +78,8 @@ def prga_fifo_test(dut):
         else:
             if(~int(full.value) and (curr_pos_wr+1)<len_src):
                 curr_pos_wr += 1
-                dut.wr <= (curr_pos_wr < len_src)
-                din <= src[curr_pos_wr]
+                dut.wr.value = (curr_pos_wr < len_src)
+                din.value = src[curr_pos_wr]
             yield Timer(1)
 
             valid = (~int(empty.value) & int(rd.value))
@@ -83,7 +93,7 @@ def prga_fifo_test(dut):
                     # raise TestFailure("[ERROR] output No." +str(curr_pos_rd) + " "+ str(dout.value.integer)+ " != "+ str(src[curr_pos_rd]))
                 curr_pos_rd += 1
             
-            rd <= random.choice([0,1])
+            # rd <= random.choice([0,1])
 
             if(curr_pos_rd >= len_src):
                 break

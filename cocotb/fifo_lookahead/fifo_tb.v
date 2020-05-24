@@ -93,14 +93,14 @@ module fifo_tb;
                 wr_cnt = wr_cnt + 1;
             end
 
-            valid = !empty && rd;
+            valid <= !empty && rd;
 
-            if (valid && curr_pos_rd>1) begin
-                if (src[rd_cnt] !== dout) begin
-                                    error <= 'b1;
-                                     $display("s time is ",$stime); 
-                           $display("[ERROR] output No. %d %d != %d", rd_cnt, dout, src[rd_cnt]);
-                          end
+            if (valid) begin
+                if (src[rd_cnt] !== dout && src[rd_cnt] !== {DATA_WIDTH{1'bx}}) begin
+                    error <= 'b1;
+                    $display("s time is ",$stime); 
+                    $display("[ERROR] output No. %d %d != %d", rd_cnt, dout, src[rd_cnt]);
+                end
                 rd_cnt <= rd_cnt + 1;
             end
 
