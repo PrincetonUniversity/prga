@@ -44,14 +44,18 @@ builder = ctx.create_logic_block("clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
 in_ = builder.create_input("in", 12, Orientation.west)
 out = builder.create_output("out", 4, Orientation.east)
+xbar_i, xbar_o = [in_], []
 cin = builder.create_input("cin", 1, Orientation.south)
 for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"], "cluster", vpr_num_pb = 2)):
     builder.connect(clk, inst.pins['clk'])
-    builder.connect(in_[6 * i: 6 * (i + 1)], inst.pins['in'])
+    # builder.connect(in_[6 * i: 6 * (i + 1)], inst.pins['in'])
     builder.connect(inst.pins['out'], out[2 * i: 2 * (i + 1)])
     builder.connect(cin, inst.pins["cin"], pack_patterns = ["carrychain"])
+    xbar_i.append(inst.pins["out"])
+    xbar_o.append(inst.pins["in"])
     cin = inst.pins["cout"]
 builder.connect(cin, builder.create_output("cout", 1, Orientation.north), pack_patterns = ["carrychain"])
+builder.connect(xbar_i, xbar_o, fully = True)
 clb = builder.commit()
 
 ctx.create_tunnel("carrychain", clb.ports["cout"], clb.ports["cin"], (0, -1))

@@ -1,8 +1,9 @@
 CONFIG ?= bitchain
+PICKLED_CONTEXT ?= $(FPGA_DIR)/ctx.pickled
+PARTIAL_IOBINDING ?= io.partial
+
 TARGET := picorv32
-PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pickled
 SIM_MAKEFILE := Makefile.sim
-PARTIAL_IOBINDING := io.partial
 
 .PHONY: all project
 all: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
