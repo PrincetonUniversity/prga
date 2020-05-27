@@ -56,9 +56,9 @@ def prga_fifo_test(dut):
 
     # Initialize src array
     src = random.sample(range(0, 2**data_width -1), len_src)
-    src = [i for i in range(1,len_src+1)]
-    # for i in range(len_src):
-        # dut._log.info("src["+str(i)+"]="+str(src[i]))
+    # src = [i for i in range(1,len_src+1)]
+    for i in range(len_src):
+        dut._log.info("src["+str(i)+"]="+str(src[i]))
 
     din <= 0
     wr <= 0
@@ -71,15 +71,13 @@ def prga_fifo_test(dut):
             curr_pos_wr = 0
             valid = 0
             rd <= 0
-            error = 0
-            din <= src[curr_pos_wr]
-            dut.wr <= (curr_pos_wr < len_src)
+            dut.wr <= 0
             error = 0
         else:
-            if(~int(full.value) and (curr_pos_wr+1)<len_src):
-                curr_pos_wr += 1
+            if(~int(full.value) and (curr_pos_wr)<len_src):
                 dut.wr.value = (curr_pos_wr < len_src)
                 din.value = src[curr_pos_wr]
+                curr_pos_wr += 1
             yield Timer(1)
 
             valid = (~int(empty.value) & int(rd.value))
@@ -93,7 +91,7 @@ def prga_fifo_test(dut):
                     # raise TestFailure("[ERROR] output No." +str(curr_pos_rd) + " "+ str(dout.value.integer)+ " != "+ str(src[curr_pos_rd]))
                 curr_pos_rd += 1
             
-            # rd <= random.choice([0,1])
+            rd <= random.choice([0,1])
 
             if(curr_pos_rd >= len_src):
                 break
