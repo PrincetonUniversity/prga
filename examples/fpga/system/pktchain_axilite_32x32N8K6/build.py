@@ -7,6 +7,7 @@ from prga.passes.rtl import *
 from prga.passes.yosys import *
 from prga.cfg.pktchain.lib import Pktchain
 from prga.cfg.pktchain.system import PktchainSystem
+from prga.netlist.module.module import Module
 from prga.netlist.module.util import ModuleUtils
 from prga.netlist.net.util import NetUtils
 from prga.util import enable_stdout_logging
@@ -24,6 +25,14 @@ memcol_idx = (2, )
 try:
     f = open("ctx.tmp.pkl", "rb")
     ctx = Context.unpickle(f)
+
+    # patches
+    if "i_clkdiv" not in ctx._database[ModuleView.logical, "pktchain_axilite_intf"].instances:
+        clkdiv = ctx._database[ModuleView.logical, "prga_clkdiv"] = Module("prga_clkdiv",
+                view = ModuleView.logical,
+                verilog_template = "cdclib/prga_clkdiv.v")
+        ModuleUtils.instantiate(ctx._database[ModuleView.logical, "pktchain_axilite_intf"],
+                clkdiv, "i_clkdiv")
 except FileNotFoundError:
     ctx = Pktchain.new_context(phit_width = 32, cfg_width = 1)
     

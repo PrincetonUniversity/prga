@@ -138,7 +138,7 @@ module sha256_axilite_slave (
 
     always @(posedge ACLK) begin
         if (~ARESETn) begin
-            block <= 'b0;
+            block <= 512'b0;
             first_n <= 'b0;
         end else begin
             if (awaddr_val && wdata_val && ~bresp_stall) begin

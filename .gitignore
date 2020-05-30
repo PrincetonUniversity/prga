@@ -13,5 +13,5 @@ examples/target/*/*/*
 !examples/target/*/*/Makefile
 
 !examples/target/sha256/testbench/*.v
-!examples/target/sha256/testsys/wrap.v
+!examples/target/sha256/testsys/src
 !examples/target/sha256/testsys/test.py
