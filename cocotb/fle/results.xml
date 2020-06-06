@@ -1,0 +1,8 @@
+<testsuites name="results">
+  <testsuite name="all" package="all" tests="0">
+    <property name="random_seed" value="1591460251" />
+    <testcase classname="test" name="simple_test" ratio_time="12448178770949.72" sim_time_ns="731000000000" time="0.05872344970703125">
+      <failure message="Test failed with random_seed=1591460251" stderr="" stdout="'Mode LUT6X1 given bits_in bits 3 expected_out[1]!=out[0]'" />
+    </testcase>
+  </testsuite>
+</testsuites>

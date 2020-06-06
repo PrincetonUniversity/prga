@@ -53,16 +53,16 @@ def always_star(dut,cfg_d,LUT5A_DATA,LUT5B_DATA,CIN_FABRIC,ENABLE_FFA,ENABLE_FFB
                 expected_out[1] = 0
 
                 if expected_out[1] != dut.out.value[0].integer: 
-                    # dut._log.info("Mode LUT6X1 given bits_in bits " + input+" expected_out[1]!=out[0]")
-                    raise TestFailure("Mode LUT6X1 given bits_in bits " + input+" expected_out[1]!=out[0]")
+                    # dut._log.info("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[1]!=out[0]")
+                    raise TestFailure("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[1]!=out[0]")
                 
                 if expected_out[0] != dut.out.value[1].integer: 
-                    # dut._log.info("Mode LUT6X1 given bits_in bits " + input+" expected_out[0]!=out[1]")
-                    raise TestFailure("Mode LUT6X1 given bits_in bits " + input+" expected_out[0]!=out[1]")
+                    # dut._log.info("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[0]!=out[1]")
+                    raise TestFailure("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[0]!=out[1]")
                 
                 if expected_cout != dut.cout.value.integer:
-                    # dut._log.info("Mode LUT6X1 given bits_in bits " + input+" expected_cout!=cout")
-                    raise TestFailure("Mode LUT6X1 given bits_in bits " + input+" expected_cout!=cout")
+                    # dut._log.info("Mode LUT6X1 given bits_in bits " + str(input)+" expected_cout!=cout")
+                    raise TestFailure("Mode LUT6X1 given bits_in bits " + str(input)+" expected_cout!=cout")
                 
                 raise TestSuccess("Test Success")
 
@@ -78,18 +78,18 @@ def always_star(dut,cfg_d,LUT5A_DATA,LUT5B_DATA,CIN_FABRIC,ENABLE_FFA,ENABLE_FFB
                 else:
                     expected_out[1] = internal_lut[1]
                 
-                if expected_out[1] != out.value[0].integer: 
-                    # dut._log.info("Mode LUT5X2 given bits_in bits " + bits_in.value.binstr+" expected_out[1]!=out[0]")
-                    raise TestFailure("Mode LUT5X2 given bits_in bits " + bits_in.value.binstr+" expected_out[1]!=out[0]")
-                
-                if expected_out[0] != out.value[1].integer: 
-                    # dut._log.info("Mode LUT5X2 given bits_in bits " + bits_in.value.binstr+" expected_out[0]!=out[1]")
-                    raise TestFailure("Mode LUT5X2 given bits_in bits " + bits_in.value.binstr+" expected_out[0]!=out[1]")
-                
-                if expected_cout != cout.value.integer:
-                    # dut._log.info("Mode LUT5X2 given bits_in bits " + bits_in.value.binstr+" expected_cout!=cout")
-                    raise TestFailure("Mode LUT5X2 given bits_in bits " + bits_in.value.binstr+" expected_cout!=cout")
 
+                if expected_out[1] != dut.out.value[0].integer: 
+                    # dut._log.info("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[1]!=out[0]")
+                    raise TestFailure("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[1]!=out[0]")
+                
+                if expected_out[0] != dut.out.value[1].integer: 
+                    # dut._log.info("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[0]!=out[1]")
+                    raise TestFailure("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[0]!=out[1]")
+                
+                if expected_cout != dut.cout.value.integer:
+                    # dut._log.info("Mode LUT6X1 given bits_in bits " + str(input)+" expected_cout!=cout")
+                    raise TestFailure("Mode LUT6X1 given bits_in bits " + str(input)+" expected_cout!=cout")
 
             elif mode == 3:
 
@@ -106,17 +106,18 @@ def always_star(dut,cfg_d,LUT5A_DATA,LUT5B_DATA,CIN_FABRIC,ENABLE_FFA,ENABLE_FFB
 
                 expected_cout = internal_sum//2
                 
-                if expected_out[1] != out.value[0].integer: 
-                    # dut._log.info("Mode ARITH given bits_in bits " + bits_in.value.binstr+" expected_out[1]!=out[0]")
-                    raise TestFailure("Mode ARITH given bits_in bits " + bits_in.value.binstr+" expected_out[1]!=out[0]")
+
+                if expected_out[1] != dut.out.value[0].integer: 
+                    # dut._log.info("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[1]!=out[0]")
+                    raise TestFailure("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[1]!=out[0]")
                 
-                if expected_out[0] != out.value[1].integer: 
-                    # dut._log.info("Mode ARITH given bits_in bits " + bits_in.value.binstr+" expected_out[0]!=out[1]")
-                    raise TestFailure("Mode ARITH given bits_in bits " + bits_in.value.binstr+" expected_out[0]!=out[1]")
+                if expected_out[0] != dut.out.value[1].integer: 
+                    # dut._log.info("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[0]!=out[1]")
+                    raise TestFailure("Mode LUT6X1 given bits_in bits " + str(input)+" expected_out[0]!=out[1]")
                 
-                if expected_cout != cout.value.integer:
-                    # dut._log.info("Mode ARITH given bits_in bits " + bits_in.value.binstr+" expected_cout!=cout")
-                    raise TestFailure("Mode ARITH given bits_in bits " + bits_in.value.binstr+" expected_cout!=cout")
+                if expected_cout != dut.cout.value.integer:
+                    # dut._log.info("Mode LUT6X1 given bits_in bits " + str(input)+" expected_cout!=cout")
+                    raise TestFailure("Mode LUT6X1 given bits_in bits " + str(input)+" expected_cout!=cout")
 
             else:
                 raise TestFailure("Mode Not Supported")  
@@ -167,19 +168,30 @@ def simple_test(dut):
 
     yield NextTimeStep()
 
+    dut._log.info("        TEST PARAMETERS         ")
     n_bits = CFG_BITCOUNT
     
     # Set CIN_FABRIC bit
-    cfg_d.insert(0,0)
-    cfg_i <= 0
+    cin_fabric = random.choice([0,1]) 
+    cfg_d.insert(0,cin_fabric)
+    cfg_i <= cin_fabric
     yield RisingEdge(cfg_clk)
+    dut._log.info("        CIN_FABRIC "+str(cin_fabric))
 
     # Set the MODE
     # 3 modes:
     #  a) LUT6 + optional DFF (mode = 0) 
     #  b) 2x (LUT5 + optional DFF (mode = 2)
     #  c) 2x LUT => adder => optional DFF for sum & cout_fabric (mode = 3)
-    mode = 0 # Substitute the value in paranthesis from any one of the above
+
+    mode = 2 # Substitute the value in paranthesis from any one of the above
+    if mode == 0:
+        dut._log.info("        LUT6 + optional DFF         ")
+    elif mode == 2:
+        dut._log.info("        2x (LUT5 + optional DFF         ")
+    else:
+        dut._log.info("        2x LUT => adder => optional DFF for sum & cout_fabric         ")
+
     for _ in range(MODE_WIDTH):
         cfg_d.insert(0,mode%2)
         cfg_i <= mode%2
@@ -187,19 +199,21 @@ def simple_test(dut):
         yield RisingEdge(cfg_clk)
     
     # Set the ENABLE_FFB
-    cfg_d.insert(0,0)
-    cfg_i <= 0
+    enable_ffb = random.choice([0,1]) 
+    cfg_d.insert(0,enable_ffb)
+    cfg_i <= enable_ffb
     yield RisingEdge(cfg_clk)
 
     # Set the ENABLE_FFA
-    cfg_d.insert(0,0)
-    cfg_i <= 0
+    enable_ffa = random.choice([0,1]) 
+    cfg_d.insert(0,enable_ffa)
+    cfg_i <= enable_ffa
     yield RisingEdge(cfg_clk)
     
     # Set the LUTB_DATA
     b_data = random.choice(range(2**LUT5B_DATA_WIDTH - 1))
     # b_data =1
-    print("b_data is "+str(b_data))
+    dut._log.info("        b_data is "+str(b_data)+"         ")
     for _ in range(LUT5B_DATA_WIDTH):
         cfg_d.insert(0,b_data%2)
         cfg_i <= b_data%2
@@ -209,7 +223,7 @@ def simple_test(dut):
     # Set the LUTA_DATA
     a_data = random.choice(range(2**LUT5A_DATA_WIDTH - 1))
     # a_data =1
-    print("a_data is "+str(a_data))
+    dut._log.info("       a_data is "+str(a_data)+"         ")
     for _ in range(LUT5A_DATA_WIDTH):
         cfg_d.insert(0,a_data%2)
         cfg_i <= a_data%2
