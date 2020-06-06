@@ -50,3 +50,11 @@ cocotb/lut/dump.vcd
 cocotb/lut/build
 cocotb/lut/sim_build/*
 cocotb/lut/a.out
+cocotb/lut/results.xml
+
+cocotb/fle/__pycache__/*
+cocotb/fle/dump.vcd
+cocotb/fle/build
+cocotb/fle/sim_build/*
+cocotb/fle/results.xml
+cocotb/fle/a.out
