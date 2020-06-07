@@ -1,8 +1,8 @@
 <testsuites name="results">
   <testsuite name="all" package="all" tests="0">
-    <property name="random_seed" value="1591460251" />
-    <testcase classname="test" name="simple_test" ratio_time="12448178770949.72" sim_time_ns="731000000000" time="0.05872344970703125">
-      <failure message="Test failed with random_seed=1591460251" stderr="" stdout="'Mode LUT6X1 given bits_in bits 3 expected_out[1]!=out[0]'" />
-    </testcase>
+    <property name="random_seed" value="1591549108" />
+    <testcase classname="test" name="test_ARITH" ratio_time="9256607621641.484" sim_time_ns="1021000000000" time="0.11029958724975586" />
+    <testcase classname="test" name="test_LUT5X2" ratio_time="10944412343943.672" sim_time_ns="1021000000000" time="0.09328961372375488" />
+    <testcase classname="test" name="test_LUT6X1" ratio_time="17393983872587.533" sim_time_ns="702000000000" time="0.040358781814575195" />
   </testsuite>
 </testsuites>

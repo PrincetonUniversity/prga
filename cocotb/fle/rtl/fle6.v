@@ -81,7 +81,7 @@ module fle6 (
         // synopsys translate_on
     end
 
-    wire [1:0] internal_sum;
+    wire [1:0] internal_sum; 
     assign internal_sum = internal_lut[0] + internal_lut[1] + (cfg_d[CIN_FABRIC] ? internal_in[5] : cin);
 
     wire [MODE_WIDTH-1:0] mode;
