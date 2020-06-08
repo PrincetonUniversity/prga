@@ -72,13 +72,9 @@ def always_star(dut,cfg_d,LUT5A_DATA,LUT5B_DATA,CIN_FABRIC,ENABLE_FFA,ENABLE_FFB
                 else:
                     expected_out[1] = config.internal_lut[1]
                 
-                # if (expected_out[0]+2*expected_out[1]) != dut.out.value.integer: 
-                #     dut._log.info("Mode LUT5X2 given bits_in bits " + str(input)+" expected_out!=out")
-                #     # raise TestFailure("Mode LUT5X2 given bits_in bits " + str(input)+" expected_out[1]!=out[0]")
-                if dut.out.value[0].binstr != 'x' and dut.out.value[1].binstr != 'x':
-                    if (expected_out[0]+2*expected_out[1]) != dut.out.value.integer: 
-                        dut._log.info("Mode LUT5X2 given bits_in bits " + str(input)+" expected_out!=out")
-                        # raise TestFailure("Mode LUT5X2 given bits_in bits " + str(input)+" expected_out[1]!=out[0]")
+                if (expected_out[0]+2*expected_out[1]) != dut.out.value.integer: 
+                    dut._log.info("Mode LUT5X2 given bits_in bits " + str(input)+" expected_out!=out")
+                    # raise TestFailure("Mode LUT5X2 given bits_in bits " + str(input)+" expected_out[1]!=out[0]")
                                 
                 if expected_cout != dut.cout.value.integer:
                     dut._log.info("Mode LUT5X2 given bits_in bits " + str(input)+" expected_cout!=cout")
@@ -147,7 +143,7 @@ def wrapper(dut,test_mode=0):
     CFG_BITCOUNT = dut.CFG_BITCOUNT.value.integer
 
     # No. of input bits
-    n_input = 6
+    n_input = {{module.n_input}}
 
     cfg_d = []
 
