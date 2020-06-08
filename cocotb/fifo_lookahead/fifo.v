@@ -14,7 +14,10 @@ module fifo #(
 
     output wire [0:0] empty,
     input wire [0:0] rd,
-    output wire [DATA_WIDTH - 1:0] dout
+    output wire [DATA_WIDTH - 1:0] dout,
+
+    // Test variables
+    input wire [0:0] test_clk 
     );
 
 
@@ -84,7 +87,7 @@ module fifo #(
     end else begin
         assign rd_internal = rd;
         assign dout = ram_dout;
-        assign empty = rst_f || rd_ptr == wr_ptr;
+        assign empty = rst_f || (rd_ptr == wr_ptr);
     end endgenerate
 
 endmodule

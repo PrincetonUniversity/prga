@@ -2,12 +2,13 @@
 //
 // Convert a non-lookahead FIFO to a lookahead FIFO if REVERSED is 0
 // or, convert a lookahead FIFO to a non-lookahead FIFO if REVERSED is 1
+`timescale 1ns/1ps
 module fifo_lookahead_buffer #(
     parameter DATA_WIDTH = 32,
     parameter REVERSED = 0
 ) (
     input wire [0:0] clk,
-    input  [0:0] rst,
+    input wire [0:0] rst,
 
     input wire [0:0] empty_i,
     output reg [0:0] rd_i,
