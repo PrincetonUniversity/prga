@@ -32,6 +32,7 @@ def simple_test(dut):
     cfg_d = dut.cfg_d
     
     # No. of input bits
+    # n_input = input()
     n_input = {{module.n_input}}
 
     # Setting up LUT

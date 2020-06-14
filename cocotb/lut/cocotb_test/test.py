@@ -6,7 +6,7 @@ import math
 from cocotb.result import TestFailure
 from cocotb.binary import BinaryValue
 from cocotb.scoreboard import Scoreboard
-import queue
+import pickle
 
 def clock_generation(clk):
     clock_period = 10 #This must be an even number
@@ -22,7 +22,12 @@ def simple_test(dut):
     
     clock_generation(dut.cfg_clk)
     clk = dut.cfg_clk
-    # Signals
+    # Get data from pickled file
+    infile = open('test.pckl','rb')
+    module = pickle.load(infile)
+    infile.close()
+
+    # Signals 
     input = dut.bits_in
     out = dut.out
     cfg_e = dut.cfg_e
@@ -32,7 +37,7 @@ def simple_test(dut):
     cfg_d = dut.cfg_d
     
     # No. of input bits
-    n_input = 4
+    n_input = module["n_input"]
 
     # Setting up LUT
     # Set the value of cfd
@@ -64,6 +69,10 @@ def changing_config(dut):
     
     clock_generation(dut.cfg_clk)
     clk = dut.cfg_clk
+    # Get data from pickled file
+    infile = open('test.pckl','rb')
+    module = pickle.load(infile)
+    infile.close()
 
     # Signals
     input = dut.bits_in
@@ -75,7 +84,7 @@ def changing_config(dut):
     cfg_d = dut.cfg_d
     
     # No. of input bits
-    n_input = 4
+    n_input = module["n_input"]
 
     # Setting up LUT
     # Set the value of cfd
