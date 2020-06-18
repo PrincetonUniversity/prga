@@ -9,7 +9,7 @@ from prga.netlist.module.util import ModuleUtils
 from prga.netlist.net.util import NetUtils
 
 from itertools import product
-from pympler.asizeof import asizeof as size
+import sys
 
 ctx = Scanchain.new_context(1)
 gbl_clk = ctx.create_global("clk", is_clock = True)
@@ -22,7 +22,7 @@ memory = ctx.create_memory("dpram_a10d8", 10, 8).commit()
 builder = ctx.create_cluster("cluster")
 o = builder.create_output("o", 3)
 lut = builder.instantiate(ctx.primitives["fraclut6"], "lut")
-(ffA, ffB) = builder.instantiate(ctx.primitives["mdff"], "ff", vpr_num_pb = 2)
+(ffA, ffB) = builder.instantiate(ctx.primitives["mdff"], "ff", 2)
 adder = builder.instantiate(ctx.primitives["adder"], "fa")
 builder.connect(builder.create_clock("clk"), [ffA.pins['clk'], ffB.pins['clk']], fully = True)
 builder.connect(builder.create_input("ce", 1), [ffA.pins["ce"], ffB.pins['ce']], fully = True)
@@ -30,16 +30,16 @@ builder.connect(builder.create_input("sr", 1), [ffA.pins["sr"], ffB.pins['sr']],
 builder.connect(builder.create_input("ia", 6), lut.pins['in'])
 builder.connect(lut.pins['o6'], o[0])
 builder.connect(lut.pins['o5'], o[2])
-builder.connect(lut.pins['o6'], ffA.pins['D'], pack_patterns = ['lut6_dff', 'lut5A_dff'])
-builder.connect(lut.pins['o5'], ffB.pins['D'], pack_patterns = ['lut5B_dff'])
+builder.connect(lut.pins['o6'], ffA.pins['D'], vpr_pack_patterns = ['lut6_dff', 'lut5A_dff'])
+builder.connect(lut.pins['o5'], ffB.pins['D'], vpr_pack_patterns = ['lut5B_dff'])
 builder.connect(lut.pins['o6'], adder.pins['a']) 
 builder.connect(builder.create_input("ib", 1), adder.pins['b']) 
-builder.connect(builder.create_input("cin", 1), adder.pins["cin"], pack_patterns = ["carrychain"])
+builder.connect(builder.create_input("cin", 1), adder.pins["cin"], vpr_pack_patterns = ["carrychain"])
 builder.connect(builder.create_input("cin_fabric", 1), adder.pins["cin_fabric"])
 builder.connect(adder.pins["s"], ffA.pins["D"])
 builder.connect(adder.pins["s"], o[1])
 builder.connect(ffA.pins['Q'], o[1])
-builder.connect(adder.pins["cout"], builder.create_output("cout", 1), pack_patterns = ["carrychain"])
+builder.connect(adder.pins["cout"], builder.create_output("cout", 1), vpr_pack_patterns = ["carrychain"])
 builder.connect(adder.pins["cout_fabric"], ffB.pins["D"])
 builder.connect(adder.pins["cout_fabric"], o[2])
 builder.connect(ffB.pins['Q'], o[2])
@@ -67,7 +67,7 @@ clk = builder.create_global(gbl_clk, Orientation.south)
 ce = builder.create_input("ce", 1, Orientation.south)
 sr = builder.create_input("sr", 1, Orientation.south)
 cin = builder.create_input("cin", 1, Orientation.south)
-for i, inst in enumerate(builder.instantiate(cluster, "cluster", vpr_num_pb = 2)):
+for i, inst in enumerate(builder.instantiate(cluster, "cluster", 2)):
     builder.connect(clk, inst.pins['clk'])
     builder.connect(ce, inst.pins['ce'])
     builder.connect(sr, inst.pins['sr'])
@@ -75,9 +75,9 @@ for i, inst in enumerate(builder.instantiate(cluster, "cluster", vpr_num_pb = 2)
     builder.connect(builder.create_input("ib{}".format(i), 1, Orientation.west), inst.pins['ib'])
     builder.connect(inst.pins['o'], builder.create_output("o{}".format(i), 3, Orientation.east))
     builder.connect(builder.create_input("cin_fabric{}".format(i), 1, Orientation.west), inst.pins['cin_fabric'])
-    builder.connect(cin, inst.pins["cin"], pack_patterns = ["carrychain"])
+    builder.connect(cin, inst.pins["cin"], vpr_pack_patterns = ["carrychain"])
     cin = inst.pins["cout"]
-builder.connect(cin, builder.create_output("cout", 1, Orientation.north), pack_patterns = ["carrychain"])
+builder.connect(cin, builder.create_output("cout", 1, Orientation.north), vpr_pack_patterns = ["carrychain"])
 clb = builder.commit()
 
 ctx.create_tunnel("carrychain", clb.ports["cout"], clb.ports["cin"], (0, -1))
@@ -160,4 +160,4 @@ YosysScriptsCollection(r, "syn").run(ctx)
 
 r.render()
 
-ctx.pickle("ctx.pickled")
+ctx.pickle(sys.argv[1])

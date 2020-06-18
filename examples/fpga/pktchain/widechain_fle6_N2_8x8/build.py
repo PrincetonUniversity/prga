@@ -10,7 +10,7 @@ from prga.netlist.net.util import NetUtils
 from prga.util import enable_stdout_logging
 
 from itertools import product
-from pympler.asizeof import asizeof as size
+import sys
 
 enable_stdout_logging("prga")
 
@@ -45,13 +45,13 @@ clk = builder.create_global(gbl_clk, Orientation.south)
 in_ = builder.create_input("in", 12, Orientation.west)
 out = builder.create_output("out", 4, Orientation.east)
 cin = builder.create_input("cin", 1, Orientation.south)
-for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"], "cluster", vpr_num_pb = 2)):
+for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"], "cluster", 2)):
     builder.connect(clk, inst.pins['clk'])
     builder.connect(in_[6 * i: 6 * (i + 1)], inst.pins['in'])
     builder.connect(inst.pins['out'], out[2 * i: 2 * (i + 1)])
-    builder.connect(cin, inst.pins["cin"], pack_patterns = ["carrychain"])
+    builder.connect(cin, inst.pins["cin"], vpr_pack_patterns = ["carrychain"])
     cin = inst.pins["cout"]
-builder.connect(cin, builder.create_output("cout", 1, Orientation.north), pack_patterns = ["carrychain"])
+builder.connect(cin, builder.create_output("cout", 1, Orientation.north), vpr_pack_patterns = ["carrychain"])
 clb = builder.commit()
 
 ctx.create_tunnel("carrychain", clb.ports["cout"], clb.ports["cin"], (0, -1))
@@ -152,5 +152,5 @@ YosysScriptsCollection(r, "syn").run(ctx)
 
 r.render()
 
-ctx.pickle("ctx.pickled")
-ctx.pickle_summary("summary.pickled")
+ctx.pickle(sys.argv[1])
+# ctx.pickle_summary("summary.pickled")

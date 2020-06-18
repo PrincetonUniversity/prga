@@ -4,12 +4,12 @@ from prga.passes.translation import *
 from prga.passes.vpr import *
 from prga.passes.rtl import *
 from prga.passes.yosys import *
-from prga.cfg.pktchain.lib import Pktchain
+from prga.cfg.scanchain.lib import ScanchainSwitchDatabase, Scanchain
 from prga.netlist.module.util import ModuleUtils
 from prga.netlist.net.util import NetUtils
 from prga.util import enable_stdout_logging
 
-from itertools import product, chain
+from itertools import product
 import sys
 
 enable_stdout_logging("prga")
@@ -19,7 +19,7 @@ N = 6
 subarray_width, subarray_height = 8, 8
 subarray_col, subarray_row = 5, 4
 
-ctx = Pktchain.new_context(phit_width = 32, cfg_width = 1)
+ctx = Scanchain.new_context(1)
 gbl_clk = ctx.create_global("clk", is_clock = True)
 gbl_clk.bind((0, 1), 0)
 l1a = ctx.create_segment('L1', 40, 1)
@@ -34,16 +34,13 @@ builder.connect(builder.instances['io'].pins['inpad'], i)
 builder.connect(o, builder.instances['io'].pins['outpad'])
 iob = builder.commit()
 
-pattern = SwitchBoxPattern.cycle_free
+pattern = SwitchBoxPattern.wilton
 
 iotiles = {}
 for ori in Orientation:
-    builder = ctx.create_array('iotile_{}'.format(ori.name),
-            1 if ori.dimension.is_x else subarray_width,
-            1 if ori.dimension.is_y else subarray_height,
+    builder = ctx.create_array('iotile_{}'.format(ori.name), 1, 1,
             set_as_top = False, edge = OrientationTuple(False, **{ori.name: True}))
-    for x, y in product(range(builder.width), range(builder.height)):
-        builder.instantiate(iob, (x, y))
+    builder.instantiate(iob, (0, 0))
     builder.fill( (0.5, 0.5), sbox_pattern = pattern )
     iotiles[ori] = builder.commit()
 
@@ -111,10 +108,9 @@ for x, y in product(range(top_width), range(top_height)):
         builder.instantiate(cornertiles[Corner.southeast], (x, y))
     elif x == top_width - 1 and y == top_height - 1:
         builder.instantiate(cornertiles[Corner.northeast], (x, y))
-    elif x in (0, top_width - 1) and 0 < y < top_height - 1 and y % subarray_height == 1:
-        builder.instantiate(iotiles[Orientation.west if x == 0 else Orientation.east], (x, y))
-    elif y in (0, top_height - 1) and 0 < x < top_width - 1 and x % subarray_width == 1:
-        builder.instantiate(iotiles[Orientation.south if y == 0 else Orientation.north], (x, y))
+    elif (x in (0, top_width - 1) and 0 < y < top_height - 1) or (y in (0, top_height) and 0 < x < top_width - 1):
+        builder.instantiate(iotiles[Orientation.west if x == 0 else
+            Orientation.east if x == top_width - 1 else Orientation.south if y == 0 else Orientation.north], (x, y))
     elif 0 < x < top_width - 1 and 0 < y < top_height - 1 and x % subarray_width == 1 and y % subarray_height == 1:
         builder.instantiate(subarray, (x, y))
 builder.auto_connect()
@@ -122,26 +118,13 @@ top = builder.commit()
 
 TranslationPass().run(ctx)
 
-def iter_instances(module):
-    if module.name == "top":
-        for x in chain(iter([0]), iter(subarray_width * x + 1 for x in range(subarray_col)), iter([top_width - 1])):
-            for y in chain(iter([top_height - 1]),
-                    iter(subarray_height * y + 1 for y in reversed(range(0, subarray_row, 2))),
-                    iter([0]),
-                    iter(subarray_height * y + 1 for y in range(1, subarray_row, 2))):
-                yield module.instances[x, y]
-            yield None
-    else:
-        for i in itervalues(module.instances):
-            yield i
-
-Pktchain.complete_pktchain(ctx, iter_instances = iter_instances)
-Pktchain.annotate_user_view(ctx)
+Scanchain.complete_scanchain(ctx, ctx.database[ModuleView.logical, top.key])
+Scanchain.annotate_user_view(ctx)
 
 VPRArchGeneration('vpr/arch.xml').run(ctx)
 VPR_RRG_Generation("vpr/rrg.xml").run(ctx)
 
-r = Pktchain.new_renderer()
+r = Scanchain.new_renderer()
 
 VerilogCollection(r, 'rtl').run(ctx)
 

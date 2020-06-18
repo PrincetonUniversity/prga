@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 
+if [ "${BASH_SOURCE-}" = "$0" ]; then
+    sourced=0
+else
+    sourced=1
+fi
+
+export PRGA_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
+
 function err() {
     >&2 echo -e "\033[0;31m[ERROR]\033[0m" $@
-    exit 1
 }
 
 function info() {
@@ -11,27 +18,37 @@ function info() {
 
 if [ ! -z "${VIRTUAL_ENV}" ]; then
     err "Already in a Python virtualenv"
+    if [ "$sourced" = "1" ]; then
+        return 0
+    else
+        exit 1
+    fi
 fi
 
-CWD=${PWD}
-cd "$( dirname "${BASH_SOURCE[0]}" )"/..    # move to PRGA_ROOT
-
 # choose the correct binaries
-OLD_PATH=$PATH
 info "Setting \$PATH"
-export PATH=${PWD}/local/bin:$PATH
+OLD_PATH=$PATH
+export PATH=$PRGA_ROOT/local/bin:$PATH
 
 # activate virtual env
-cd prga.py
-info "Entering virtual environment ..."
-PIPENV_VENV_IN_PROJECT=1 pipenv shell cd ${CWD}
-info "Leaving virtual environment ..."
+if [[ "$sourced" == "1" ]]; then
+    info "Activating virtual environment ..."
+    source $PRGA_ROOT/prga.py/.venv/bin/activate
+else
+    CWD=${PWD}
+    cd $PRGA_ROOT/prga.py
 
-# roll back to the old state
-info "Reverting \$PATH"
-export PATH=$OLD_PATH
-cd $CWD
+    info "Entering virtual environment in a subshell ..."
+    PIPENV_VENV_IN_PROJECT=1 pipenv shell cd ${CWD}
+    info "Leaving virtual environment ..."
 
-info "Thanks for using PRGA. We look forward to your next use :)"
+    # roll back to the old state
+    info "Reverting \$PATH"
+    export PRGA_ROOT=
+    export PATH=$OLD_PATH
+    cd $CWD
+
+    info "Thanks for using PRGA. We look forward to your next use :)"
+fi
 
 # vim: set ft=sh:

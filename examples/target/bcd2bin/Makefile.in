@@ -1,30 +1,52 @@
-TARGET := bcd2bin
-PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pickled
-SIM_MAKEFILE := Makefile.sim
-PARTIAL_IOBINDING := io.partial
 COMPILER ?= vcs
+SIM_MAKEFILE ?= Makefile.sim
+PICKLED_SUMMARY ?= summary.pkl
+TEST_WRAPPER ?= testwrapper.v
+SYNTH_SCRIPT ?= synth.ys
+PARTIAL_IOBINDING ?= io.partial
 
-.PHONY: all project
-all: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
-	make -f $(SIM_MAKEFILE)
+TARGET := bcd2bin
+PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pkl
+DESIGN_SRCS := ../$(TARGET).v
+DESIGN_TEST_SRCS := ../$(TARGET)_host.v
 
-project: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
+ifndef CONFIG
+	$(error "CONFIG is not defined")
+endif
+
+ifndef FPGA_DIR
+	$(error "FPGA_DIR is not defined")
+endif
+
+deps := $(PARTIAL_IOBINDING) $(DESIGN_SRCS) $(DESIGN_TEST_SRCS) $(MAKEFILE_LIST)
+project_files := $(SIM_MAKEFILE) $(PICKLED_SUMMARY) $(TEST_WRAPPER) $(SYNTH_SCRIPT) io.pads
+
+.PHONY: all project clean
+all: $(SIM_MAKEFILE)
+	$(MAKE) -f $(SIM_MAKEFILE)
+
+project: $(project_files)
 
 clean:
-	if [ -f $(SIM_MAKEFILE) ]; then make -f $(SIM_MAKEFILE) cleanall; fi
-	rm -rf $(SIM_MAKEFILE) *.v synth.ys io.pads summary.pickled
+	if [ -f $(SIM_MAKEFILE) ]; then $(MAKE) -f $(SIM_MAKEFILE) cleanall; fi
+	rm -rf $(project_files)
 
-$(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../$(TARGET).v
-	python -m prga_tools.$(CONFIG).simproj \
+$(project_files) &: $(PICKLED_CONTEXT) $(deps)
+	python -m prga.tools.$(CONFIG).simproj \
 		--fix_io $(PARTIAL_IOBINDING) \
-		-t ../$(TARGET)_host.v \
-		-m ../$(TARGET).v \
+		-t $(DESIGN_TEST_SRCS) \
+		-m $(DESIGN_SRCS) \
 		-c $(COMPILER) \
-		--makefile $@ \
+		--summary $(PICKLED_SUMMARY) \
+		--makefile $(SIM_MAKEFILE) \
+		--wrapper $(TEST_WRAPPER) \
+		--yosys_script $(SYNTH_SCRIPT) \
 		$(PICKLED_CONTEXT)
 
 $(PICKLED_CONTEXT):
-	make -C $(FPGA_DIR)
+	$(MAKE) -C $(FPGA_DIR)
 
-%: project
-	make -f $(SIM_MAKEFILE) $@
+$(deps): %: ;
+
+%:: project
+	$(MAKE) -f $(SIM_MAKEFILE) $@

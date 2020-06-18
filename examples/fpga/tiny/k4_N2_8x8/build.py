@@ -10,8 +10,7 @@ from prga.netlist.net.util import NetUtils
 from prga.util import enable_stdout_logging
 
 from itertools import product
-from pympler.asizeof import asizeof as size
-import logging
+import logging, sys
 
 # enable_stdout_logging("prga", logging.INFO)
 
@@ -30,7 +29,7 @@ ff = builder.instantiate(ctx.primitives["flipflop"], "ff")
 builder.connect(clk, ff.pins['clk'])
 builder.connect(i, lut.pins['in'])
 builder.connect(lut.pins['out'], o)
-builder.connect(lut.pins['out'], ff.pins['D'], pack_patterns = ('lut_dff', ))
+builder.connect(lut.pins['out'], ff.pins['D'], vpr_pack_patterns = ('lut_dff', ))
 builder.connect(ff.pins['Q'], o)
 cluster = builder.commit()
 
@@ -51,7 +50,7 @@ for ori in Orientation:
 
 builder = ctx.create_logic_block("clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
-for i, inst in enumerate(builder.instantiate(cluster, "cluster", vpr_num_pb = 2)):
+for i, inst in enumerate(builder.instantiate(cluster, "cluster", 2)):
     builder.connect(clk, inst.pins['clk'])
     builder.connect(builder.create_input("i{}".format(i), 4, Orientation.west), inst.pins['i'])
     builder.connect(inst.pins['o'], builder.create_output("o{}".format(i), 1, Orientation.east))
@@ -106,4 +105,4 @@ YosysScriptsCollection(r, "syn").run(ctx)
 
 r.render()
 
-ctx.pickle("ctx.pickled")
+ctx.pickle(sys.argv[1])

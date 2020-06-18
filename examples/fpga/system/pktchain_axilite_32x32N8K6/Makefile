@@ -5,7 +5,7 @@ ts := $(shell /bin/date "+%Y-%m-%d-%H-%M-%S")
 all: $(PICKLED_CTX)
 
 clean:
-	rm -rf $(PICKLED_CTX) rtl syn vpr
+	rm -rf $(PICKLED_CTX) rtl syn vpr constraints
 
 backup:
 	cp $(PICKLED_CTX) $(PICKLED_CTX).$(ts)
@@ -17,4 +17,4 @@ clean-backup:
 	rm -rf $(PICKLED_CTX).* rtl.* syn.* vpr.*
 
 $(PICKLED_CTX): build.py
-	python $<
+	python $< $@

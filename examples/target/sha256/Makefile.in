@@ -1,32 +1,49 @@
+COMPILER ?= vcs
 CONFIG ?= pktchain
+SIM_MAKEFILE ?= Makefile.sim
+PICKLED_SUMMARY ?= summary.pkl
+TEST_WRAPPER ?= testwrapper.v
+SYNTH_SCRIPT ?= synth.ys
+IO_CONSTRAINTS ?= io.partial
+
 TARGET := sha256_axilite_slave
 PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pkl
-SIM_MAKEFILE := Makefile.sim
-TARGET_SRCS := ../testbench/$(TARGET).v ../sha256/src/rtl/sha256_core.v ../sha256/src/rtl/sha256_k_constants.v ../sha256/src/rtl/sha256_w_mem.v
+DESIGN_SRCS := ../testbench/$(TARGET).v ../sha256/src/rtl/sha256_core.v ../sha256/src/rtl/sha256_k_constants.v ../sha256/src/rtl/sha256_w_mem.v
+DESIGN_TEST_SRCS := ../testbench/$(TARGET)_host.v
 
-.PHONY: all project
-all: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
+ifndef FPGA_DIR
+	$(error "FPGA_DIR is not defined")
+endif
+
+deps := $(IO_CONSTRAINTS) $(DESIGN_SRCS) $(DESIGN_TEST_SRCS) $(MAKEFILE_LIST)
+project_files := $(SIM_MAKEFILE) $(PICKLED_SUMMARY) $(TEST_WRAPPER) $(SYNTH_SCRIPT) io.pads
+
+.PHONY: all project clean
+all: $(SIM_MAKEFILE)
 	make -f $(SIM_MAKEFILE)
 
-project: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
+project: $(project_files)
 
 clean:
-	if [ -f $(SIM_MAKEFILE) ]; then make -f $(SIM_MAKEFILE) cleanall; fi
-	rm -rf $(SIM_MAKEFILE) $(TARGET)_host_wrapper.v synth.ys io.pads
+	if [ -f $(SIM_MAKEFILE) ]; then $(MAKE) -f $(SIM_MAKEFILE) cleanall; fi
+	rm -rf $(project_files)
 
-$(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(IO_CONSTRAINTS) ../testbench/$(TARGET)_host.v $(TARGET_SRCS)
-	python -m prga_tools.$(CONFIG).simproj \
+$(project_files) &: $(PICKLED_CONTEXT) $(deps)
+	python -m prga.tools.$(CONFIG).simproj \
 		--fix_io $(IO_CONSTRAINTS) \
-		-t ../testbench/$(TARGET)_host.v --testbench_top picorv32_wrapper \
+		-t $(DESIGN_TEST_SRCS) \
 		--testbench_plus_args max_cycle=10000000 quiet \
-		-m $(TARGET_SRCS) --model_top sha256_axilite_slave \
-		--makefile $@ \
+		-m $(DESIGN_SRCS) --model_top sha256_axilite_slave \
+		--summary $(PICKLED_SUMMARY) \
+		--makefile $(SIM_MAKEFILE) \
+		--wrapper $(TEST_WRAPPER) \
+		--yosys_script $(SYNTH_SCRIPT) \
 		$(PICKLED_CONTEXT)
 
 $(PICKLED_CONTEXT):
 	make -C $(FPGA_DIR)
 
-$(IO_CONSTRAINTS):
+$(deps): %: ;
 
-%: project
-	make -f $(SIM_MAKEFILE) $@
+%:: project
+	$(MAKE) -f $(SIM_MAKEFILE) $@

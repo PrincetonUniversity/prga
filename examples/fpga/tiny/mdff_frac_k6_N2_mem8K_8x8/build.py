@@ -9,7 +9,7 @@ from prga.netlist.module.util import ModuleUtils
 from prga.netlist.net.util import NetUtils
 
 from itertools import product
-from pympler.asizeof import asizeof as size
+import sys
 
 ctx = Scanchain.new_context(1)
 gbl_clk = ctx.create_global("clk", is_clock = True)
@@ -29,7 +29,7 @@ builder.connect(builder.create_input("sr", 1), ff.pins["sr"])
 builder.connect(builder.create_input("i", 6), lut.pins['in'])
 builder.connect(lut.pins['o5'], o[1])
 builder.connect(lut.pins['o6'], o[0])
-builder.connect(lut.pins['o6'], ff.pins['D'], pack_patterns = ('lut6_dff', 'lut5A_dff'))
+builder.connect(lut.pins['o6'], ff.pins['D'], vpr_pack_patterns = ('lut6_dff', 'lut5A_dff'))
 builder.connect(ff.pins['Q'], o[0])
 cluster = builder.commit()
 
@@ -52,7 +52,7 @@ builder = ctx.create_logic_block("clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
 ce = builder.create_input("ce", 1, Orientation.south)
 sr = builder.create_input("sr", 1, Orientation.south)
-for i, inst in enumerate(builder.instantiate(cluster, "cluster", vpr_num_pb = 2)):
+for i, inst in enumerate(builder.instantiate(cluster, "cluster", 2)):
     builder.connect(clk, inst.pins['clk'])
     builder.connect(ce, inst.pins['ce'])
     builder.connect(sr, inst.pins['sr'])
@@ -123,4 +123,4 @@ YosysScriptsCollection(r, "syn").run(ctx)
 
 r.render()
 
-ctx.pickle("ctx.pickled")
+ctx.pickle(sys.argv[1])

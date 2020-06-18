@@ -1,34 +1,53 @@
-CONFIG ?= bitchain
-PICKLED_CONTEXT ?= $(FPGA_DIR)/ctx.pickled
+COMPILER ?= vcs
+SIM_MAKEFILE ?= Makefile.sim
+PICKLED_SUMMARY ?= summary.pkl
+TEST_WRAPPER ?= testwrapper.v
+SYNTH_SCRIPT ?= synth.ys
 PARTIAL_IOBINDING ?= io.partial
 
 TARGET := picorv32
-SIM_MAKEFILE := Makefile.sim
+PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pkl
+DESIGN_SRCS := ../$(TARGET).v
+DESIGN_TEST_SRCS := ../$(TARGET)_host.v
 
-.PHONY: all project
-all: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
+ifndef CONFIG
+	$(error "CONFIG is not defined")
+endif
+
+ifndef FPGA_DIR
+	$(error "FPGA_DIR is not defined")
+endif
+
+deps := $(PARTIAL_IOBINDING) $(DESIGN_SRCS) $(DESIGN_TEST_SRCS) $(MAKEFILE_LIST) ../firmware.hex
+project_files := $(SIM_MAKEFILE) $(PICKLED_SUMMARY) $(TEST_WRAPPER) $(SYNTH_SCRIPT) io.pads
+
+.PHONY: all project clean
+all: $(SIM_MAKEFILE)
 	make -f $(SIM_MAKEFILE)
 
-project: $(SIM_MAKEFILE) $(PICKLED_CONTEXT)
+project: $(project_files)
 
 clean:
-	if [ -f $(SIM_MAKEFILE) ]; then make -f $(SIM_MAKEFILE) cleanall; fi
-	rm -rf $(SIM_MAKEFILE) $(TARGET)_host_wrapper.v synth.ys io.pads
+	if [ -f $(SIM_MAKEFILE) ]; then $(MAKE) -f $(SIM_MAKEFILE) cleanall; fi
+	rm -rf $(project_files)
 
-$(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../$(TARGET).v
-	python -m prga_tools.$(CONFIG).simproj \
+$(project_files) &: $(PICKLED_CONTEXT) $(deps)
+	python -m prga.tools.$(CONFIG).simproj \
 		--fix_io $(PARTIAL_IOBINDING) \
-		-t ../$(TARGET)_host.v --testbench_top picorv32_wrapper \
+		-t $(DESIGN_TEST_SRCS) --testbench_top picorv32_wrapper \
 		--testbench_plus_args firmware=../firmware.hex max_cycle=10000000 quiet \
-		-m ../$(TARGET).v --model_top picorv32_axi \
+		-m $(DESIGN_SRCS) --model_top picorv32_axi \
 		--model_parameters COMPRESSED_ISA=1 ENABLE_MUL=1 ENABLE_DIV=1 ENABLE_IRQ=1 ENABLE_TRACE=1 \
-		--makefile $@ \
+		--summary $(PICKLED_SUMMARY) \
+		--makefile $(SIM_MAKEFILE) \
+		--wrapper $(TEST_WRAPPER) \
+		--yosys_script $(SYNTH_SCRIPT) \
 		$(PICKLED_CONTEXT)
 
 $(PICKLED_CONTEXT):
 	make -C $(FPGA_DIR)
 
-$(PARTIAL_IOBINDING):
+$(deps): %: ;
 
-%: project
-	make -f $(SIM_MAKEFILE) $@
+%:: project
+	$(MAKE) -f $(SIM_MAKEFILE) $@

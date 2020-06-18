@@ -4,16 +4,20 @@ from prga.api.context import *
 from prga.api.flow import *
 from prga.api.config import *
 
+from itertools import product
+
 def run():
-    context = ArchitectureContext('top', 8, 8, BitchainConfigCircuitryDelegate)
+    width, height = 42, 34
+    context = ArchitectureContext('top', width, height, BitchainConfigCircuitryDelegate)
 
     # 1. routing stuff
     clk = context.create_global('clk', is_clock = True, bind_to_position = (0, 1))
-    context.create_segment('L1', 12, 1)
-    context.create_segment('L2', 4, 2)
+    context.create_segment('L1', 48, 1)
+    context.create_segment('L2', 16, 2)
+    context.create_segment('L4', 8, 4)
 
     # 2. create IOB
-    iob = context.create_io_block('iob', 4)
+    iob = context.create_io_block('iob', 8)
     while True:
         outpad = iob.create_input('outpad', 1)
         inpad = iob.create_output('inpad', 1)
@@ -37,7 +41,7 @@ def run():
         ceport = clb.create_input('ce', 1, Orientation.south)
         srport = clb.create_input('sr', 1, Orientation.south)
         cin = clb.create_input('cin', 1, Orientation.north)
-        for i in range(2):
+        for i in range(4):
             inst = clb.instantiate(context.primitives['fraclut6sffc'], 'cluster{}'.format(i))
             clb.connect(clkport, inst.pins['clk'])
             clb.connect(ceport, inst.pins['ce'])
@@ -78,30 +82,34 @@ def run():
     # 9. create tile
     bramtile = context.create_tile('bram_tile', bram)
 
-    # 10. fill top-level array
-    for x in range(8):
-        for y in range(8):
+    # 10. create sub-array
+    subarray = context.create_array('subarray', 5, 4)
+    for x, y in product(range(5), range(4)):
+        if x == 2:
+            if y % 2 == 0:
+                subarray.instantiate_element(bramtile, (x, y))
+        else:
+            subarray.instantiate_element(clbtile, (x, y))
+
+    # 11. fill top-level array
+    for x in range(width):
+        for y in range(height):
             if x == 0:
-                if y > 0 and y < 7:
+                if y > 0 and y < height - 1:
                     context.top.instantiate_element(iotiles[Orientation.west], (x, y))
-            elif x == 7:
-                if y > 0 and y < 7:
+            elif x == width - 1:
+                if y > 0 and y < height - 1:
                     context.top.instantiate_element(iotiles[Orientation.east], (x, y))
             elif y == 0:
                 context.top.instantiate_element(iotiles[Orientation.south], (x, y))
-            elif y == 7:
+            elif y == height - 1:
                 context.top.instantiate_element(iotiles[Orientation.north], (x, y))
-            elif x in (2, 5):
-                if y % 2 == 1:
-                    context.top.instantiate_element(bramtile, (x, y))
-            else:
-                context.top.instantiate_element(clbtile, (x, y))
+            elif x % 5 == 1 and y % 4 == 1:
+                context.top.instantiate_element(subarray, (x, y))
 
-    # 11. flow
+    # 12. flow
     flow = Flow((
-        CompleteRoutingBox(BlockFCValue(BlockPortFCValue(0.25), BlockPortFCValue(0.5)),
-            {'clb': BlockFCValue(BlockPortFCValue(0.25), BlockPortFCValue(0.25),
-                {'cin': BlockPortFCValue(0), 'cout': BlockPortFCValue(0)})}),
+        CompleteRoutingBox(BlockFCValue(BlockPortFCValue(0.25), BlockPortFCValue(0.1))),
         CompleteSwitch(),
         CompleteConnection(),
         GenerateVerilog('rtl'),
@@ -113,10 +121,10 @@ def run():
         GenerateYosysResources('syn'),
             ))
 
-    # 11. run flow
+    # 13. run flow
     flow.run(context)
 
-    # 12. create a pickled version
+    # 14. create a pickled version
     context.pickle('ctx.pickled')
 
 if __name__ == '__main__':

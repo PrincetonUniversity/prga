@@ -1,17 +1,3 @@
-docs/build
-docs/.eggs
-
 .python-version
 local
 pyenv
-
-examples/fpga/*/*/*
-!examples/fpga/*/*/build.py
-!examples/fpga/*/*/Makefile
-examples/target/*/*/*
-!examples/target/*/*/io.partial
-!examples/target/*/*/Makefile
-
-!examples/target/sha256/testbench/*.v
-!examples/target/sha256/testsys/src
-!examples/target/sha256/testsys/test.py

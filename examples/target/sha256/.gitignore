@@ -1,6 +1,7 @@
-!.gitignore
-!install
-!Makefile.in
-
-sha256
 testbench/build
+*/*
+!*/Makefile
+
+!testsys/Makefile
+!testsys/src
+!testsys/test.py
