@@ -1,6 +1,6 @@
 [submodule "prga.py"]
 	path = prga.py
-	url = git@github.com:crusader2000/prga.py.git
+	url = https://github.com/crusader2000/prga.py.git
 	branch = dev
 [submodule "vtr"]
 	path = vtr
