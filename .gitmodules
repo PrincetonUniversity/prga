@@ -1,7 +1,3 @@
-[submodule "prga.py"]
-	path = prga.py
-	url = https://github.com/crusader2000/prga.py.git
-	branch = dev
 [submodule "vtr"]
 	path = vtr
 	url = https://github.com/verilog-to-routing/vtr-verilog-to-routing.git
