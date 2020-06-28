@@ -17,4 +17,4 @@ clean-backup:
 	rm -rf $(PICKLED_CTX).* rtl.* syn.* vpr.*
 
 $(PICKLED_CTX): build.py
-	python $< $@
+	python -O $< $@

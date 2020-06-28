@@ -4,6 +4,7 @@ PICKLED_SUMMARY ?= summary.pkl
 TEST_WRAPPER ?= testwrapper.v
 SYNTH_SCRIPT ?= synth.ys
 PARTIAL_IOBINDING ?= io.partial
+ADDITIONAL_SIMPROJ_ARGS ?=
 
 TARGET := bcd2bin
 PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pkl
@@ -41,7 +42,7 @@ $(project_files) &: $(PICKLED_CONTEXT) $(deps)
 		--makefile $(SIM_MAKEFILE) \
 		--wrapper $(TEST_WRAPPER) \
 		--yosys_script $(SYNTH_SCRIPT) \
-		$(PICKLED_CONTEXT)
+		$(ADDITIONAL_SIMPROJ_ARGS) -- $(PICKLED_CONTEXT)
 
 $(PICKLED_CONTEXT):
 	$(MAKE) -C $(FPGA_DIR)
