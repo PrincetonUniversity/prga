@@ -1,20 +1,7 @@
-from prga.compatible import *
-from prga.core.common import *
-from prga.core.context import *
-from prga.passes.translation import *
-from prga.passes.vpr import *
-from prga.passes.rtl import *
-from prga.passes.yosys import *
-from prga.cfg.pktchain.lib import Pktchain
-from prga.cfg.pktchain.system import PktchainSystem
-from prga.netlist.module.module import Module
-from prga.netlist.module.util import ModuleUtils
-from prga.netlist.net.util import NetUtils
-from prga.util import enable_stdout_logging
+from prga import *
 
 from itertools import product, chain
-import os, logging, sys
-enable_stdout_logging("prga", logging.DEBUG)
+import os, sys
 
 K, N = 6, 8
 maw, mdw = 10, 32
@@ -35,13 +22,13 @@ l4a = ctx.create_segment('L4', 20, 4)
 # ============================================================================
 # -- Primitives --------------------------------------------------------------
 # ============================================================================
-memory = ctx.create_memory("prga_RAM", maw, mdw).commit()
+memory = ctx.build_memory("prga_RAM", maw, mdw).commit()
 
 # ============================================================================
 # -- Blocks ------------------------------------------------------------------
 # ============================================================================
 # -- IOB ---------------------------------------------------------------------
-builder = ctx.create_io_block("prga_iob", 16)
+builder = ctx.build_io_block("iob")
 o = builder.create_input("outpad", 1)
 i = builder.create_output("inpad", 1)
 builder.connect(builder.instances['io'].pins['inpad'], i)
@@ -49,7 +36,7 @@ builder.connect(o, builder.instances['io'].pins['outpad'])
 iob = builder.commit()
 
 # -- CLB ---------------------------------------------------------------------
-builder = ctx.create_logic_block("prga_clb")
+builder = ctx.build_logic_block("prga_clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
 in_ = builder.create_input("in", N * 6 // 2, Orientation.west)
 out = builder.create_output("out", N * 2, Orientation.east)
@@ -57,7 +44,6 @@ cin = builder.create_input("cin", 1, Orientation.south)
 xbar_i, xbar_o = [in_], []
 for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"], "i_cluster", N)):
     builder.connect(clk, inst.pins['clk'])
-    # builder.connect(in_[6 * i: 6 * (i + 1)], inst.pins["in"])
     builder.connect(inst.pins['out'], out[2 * i: 2 * (i + 1)])
     builder.connect(cin, inst.pins["cin"], vpr_pack_patterns = ["carrychain"])
     xbar_i.append(inst.pins["out"])
@@ -71,7 +57,7 @@ clb = builder.commit()
 ctx.create_tunnel("carrychain", clb.ports["cout"], clb.ports["cin"], (0, -1))
 
 # -- BRAM --------------------------------------------------------------------
-builder = ctx.create_logic_block("prga_bram", 1, subarray_height)
+builder = ctx.build_logic_block("prga_bram", 1, subarray_height)
 inst = builder.instantiate(memory, "i_ram")
 builder.connect(builder.create_global(gbl_clk, Orientation.south), inst.pins["clk"])
 builder.connect(builder.create_input("addr1", len(inst.pins["addr1"]), Orientation.south, (0, 0)), inst.pins["addr1"])
@@ -93,151 +79,136 @@ bram = builder.commit()
 # ============================================================================
 # -- Tiles -------------------------------------------------------------------
 # ============================================================================
+iotile = ctx.build_tile(iob, 16, edge = OrientationTuple(False, west = True)).fill( (.5, .5) ).auto_connect().commit()
+clbtile = ctx.build_tile(clb).fill( (0.25, 0.15) ).auto_connect().commit()
+bramtile = ctx.build_tile(bram).fill( (0.4, 0.25) ).auto_connect().commit()
+
+# ============================================================================
+# -- Subarrays ---------------------------------------------------------------
+# ============================================================================
 pattern = SwitchBoxPattern.cycle_free
 
 # -- CLB Subarray ------------------------------------------------------------
-builder = ctx.create_array("prga_logictile", subarray_width, subarray_height, set_as_top = False)
+builder = ctx.build_array("prga_logic_region", subarray_width, subarray_height, set_as_top = False)
 for x, y in product(range(builder.width), range(builder.height)):
-    builder.instantiate(clb, (x, y))
-builder.fill( (0.25, 0.15), sbox_pattern = pattern )
-logictile = builder.commit()
+    builder.instantiate(clbtile, (x, y))
+logicregion = builder.fill( pattern ).auto_connect().commit()
 
 # -- RAM Subarray ------------------------------------------------------------
-builder = ctx.create_array("prga_memtile", subarray_width, subarray_height, set_as_top = False)
+builder = ctx.build_array("prga_mem_region", subarray_width, subarray_height, set_as_top = False)
 for x, y in product(range(builder.width), range(builder.height)):
     if x == builder.width // 2:
         if y == 0:
-            builder.instantiate(bram, (x, y))
+            builder.instantiate(bramtile, (x, y))
     else:
-        builder.instantiate(clb, (x, y))
-builder.fill( (0.25, 0.15), sbox_pattern = pattern )
-memtile = builder.commit()
+        builder.instantiate(clbtile, (x, y))
+memregion = builder.fill( pattern ).auto_connect().commit()
 
 # -- IOs ---------------------------------------------------------------------
-builder = ctx.create_array("prga_iotile", 1, subarray_height,
+builder = ctx.build_array("prga_io_region", 1, subarray_height,
         set_as_top = False, edge = OrientationTuple(False, west = True))
 for x, y in product(range(builder.width), range(builder.height)):
-    builder.instantiate(iob, (x, y))
-builder.fill( (0.5, 0.5), sbox_pattern = pattern )
-iotile = builder.commit()
+    builder.instantiate(iotile, (x, y))
+ioregion = builder.fill( pattern ).auto_connect().commit()
 
 # -- Edge Fillers ------------------------------------------------------------
-edgetiles = {}
+edgefillers = {}
 for ori in Orientation:
     if ori.is_west:
         continue
-    builder = ctx.create_array("prga_edgetile_{}".format(ori.name[0]),
+    builder = ctx.build_array("prga_edge_region_{}".format(ori.name[0]),
             1 if ori.dimension.is_x else subarray_width,
             1 if ori.dimension.is_y else subarray_height,
             set_as_top = False, edge = OrientationTuple(False, **{ori.name: True}))
-    builder.fill( (0.5, 0.5), sbox_pattern = pattern )
-    edgetiles[ori] = builder.commit()
+    edgefillers[ori] = builder.fill( pattern ).auto_connect().commit()
 
 # -- Corner Fillers ----------------------------------------------------------
-cornertiles = {}
+cornerregions = {}
 for corner in Corner:
-    builder = ctx.create_array("prga_cornertile_{}".format(corner.case("ne", "nw", "se", "sw")), 1, 1,
+    builder = ctx.build_array("prga_corner_region_{}".format(corner.case("ne", "nw", "se", "sw")), 1, 1,
             set_as_top = False, edge = OrientationTuple(False, **{ori.name: True for ori in corner.decompose()}))
-    builder.fill( (0.5, 0.5), sbox_pattern = pattern )
-    cornertiles[corner] = builder.commit()
+    cornerregions[corner] = builder.fill( pattern ).auto_connect().commit()
 
 # ============================================================================
 # -- Fabric ------------------------------------------------------------------
 # ============================================================================
-builder = ctx.create_array("prga_fabric", top_width * subarray_width + 2, top_height * subarray_height + 2,
-        hierarchical = True, set_as_top = True)
+builder = ctx.build_array("prga_fabric", top_width * subarray_width + 2, top_height * subarray_height + 2,
+        set_as_top = True)
 for x, y in product(range(builder.width), range(builder.height)):
     if x == 0:
         if y == 0:
-            builder.instantiate(cornertiles[Corner.southwest], (x, y))
+            builder.instantiate(cornerregions[Corner.southwest], (x, y))
         elif y == top_height * subarray_height + 1:
-            builder.instantiate(cornertiles[Corner.northwest], (x, y))
+            builder.instantiate(cornerregions[Corner.northwest], (x, y))
         elif y % subarray_height == 1:
-            builder.instantiate(iotile, (x, y))
+            builder.instantiate(ioregion, (x, y))
     elif x == top_width * subarray_width + 1:
         if y == 0:
-            builder.instantiate(cornertiles[Corner.southeast], (x, y))
+            builder.instantiate(cornerregions[Corner.southeast], (x, y))
         elif y == top_height * subarray_height + 1:
-            builder.instantiate(cornertiles[Corner.northeast], (x, y))
+            builder.instantiate(cornerregions[Corner.northeast], (x, y))
         elif y % subarray_height == 1:
-            builder.instantiate(edgetiles[Orientation.east], (x, y))
+            builder.instantiate(edgefillers[Orientation.east], (x, y))
     elif x % subarray_width == 1:
         if y == 0:
-            builder.instantiate(edgetiles[Orientation.south], (x, y))
+            builder.instantiate(edgefillers[Orientation.south], (x, y))
         elif y == top_height * subarray_height + 1:
-            builder.instantiate(edgetiles[Orientation.north], (x, y))
+            builder.instantiate(edgefillers[Orientation.north], (x, y))
         elif y % subarray_height == 1:
             if (x - 1) // subarray_width in memcol_idx:
-                builder.instantiate(memtile, (x, y))
+                builder.instantiate(memregion, (x, y))
             else:
-                builder.instantiate(logictile, (x, y))
-builder.auto_connect()
-fabric = builder.commit()
-
-# ============================================================================
-# -- Translation -------------------------------------------------------------
-# ============================================================================
-TranslationPass().run(ctx)
+                builder.instantiate(logicregion, (x, y))
+fabric = builder.auto_connect().commit()
 
 # ============================================================================
 # -- Configuration Chain Injection -------------------------------------------
 # ============================================================================
 def iter_instances(module):
-    if module.name in ("prga_logictile", "prga_memtile"):
+    if module.name in ("prga_logic_region", "prga_mem_region"):
         for x in range(subarray_width):
             if x % 2 == 0:
                 for y in range(subarray_height):
-                    if y > 0 and (i := module.instances.get( ((x, y), Subtile.southwest), None )): yield i
-                    if i := module.instances.get( ((x, y), Subtile.west), None ): yield i
-                    if i := module.instances.get( ((x, y), Subtile.northwest), None ): yield i
+                    if y > 0 and (i := module.instances.get( ((x, y), Corner.southwest) )): yield i
+                    if i := module.instances.get( ((x, y), Corner.northwest) ): yield i
                 for y in reversed(range(subarray_height)):
-                    if i := module.instances.get( ((x, y), Subtile.north), None ): yield i
-                    if i := module.instances.get( ((x, y), Subtile.center), None ): yield i
-                    if y > 0 and (i := module.instances.get( ((x, y), Subtile.south), None )): yield i
+                    if i := module.instances.get( (x, y) ): yield i
                 for y in range(subarray_height):
-                    if y > 0 and (i := module.instances.get( ((x, y), Subtile.southeast), None )): yield i
-                    if i := module.instances.get( ((x, y), Subtile.east), None ): yield i
-                    if i := module.instances.get( ((x, y), Subtile.northeast), None ): yield i
+                    if y > 0 and (i := module.instances.get( ((x, y), Corner.southeast) )): yield i
+                    if i := module.instances.get( ((x, y), Corner.northeast) ): yield i
             else:
                 for y in reversed(range(subarray_height)):
-                    if i := module.instances.get( ((x, y), Subtile.northwest), None ): yield i
-                    if i := module.instances.get( ((x, y), Subtile.west), None ): yield i
-                    if y > 0 and (i := module.instances.get( ((x, y), Subtile.southwest), None )): yield i
+                    if i := module.instances.get( ((x, y), Corner.northwest) ): yield i
+                    if y > 0 and (i := module.instances.get( ((x, y), Corner.southwest) )): yield i
                 for y in range(subarray_height):
-                    if y > 0 and (i := module.instances.get( ((x, y), Subtile.south), None )): yield i
-                    if i := module.instances.get( ((x, y), Subtile.center), None ): yield i
-                    if i := module.instances.get( ((x, y), Subtile.north), None ): yield i
+                    if i := module.instances.get( (x, y) ): yield i
                 for y in reversed(range(subarray_height)):
-                    if i := module.instances.get( ((x, y), Subtile.northeast), None ): yield i
-                    if i := module.instances.get( ((x, y), Subtile.east), None ): yield i
-                    if y > 0 and (i := module.instances.get( ((x, y), Subtile.southeast), None )): yield i
+                    if i := module.instances.get( ((x, y), Corner.northeast) ): yield i
+                    if y > 0 and (i := module.instances.get( ((x, y), Corner.southeast) )): yield i
         for x in reversed(range(subarray_width)):
-            if i := module.instances.get( ((x, 0), Subtile.southeast), None ): yield i
-            if i := module.instances.get( ((x, 0), Subtile.south), None ): yield i
-            if i := module.instances.get( ((x, 0), Subtile.southwest), None ): yield i
-    elif module.name == "prga_iotile":
+            if i := module.instances.get( ((x, 0), Corner.southeast) ): yield i
+            if i := module.instances.get( ((x, 0), Corner.southwest) ): yield i
+    elif module.name == "prga_io_region":
         for y in range(subarray_height):
-            for i in range(iob.capacity):
-                yield module.instances[(0, y), i]
+            yield module.instances[0, y]
         for y in reversed(range(subarray_height)):
-            if i := module.instances.get( ((0, y), Subtile.northeast), None ): yield i
-            if i := module.instances.get( ((0, y), Subtile.east), None ): yield i
-            if i := module.instances.get( ((0, y), Subtile.southeast), None ): yield i
-    elif module.name == "prga_edgetile_n":
+            if i := module.instances.get( ((0, y), Corner.northeast) ): yield i
+            if i := module.instances.get( ((0, y), Corner.southeast) ): yield i
+    elif module.name == "prga_edge_region_n":
         for x in range(subarray_width):
-            yield module.instances[(x, 0), Subtile.southeast]
+            yield module.instances[(x, 0), Corner.southeast]
         for x in reversed(range(subarray_width)):
-            yield module.instances[(x, 0), Subtile.southwest]
-    elif module.name == "prga_edgetile_s":
+            yield module.instances[(x, 0), Corner.southwest]
+    elif module.name == "prga_edge_region_s":
         for x in range(subarray_width):
-            yield module.instances[(x, 0), Subtile.northeast]
+            yield module.instances[(x, 0), Corner.northeast]
         for x in reversed(range(subarray_width)):
-            yield module.instances[(x, 0), Subtile.northwest]
-    elif module.name == "prga_edgetile_e":
+            yield module.instances[(x, 0), Corner.northwest]
+    elif module.name == "prga_edge_region_e":
         for y in range(subarray_height):
-            yield module.instances[(0, y), Subtile.northwest]
+            yield module.instances[(0, y), Corner.northwest]
         for y in reversed(range(subarray_height)):
-            yield module.instances[(0, y), Subtile.southwest]
+            yield module.instances[(0, y), Corner.southwest]
     elif module.name == "prga_fabric":
         for x in range(top_width // 2 + 1):
             # lower half
@@ -250,6 +221,7 @@ def iter_instances(module):
                 yy = 0 if y == 0 else ((y - 1) * subarray_height + 1)
                 yield module.instances[xx, yy]
             yield None
+            yield None
             # upper half
             for y in range(top_height // 2 + 1, top_height + 2):
                 yy = (y - 1) * subarray_height + 1
@@ -259,29 +231,22 @@ def iter_instances(module):
                 yy = (y - 1) * subarray_height + 1
                 yield module.instances[xx, yy]
             yield None
+            yield None
     else:
-        for i in itervalues(module.instances):
+        for i in module.instances.values():
             yield i
 
-Pktchain.complete_pktchain(ctx, iter_instances = iter_instances)
-Pktchain.annotate_user_view(ctx)
-
-VPRArchGeneration('vpr/arch.xml').run(ctx)
-VPR_RRG_Generation("vpr/rrg.xml").run(ctx)
-
-PktchainSystem.build_system_axilite(ctx, name = "prga_system",
-        io_start_pos = (0, 16), io_start_subblock = 1, io_scan_direction = Orientation.south)
-
-r = Pktchain.new_renderer()
-
-p = VerilogCollection(r, "rtl")
-p.run(ctx)
-YosysScriptsCollection(r, "syn").run(ctx)
-
-PktchainSystem.generate_axilite_io_assignment_constraint(ctx, r, "constraints/io.a8d4.pads")
-
-p._process_module(Pktchain._build_pktchain_backbone(ctx, 2, 2))
-
-r.render()
+flow = Flow(
+    TranslationPass(),
+    Pktchain.InjectConfigCircuitry(iter_instances = iter_instances),
+    VPRArchGeneration("vpr/arch.xml"),
+    VPR_RRG_Generation("vpr/rrg.xml"),
+    Pktchain.BuildAXILiteSystem(name="prga_system",
+        io_start_pos = (0, 16), io_start_subtile = 1, io_scan_direction = Orientation.south), 
+    Pktchain.GenerateAXILiteIOConstraints("constraints/io.pads", addr_width = 8, data_bytes = 4),
+    VerilogCollection('rtl'),
+    YosysScriptsCollection("syn"),
+    )
+flow.run(ctx, Pktchain.new_renderer())
 
 ctx.pickle(sys.argv[1])

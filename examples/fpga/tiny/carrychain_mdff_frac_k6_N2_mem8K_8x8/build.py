@@ -1,15 +1,10 @@
-from prga.compatible import *
-from prga.core.common import *
-from prga.passes.translation import *
-from prga.passes.vpr import *
-from prga.passes.rtl import *
-from prga.passes.yosys import *
-from prga.cfg.scanchain.lib import Scanchain
+from prga import *
 
 from itertools import product
 import sys
 
 ctx = Scanchain.new_context(1)
+
 gbl_clk = ctx.create_global("clk", is_clock = True)
 gbl_clk.bind((0, 1), 0)
 l1 = ctx.create_segment('L1', 16, 1)
@@ -110,13 +105,7 @@ for x, y in product(range(width), range(height)):
         builder.instantiate(subarray, (x, y))
 top = builder.fill( pattern ).auto_connect().commit()
 
-TranslationPass().run(ctx)
-
-Scanchain.complete_scanchain(ctx, ctx.database[ModuleView.logical, top.key])
-Scanchain.annotate_user_view(ctx)
-
-VPRArchGeneration('vpr/arch.xml').run(ctx)
-VPR_RRG_Generation("vpr/rrg.xml").run(ctx)
+r = Scanchain.new_renderer()
 
 scalable = VPRScalableDelegate(1.0)
 scalable.add_layout_rule("fill", 0, clbtile)
@@ -127,13 +116,15 @@ scalable.add_layout_rule("col", 2, iotiles[Orientation.west],  startx = 0)
 scalable.add_layout_rule("col", 2, iotiles[Orientation.east],  startx = "W - 1")
 scalable.add_layout_rule("col", 1, bramtile, startx = 6, repeatx = 8)
 
-VPRScalableArchGeneration("vpr/arch.scal.xml", scalable).run(ctx)
-
-r = Scanchain.new_renderer()
-
-VerilogCollection(r, 'rtl').run(ctx)
-YosysScriptsCollection(r, "syn").run(ctx)
-
-r.render()
+flow = Flow(
+        TranslationPass(),
+        Scanchain.InjectConfigCircuitry(),
+        VPRArchGeneration("vpr/arch.xml"),
+        VPR_RRG_Generation("vpr/rrg.xml"),
+        VPRScalableArchGeneration("vpr/arch.scal.xml", scalable),
+        VerilogCollection("rtl"),
+        YosysScriptsCollection("syn"),
+        )
+flow.run(ctx, Scanchain.new_renderer())
 
 ctx.pickle(sys.argv[1])

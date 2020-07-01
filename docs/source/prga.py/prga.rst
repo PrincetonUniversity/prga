@@ -1,34 +1,32 @@
 prga package
 ============
 
+.. automodule:: prga
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    prga.algorithm
-   prga.api
-   prga.arch
-   prga.config
-   prga.flow
-   prga.rtlgen
-   prga.vprgen
-   prga.ysgen
+   prga.cfg
+   prga.core
+   prga.netlist
+   prga.passes
+   prga.renderer
+   prga.tools
 
 Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    prga.compatible
    prga.exception
    prga.util
    prga.xml
-
-Module contents
----------------
-
-.. automodule:: prga
-   :members:
-   :undoc-members:
-   :show-inheritance:

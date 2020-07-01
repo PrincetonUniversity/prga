@@ -430,6 +430,8 @@ async def full_system(dut):
 
     await sha256_test(dut)
 
+    dut._log.info("[INFO] All tests passed")
+
 @cocotb.test()
 async def uprot(dut):
     dut._log.setLevel(logging.DEBUG)

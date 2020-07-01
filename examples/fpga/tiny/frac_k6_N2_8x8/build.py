@@ -1,16 +1,7 @@
-from prga.compatible import *
-from prga.core.common import *
-from prga.passes.translation import *
-from prga.passes.vpr import *
-from prga.passes.rtl import *
-from prga.passes.yosys import *
-from prga.cfg.scanchain.lib import Scanchain
-from prga.util import enable_stdout_logging
+from prga import *
 
 from itertools import product
 import sys
-
-enable_stdout_logging("prga")
 
 ctx = Scanchain.new_context(1)
 gbl_clk = ctx.create_global("clk", is_clock = True)
@@ -72,19 +63,14 @@ for x, y in product(range(width), range(height)):
         builder.instantiate(subarray, (x, y))
 top = builder.fill( SwitchBoxPattern.cycle_free ).auto_connect().commit()
 
-TranslationPass().run(ctx)
-
-Scanchain.complete_scanchain(ctx, ctx.database[ModuleView.logical, top.key])
-Scanchain.annotate_user_view(ctx)
-
-VPRArchGeneration('vpr/arch.xml').run(ctx)
-VPR_RRG_Generation("vpr/rrg.xml").run(ctx)
-
-r = Scanchain.new_renderer()
-
-VerilogCollection(r, 'rtl').run(ctx)
-YosysScriptsCollection(r, "syn").run(ctx)
-
-r.render()
+flow = Flow(
+        TranslationPass(),
+        Scanchain.InjectConfigCircuitry(),
+        VPRArchGeneration("vpr/arch.xml"),
+        VPR_RRG_Generation("vpr/rrg.xml"),
+        VerilogCollection("rtl"),
+        YosysScriptsCollection("syn"),
+        )
+flow.run(ctx, Scanchain.new_renderer())
 
 ctx.pickle(sys.argv[1])
