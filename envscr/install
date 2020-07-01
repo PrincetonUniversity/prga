@@ -1,37 +1,46 @@
 #!/usr/bin/env bash
 
-# Choose your desired compiler
+# ============================================================================
+# -- Choose your desired compiler --------------------------------------------
+# ============================================================================
 COMP=gcc
 MAKE_JOBCOUNT=8
-PYTHON_VERSION=3.7.2
+PYTHON_VERSION=3.8.2
 
-# Do not modify below this line
-CWD=${PWD}
-cd "$( dirname "${BASH_SOURCE[0]}" )"/..    # move to PRGA_ROOT
-
-trap "cd ${CWD}" EXIT
-trap "cd ${CWD}" SIGINT
-
+# ============================================================================
+# -- Do not modify below this line -------------------------------------------
+# ============================================================================
 function err() {
     >&2 echo -e "\033[0;31m[ERROR]\033[0m" $@
-    exit 1
+    return 0
 }
 
 function info() {
     echo -e "\033[0;34m[INFO]\033[0m" $@
 }
 
+if [ "${BASH_SOURCE-}" != "$0" ]; then
+    err "Script is being sourced. Please run 'install' in a subshell instead"
+    return 0
+fi
+
+CWD=${PWD}
+trap "cd ${CWD}" EXIT
+trap "cd ${CWD}" SIGINT
+
+cd "$( dirname "${BASH_SOURCE[0]}" )"/..    # move to PRGA_ROOT
+
 # find git
 GIT=$( command -v git 2>/dev/null )
 if [ -z "${GIT}" ]; then
-    err "'git' not found"
+    err "'git' not found" || exit 1
 fi
 info "Using 'git': ${GIT}"
 
 # find make
 MAKE=$( command -v make 2>/dev/null )
 if [ -z "${MAKE}" ]; then
-    err "'make' not found"
+    err "'make' not found" || exit 1
 fi
 info "Using 'make': ${MAKE}"
 
@@ -40,25 +49,18 @@ CMAKE=$( command -v cmake3 2>/dev/null )
 if [ -z "${CMAKE}" ]; then
     CMAKE=$( command -v cmake 2>/dev/null )
     if [ -z "${CMAKE}" ]; then
-        err "'cmake' not found"
+        err "'cmake' not found" || exit 1
+        exit 1
     elif [[ $( ${CMAKE} --version | cut -d " " -f 3 ) != "3"* ]]; then
-        err "CMake 3.x is required to build VPR"
+        err "CMake 3.x is required to build VPR" || exit 1
     fi
 fi
 info "Using 'cmake': ${CMAKE}"
 
-if [ -z "${COMP}" ]; then
-    COMP=gcc
-fi
-
-if [ -z "${MAKE_JOBCOUNT}" ]; then
-    MAKE_JOBCOUNT=8
-fi
-
 # find C compiler
 CC=$( command -v ${COMP} 2>/dev/null )
 if [ -z "${CC}" ]; then
-    err "'${COMP}' not found"
+    err "'${COMP}' not found" || exit 1
 fi
 info "Using '${COMP}': ${CC}"
 
@@ -71,7 +73,9 @@ else
         ${GIT} clone https://github.com/pyenv/pyenv.git || exit 1
         info "'pyenv' installed locally to ${PWD}/pyenv"
     else
-        info "Locally-installed 'pyenv' found. Skipping installation of 'pyenv'"
+        info "Locally-installed 'pyenv' found. Updating 'pyenv'"
+        cd pyenv && ${GIT} fetch && ${GIT} pull && cd ..
+        info "'pyenv' updated"
     fi
 
     info "Activating locally-installed 'pyenv'"
@@ -82,37 +86,35 @@ else
 fi
 
 # install the desired python if it's not installed already
-if [ -z "${PYTHON_VERSION}" ]; then
-    PYTHON_VERSION=3.7.2
-fi
 info "Installing Python ${PYTHON_VERSION} with 'pyenv'"
-pyenv install -s ${PYTHON_VERSION} || exit 1
+env PYTHON_CONFIGURE_OPTS="--enable-shared" CFLAGS="-fPIC" CXXFLAGS="-fPIC" pyenv install -s ${PYTHON_VERSION} || exit 1
 info "Python ${PYTHON_VERSION} installed with 'pyenv'"
 pyenv local ${PYTHON_VERSION} || exit 1
 if [[ $( python --version | cut -d " " -f 2 ) != "${PYTHON_VERSION}" ]]; then
-    err "'pyenv' is not choosing the correct Python version"
+    err "'pyenv' is not choosing the correct Python version" || exit 1
 fi
 info "Python ${PYTHON_VERSION} chosen as the local version"
 
+# upgrade pip and setuptools
+info "Upgrading 'pip' and 'setuptools'"
+pip install --upgrade setuptools pip
+info "'pip' and 'setuptools' upgraded"
+
 # install pipenv
-if [ -z "$( pip show pipenv 2>&1 >/dev/null )" ]; then
-    info "'pipenv' already installed. Skipping installation of 'pipenv'"
-else
-    info "Installing 'pipenv'"
-    pip install pipenv || exit 1
-    info "'pipenv' installed"
-fi
+info "Installing 'pipenv'"
+pip install pipenv || exit 1
+info "'pipenv' installed"
 
 # check out submodules
 info "Checking out submodules"
-${GIT} submodule update --init --recursive || exit 1
+# ${GIT} submodule update --init --recursive || exit 1
+info "Submodules checked out"
 
 mkdir -p local
 
 # build VTR
 info "Building VTR"
 cd vtr
-${GIT} apply ../envscr/69a8e95.patch 2>&1 >/dev/null
 ${MAKE} -j${MAKE_JOBCOUNT} CMAKE=${CMAKE} || exit 1
 cd ..
 info "VTR built successfully"
@@ -131,13 +133,22 @@ cd local/bin
 ln -s -f ../../vtr/vpr/vpr vpr
 ln -s -f ../../vtr/build/utils/fasm/genfasm genfasm
 cd ../..
+info "'vpr' and 'genfasm' linked to ${PWD}/local/bin"
 
 # build a virtualenv for prga.py
-info "Creating a virtual environment for prga.py"
 cd prga.py
-PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e . || exit 1
+if [ ! -d ".venv" ]; then
+    info "Creating a virtual environment for prga.py"
+    PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e . || exit 1
+elif ["`PIPENV_VENV_IN_PROJECT=1 pipenv run python --version`" -ne "python ${PYTHON_VERSION}"]; then
+    info "Virtual environment exists but version doesn't match"
+    PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e . || exit 1
+else
+    info "Virtual environment exists. Run update"
+    PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} update || exit 1
+fi
 cd ..
-info "Virtual environment created for prga.py"
+info "Virtual environment setup completed for prga.py"
 
 info "Installation finished successfully"
 

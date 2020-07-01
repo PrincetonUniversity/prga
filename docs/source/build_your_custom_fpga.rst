@@ -1,278 +1,347 @@
 Build Your Custom FPGA
 ======================
 
-This tutorial introduces the process of building a custom FPGA.
+This tutorial introduces how to build a custom FPGA. The full script can be
+found at ``examples/fpga/medium/fle6_N4_mem8K_42x34``.
 
 Describe the architecture
 -------------------------
 
-The entry point of PRGA is an `ArchitectureContext` object. It provides all the
-API for customizing CLB/IOB structure, describing FPGA layout, and customizing
-routing resources. It also manages all generated modules and resources, which
-are later used by the RTL-to-bitstream flow.
+To start building an FPGA, we first need to create a `Context` object. A
+`Context` object provides a set of API for describing CLB/IOB structure, FPGA
+layout and routing resources. It also stores and manages all created/generated
+modules and other information about the FPGA, which are later used by the
+RTL-to-bitstream flow.
 
-To create an `ArchitectureContext` object, the type of configuration circuitry
-must be chosen first. PRGA now provides one type of configuration
-circuitry: :py:mod:`prga.config.bitchain`.
+To create a `Context` object, call the ``new_context`` class method of a
+configuration circuitry class, for example, `Scanchain`. This is because
+different configuration circuitry needs to initialize the `Context` object
+differently. For example, the configuration cell in a SRAM-based configuration
+circuitry are SRAM cells, while the `Scanchain` configuration circuitry simply
+uses D-Flipflops.
 
 .. code-block:: python
 
-    from prga.api.context import *
-    from prga.api.config import *
+    from prga import *
 
-    width, height = 42, 34
+    N = 6
+    subarray_width, subarray_height = 8, 8
+    subarray_col, subarray_row = 5, 4
 
-    # create an FPGA with bitchain-type configuration circuitry
-    #  - top-level module is named "top"
-    #  - the grid size is 42 tiles wide and 34 tiles high
-    context = ArchitectureContext('top', width, height, BitchainConfigCircuitryDelegate)
+    # The argument ``1`` here specifies the width of the scanchain. This
+    # argument is specific to `Scanchain`.
+    ctx = Scanchain.new_context(1)
 
-After creating an `ArchitectureContext` object, we can start to describe our
-custom FPGA. The first step is to describe the routing resources: wire segments
-and global wires. PRGA only supports uni-directional straight wires.
+After creating the `Context` object, we can start to describe our custom FPGA.
+Here, we first describe the routing resources in the FPGA: the routing wire
+segments and the global wires. Currently PRGA only supports uni-directional,
+straight wires.
 
 .. code-block:: python
     
     # create global clock
-    # the clock is driven by the I/O at tile (0, 1)
-    context.create_global('clk', is_clock = True, bind_to_position = (0, 1))
+    gbl_clk = ctx.create_global("clk", is_clock = True)
+
+    # assign an IOB to drive the clock
+    #   the first argument is the position of a tile, and the second argument is
+    #   the subtile ID in that tile
+    gbl_clk.bind( (0, 1), 0)
 
     # create wire segments: name, width, length
-    context.create_segment( 'L1', 48,    1)
-    context.create_segment( 'L2', 16,    2)
-    context.create_segment( 'L4', 8,     4)
+    ctx.create_segment(     'L1', 40,    1)
+    ctx.create_segment(     'L4', 20,    4)
 
 Note that ``width`` is the number of the specific type of wire segments in each
-routing channel in one direction.
+routing channel in one direction. In the example above, each horizontal channel
+contains 240 tracks:
 
-The second step is to describe the CLB/IOB structures. PRGA supports
-hierarchical description of CLB/IOB structures. Use
-`ArchitectureContext.create_cluster` to create a sub-block cluster,
-`ArchitectureContext.create_logic_block` to create a CLB, and
-`ArchitectureContext.create_io_block` to create an IOB.
+- 40 ``L1`` tracks that run from west to east
+- 40 ``L1`` tracks that run from east to west
+- 20 ``L4`` tracks that run from west to east, starting from the current tile
+- 20 ``L4`` tracks that run from west to east, starting from 1 tiles west to the current tile
+- 20 ``L4`` tracks that run from west to east, starting from 2 tiles west to the current tile
+- 20 ``L4`` tracks that run from west to east, starting from 3 tiles west to the current tile
+- 20 ``L4`` tracks that run from east to west, starting from the current tile
+- 20 ``L4`` tracks that run from east to west, starting from 1 tiles east to the current tile
+- 20 ``L4`` tracks that run from east to west, starting from 2 tiles east to the current tile
+- 20 ``L4`` tracks that run from east to west, starting from 3 tiles east to the current tile
 
-.. code-block:: python
-    
-    # create IOB:                 block name, capacity (#blocks per tile)
-    iob = context.create_io_block('iob',      8)
-
-    # create ports of the IOB
-    clkport = iob.create_global(clk)
-
-    #                         port name, port width
-    outpad = iob.create_input('outpad',  1)
-    inpad = iob.create_output('inpad',   1)
-
-    # an IOB has a built-in sub-instance io
-    ioinst = iob.instances['io']
-
-    # instantiate two D-flipflops: module,                         instance name
-    iff = iob.instantiate(         context.primitives['flipflop'], 'iff')
-    off = iob.instantiate(         context.primitives['flipflop'], 'off')
-
-    # create configurable connections
-    iob.connect(clkport,                iff.pins['clk'])
-    iob.connect(ioinst.pins['inpad'],   iff.pins['D'])
-    iob.connect(iff.pins['Q'],          inpad)
-    iob.connect(ioinst.pins['inpad'],   inpad)
-    iob.connect(clkport,                off.pins['clk'])
-    iob.connect(off.pins['Q'],          ioinst.pins['outpad'])
-    iob.connect(outpad,                 ioinst.pins['outpad'])
-    iob.connect(outpad,                 off.pins['D'])
-
-After creating an IOB, one or multiple types of tiles can be created. Each type
-of tile encapsulates an IOB/CLB and the connection boxes around it.
+Before describing the CLB/IOBs in our custom FPGA, we can add custom logic
+elements (or primitive cells, hardwired IP blocks, etc.) to our `Context` and
+use them when we describe CLB/IOBs. For example, PRGA provides an API to create
+a memory module:
 
 .. code-block:: python
     
-    # create tiles
-    iotiles = {}
-    for orientation in iter(Orientation):
-        if orientation.is_auto:
-            continue
-        iotiles[orientation] = context.create_tile(
-                'io_tile_{}'.format(orientation.name),  # name of the tile
-                iob,            # IOB/CLB in the tile
-                orientation)    # on which side of the FPGA the tile can be placed
+    # `build_memory` returns a builder object which wraps the module we're
+    # designing and provides the API for designing the module
+    #
+    # the `commit` method of a builder object commits the module into the
+    # context database
+    memory = ctx.build_memory("dpram_a10d8", 10, 8).commit()
 
-`Orientation` is an enum with 5 values: `Orientation.north`, `Orientation.east`,
-`Orientation.south`, `Orientation.west`, and `Orientation.auto`. Except for the
-last value, each value represents a direction, or a side of a tile/array. The
-code above creates 4 different tiles with the same IOB, but to be placed on
-different edges of the FPGA.
+PRGA also provides API for adding and using arbitrary Verilog modules in the FPGA,
+for example `Context.build_primitive`. Multi-modal primitives are also supported
+by calling `Context.build_multimode`.
 
-CLBs are created in a similar way, but there are a few key differences. First of
-all, for each port created in the CLB, it must be explicitly specified on which
-side of the CLB is the port.
+::
+    
+    TODO: Add tutorials for adding custom Verilog modules and multi-modal
+    primitives.
 
-.. code-block:: python
-
-    # create CLB
-    clb = context.create_logic_block('clb')
-
-    # create ports of the CLB
-    clkport = clb.create_global(clk, Orientation.south)
-    ceport = clb.create_input('ce', 1, Orientation.south)
-    srport = clb.create_input('sr', 1, Orientation.south)
-    cin = clb.create_input('cin', 1, Orientation.north)
-    for i in range(4):
-        # "fraclut6sffc" is a multi-modal primitive specific to the
-        # 'bitchain'-type configuration circuitry. It consists of a fractuable
-        # 6-input LUT that can be used as two 5-input LUTs, two D-flipflops, and
-        # a look-ahead carry chain
-        inst = clb.instantiate(context.primitives['fraclut6sffc'], 'cluster{}'.format(i))
-        clb.connect(clkport, inst.pins['clk'])
-        clb.connect(ceport, inst.pins['ce'])
-        clb.connect(srport, inst.pins['sr'])
-        clb.connect(clb.create_input('ia' + str(i), 6, Orientation.west), inst.pins['ia'])
-        clb.connect(clb.create_input('ib' + str(i), 1, Orientation.west), inst.pins['ib'])
-        clb.connect(cin, inst.pins['cin'], pack_pattern = 'carrychain')
-        cin = inst.pins['cout']
-        clb.connect(inst.pins['oa'], clb.create_output('oa' + str(i), 1, Orientation.east))
-        clb.connect(inst.pins['ob'], clb.create_output('ob' + str(i), 1, Orientation.east))
-        clb.connect(inst.pins['q'], clb.create_output('q' + str(i), 1, Orientation.east))
-    clb.connect(cin, clb.create_output('cout', 1, Orientation.south), pack_pattern = 'carrychain')
-
-    # create tile
-    clbtile = context.create_tile('clb_tile', clb)
-
-Direct inter-block connections (`DirectTunnel` s) can be used to create
-shortcuts between block pins, which is great for carry chains or other
-latency-sensitive connections.
+Then, we can describe the CLB/IOB structures in our custom FPGA. Use
+`Context.build_io_block` or `Context.build_logic_block` to create an
+`IOBlockBuilder` or `LogicBlockBuilder` object, then use the builder
+object to build the desired block. After describing
+the desired block, use the ``commit`` method of the builder to commit
+the module into the `Context` database.
 
 .. code-block:: python
 
-    context.create_direct_tunnel('carrychain', clb.ports['cout'], clb.ports['cin'], (0, 1))
+    # =======================================================================
+    # -- CLB ----------------------------------------------------------------
+    # =======================================================================
 
-Another key difference of CLB vs IOB is that CLB may be larger than 1 tile. In
-this case, not only the side of the edge but also the position must be specified
-for the ports.
+    # create CLB builder
+    builder = ctx.build_logic_block("clb")
 
-.. code-block:: python
+    # create a block input that is directly connected to a global wire and not
+    # routable
+    clk = builder.create_global(gbl_clk, Orientation.south)
 
-    # create BRAM block
-    bram = context.create_logic_block('bram', 1, 2)
-    bram.create_global(clk, Orientation.south, position = (0, 0))
-    bram.create_input('addr1', 10, Orientation.west, position = (0, 0))
-    bram.create_input('data1', 8, Orientation.west, position = (0, 0))
-    bram.create_input('we1', 1, Orientation.west, position = (0, 0))
-    bram.create_output('out1', 8, Orientation.east, position = (0, 0))
-    bram.create_input('addr2', 10, Orientation.west, position = (0, 1))
-    bram.create_input('data2', 8, Orientation.west, position = (0, 1))
-    bram.create_input('we2', 1, Orientation.west, position = (0, 1))
-    bram.create_output('out2', 8, Orientation.east, position = (0, 1))
-    inst = bram.instantiate(context.primitive_library.get_or_create_memory(10, 8, 
-        dualport = True), 'ram')
+    # create other block inputs/outputs
+    #                         name, width,      on which side of the block is the port
+    iw = builder.create_input("iw", N // 2 * 6, Orientation.west)
+    ie = builder.create_input("ie", N // 2 * 6, Orientation.east)
+    ow = builder.create_output("ow", N // 2 * 2, Orientation.west)
+    oe = builder.create_output("oe", N // 2 * 2, Orientation.east)
+    cin = builder.create_input("cin", 1, Orientation.south)
 
-    # auto-connect according to port/pin names
-    bram.auto_connect(inst)
-
-    # create tile
-    bramtile = context.create_tile('bram_tile', bram)
-
-After describing all block types, we can layout the FPGA hierarchically. Use
-`ArchitectureContext.create_array` to create sub-arrays, then use
-`Array.instantiate_element` to instantiate tile/sub-arrays and place them into
-the grid.
-
-.. code-block:: python
-
-    # create sub-array
-    subarray = context.create_array('subarray', 5, 4)
-    for x, y in product(range(5), range(4)):
-        if x == 2:
-            if y % 2 == 0:
-                subarray.instantiate_element(bramtile, (x, y))
+    # Instantiate logic primitives
+    #                                            module to be instantiated, name,      number of instances
+    for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"],    "cluster", N)):
+        
+        # connect nets
+        builder.connect(clk, inst.pins['clk'])
+        if i % 2 == 0:
+            i = i // 2
+            builder.connect(iw[6 * i: 6 * (i + 1)], inst.pins["in"])
+            builder.connect(inst.pins['out'], oe[2 * i: 2 * (i + 1)])
         else:
-            subarray.instantiate_element(clbtile, (x, y))
+            i = i // 2
+            builder.connect(ie[6 * i: 6 * (i + 1)], inst.pins["in"])
+            builder.connect(inst.pins['out'], ow[2 * i: 2 * (i + 1)])
 
-    # top-level array
-    for x in range(width):
-        for y in range(height):
-            if x == 0:
-                if y > 0 and y < height - 1:
-                    context.top.instantiate_element(iotiles[Orientation.west], (x, y))
-            elif x == width - 1:
-                if y > 0 and y < height - 1:
-                    context.top.instantiate_element(iotiles[Orientation.east], (x, y))
-            elif y == 0:
-                context.top.instantiate_element(iotiles[Orientation.south], (x, y))
-            elif y == height - 1:
-                context.top.instantiate_element(iotiles[Orientation.north], (x, y))
-            elif x % 5 == 1 and y % 4 == 1:
-                context.top.instantiate_element(subarray, (x, y))
+        # 'vpr_pack_pattern' is a keyword-only argument. See
+        # "https://docs.verilogtorouting.org/en/latest/arch/reference/#tag-%3Cpack_patternname="
+        # for more information
+        builder.connect(cin, inst.pins["cin"], vpr_pack_patterns = ["carrychain"])
+
+        cin = inst.pins["cout"]
+
+    builder.connect(cin, builder.create_output("cout", 1, Orientation.north), vpr_pack_patterns = ["carrychain"])
+
+    # Commit the described CLB. The module is also accessible as `ctx.blocks["clb"]`
+    clb = builder.commit()
+
+    # =======================================================================
+    # -- IOB ----------------------------------------------------------------
+    # =======================================================================
+
+    # create IOB builder
+    #   An instance named "io" is automatically added into the IOB. This is the
+    #   I/O pad for off-chip connections. By default, a bi-directional pad that
+    #   can be configured as input or output is instantiated.
+    builder = ctx.build_io_block("iob")
+
+    # create block inputs/outputs
+    o = builder.create_input("outpad", 1)
+    i = builder.create_output("inpad", 1)
+
+    # connect 
+    builder.connect(builder.instances['io'].pins['inpad'], i)
+    builder.connect(o, builder.instances['io'].pins['outpad'])
+
+    # Commit the IOB. The module is also accessible as `ctx.blocks["iob"]`
+    iob = builder.commit()
+
+    # =======================================================================
+    # -- BRAM ---------------------------------------------------------------
+    # =======================================================================
+
+    # Here we specify the width and height of this block (in number of tiles)
+    builder = ctx.build_logic_block("bram", 1, 2)
+
+    # Instantiate the memory module
+    inst = builder.instantiate(ctx.primitives["dpram_a10d8"], "bram_inst")
+
+    # create and connect ports/pins
+    builder.connect(builder.create_global(gbl_clk, Orientation.south), inst.pins["clk"])
+    for port in ("addr1", "we1", "data1"):
+        builder.connect(builder.create_input(port, len(inst.pins[port]), Orientation.west, (0, 0)), inst.pins[port])
+    for port in ("addr2", "we2", "data2"):
+        builder.connect(builder.create_input(port, len(inst.pins[port]), Orientation.west, (0, 1)), inst.pins[port])
+    builder.connect(inst.pins["out1"], builder.create_output("out1", len(inst.pins["out1"]), Orientation.east, (0, 0)))
+    builder.connect(inst.pins["out2"], builder.create_output("out2", len(inst.pins["out2"]), Orientation.east, (0, 1)))
+
+    # commit the BRAM block. The module is also accessible as `ctx.blocks["bram"]`
+    bram = builder.commit()
+
+Direct inter-block connections (`DirectTunnel`) can be defined using
+`Context.create_tunnel`. This is often used for carrychains where connections
+are hardwired, i.e., not routable, but faster.
+
+.. code-block:: python
+
+    # Create a direct inter-block connection
+    #                 name of the tunnel, from port,         to port,          relative position
+    #
+    #   "relative position" is the position of the destination port relative to
+    #   the source port (not the blocks)
+    ctx.create_tunnel("carrychain",       clb.ports["cout"], clb.ports["cin"], (0, -1))
+
+After describing all the blocks we want, we can describe the tiles for each
+block. A tile contains one or more block instances and the connection boxes
+around them.
+
+PRGA supports full customization of the connection/switch boxes. In this
+tutorial, we will let PRGA to generate the connections for us. This is done
+by calling `TileBuilder.fill` and `ArrayBuilder.fill` methods.
+
+.. code-block:: python
+
+    # Create 4 different IO tiles, one per edge
+    iotiles = {}
+    for ori in Orientation:
+        builder = ctx.build_tile(iob,                                   # block to be instantiated in this tile
+                8,                                                      # number of block instances in this tile
+                name = "tile_io_{}".format(ori.name[0]),                # name of the tile
+                edge = OrientationTuple(False, **{ori.name: True}))     # on which edge of the FPGA
+
+        # auto-generate connection boxes and fill connection box patterns
+        #              default input FC value,  default output FC value
+        builder.fill( (1.,                      1.) )
+        #   FC values affect how many tracks each block pin is connected to
+
+        # automatically connect ports/pins in the tile
+        builder.auto_connect()
+
+        # commit the tile
+        iotiles[ori] = builder.commit()
+
+    # Concatenate build, fill, auto-connect and commit
+    clbtile = ctx.build_tile(clb).fill( (0.4, 0.25) ).auto_connect().commit()
+    bramtile = ctx.build_tile(bram).fill( (0.4, 0.25) ).auto_connect().commit()
+
+After describing all the tiles, we can describe arrays/sub-arrays. An array
+is a 2D mesh. Each tile in the mesh contains one tile instance and up to four
+switch boxes, one per corner. Tiles larger than 1x1 will occupy adjacent tiles
+and switch box slots:
+
+.. code-block:: python
+
+    # Select a switch box pattern. Supported values are:
+    #   wilton, universal, subset, cycle_free
+    pattern = SwitchBoxPattern.wilton
+    
+    # Create an array builder
+    #                         name,       width,          height
+    builder = ctx.build_array('subarray', subarray_width, subarray_height, set_as_top = False)
+    for x, y in product(range(builder.width), range(builder.height)):
+        if x == 6:
+            if y % 2 == 0:
+                builder.instantiate(bramtile, (x, y))
+        else:
+            builder.instantiate(clbtile, (x, y))
+
+    # Commit the subarray
+    subarray = builder.fill( pattern ).auto_connect().commit()
+
+    # Create the top-level array builder
+    top_width = subarray_width * subarray_col + 2
+    top_height = subarray_height * subarray_row + 2
+    builder = ctx.build_array('top', top_width, top_height, set_as_top = True)
+    for x, y in product(range(top_width), range(top_height)):
+        # leave the 4 corners empty
+        if x in (0, top_width - 1) and y in (0, top_height - 1):
+            pass
+        elif (x in (0, top_width - 1) and 0 < y < top_height - 1) or (y in (0, top_height - 1) and 0 < x < top_width - 1):
+            builder.instantiate(iotiles[
+                    Orientation.west if x == 0 else
+                    Orientation.east if x == top_width - 1 else
+                    Orientation.south if y == 0 else Orientation.north
+                    ], (x, y))
+        elif 0 < x < top_width - 1 and 0 < y < top_height - 1 and x % subarray_width == 1 and y % subarray_height == 1:
+            builder.instantiate(subarray, (x, y))
+
+    # commit the top-level array
+    top = builder.fill( pattern ).auto_connect().commit()
 
 Auto-complete the architecture, generate RTL and other files
 ------------------------------------------------------------
 
-All routing resources/connections are fully customizable, but we'll skip that in
-this tutorial, and let PRGA auto-complete them.
+PRGA uses `Jinja2`_ for generating most files. `Jinja2`_ is a templating
+language/framework for Python. It is fast, lightweight, and also compatible with
+plain text.
 
-PRGA adopts a pass-based flow to complete, modify, optimize the FPGA
-architecture as well as generate all files for the architecture. A `Flow` object
-is used to manage and run all the passes.
+To set up a `Jinja2`_ environment, call the ``new_renderer`` method of the same
+configuration circuitry class used to create the `Context`. This points the
+`Jinja2`_ environment to the correct directories to look for Verilog and other
+templates.
 
-.. code-block:: python
-
-    from prga.api.flow import *
-
-    flow = Flow((
-        # this pass automatically creates, places and populates connection/switch boxes
-        CompleteRoutingBox(BlockFCValue(BlockPortFCValue(0.25), BlockPortFCValue(0.1))),
-
-        # this pass implements the configurable connections with switches
-        CompleteSwitch(),
-
-        # this pass automatically connects the pins/ports of blocks, routing
-        # boxes, tiles and arrays
-        CompleteConnection(),
-
-        # this pass generates the RTL
-        GenerateVerilog('rtl'),
-
-        # this pass injects bitchain-style configuration circuitry into the
-        # architecture
-        InjectBitchainConfigCircuitry(),
-
-        # this pass generates all the files needed to run VPR
-        GenerateVPRXML('vpr'),
-
-        # this pass materializes all the modules, connections into physical stuff
-        CompletePhysical(),
-
-        # this pass is an optional pass but highly recommended. It makes sure the
-        # write-enable is deactivated when a BRAM is not used
-        ZeroingBRAMWriteEnable(),
-
-        # this pass is an optional pass but highly recommended, especially if
-        # support for post-implementation simulation is needed. It makes sure
-        # all block pins are connected to constant-zero when not used,
-        # preventing combinational loops during simulation
-        ZeroingBlockPins(),
-
-        # this pass generates all the files needed to run Yosys
-        GenerateYosysResources('syn'),
-        ))
-
-The order of the passes don't matter, because the `Flow` object inspects and
-resolves the dependency between the passes and orders them correspondingly.
-
-After creating the `Flow` object and adding all the passes to it, use `Flow.run`
-to run the flow on an `ArchitectureContext` object.
+.. _Jinja2: https://jinja.palletsprojects.com/en/2.11.x/
 
 .. code-block:: python
     
-    # run the flow
-    flow.run(context)
+    renderer = Scanchain.new_renderer()
 
-In addition, the `ArchitectureContext` object can be serialized and stored on
-disk with the Python module
-`pickle <https://docs.python.org/3/library/pickle.html>`_ . This serialized
-object can be used by other Python scripts to inspect or further improve the
-architecture. Some good examples can be found in the :py:mod:`prga_tools`
-module.
+PRGA adopts a pass-based flow to complete, modify, optimize the FPGA
+architecture as well as generate all files for the architecture. A `Flow` object
+is used to manage and run all the passes. It also checks and resolves the
+dependences between the passes. For example, the `VerilogCollection` pass
+requires `TranslationPass` as a dependency. Even if a `TranslationPass` pass is
+added after a `VerilogCollection` pass, it will be executed before the
+`VerilogCollection` pass.
 
 .. code-block:: python
 
-    # create a pickled object
-    context.pickle('ctx.pickled')
+    flow = Flow(
+
+        # This pass converts user-defined modules to Verilog modules
+        TranslationPass(),
+
+        # This pass injects configuration circuitry into the FPGA
+        Scanchain.InjectConfigCircuitry(),
+
+        # This pass generates the architecture specification for VPR to place
+        # and route designs onto this FPGA
+        VPRArchGeneration("vpr/arch.xml"),
+
+        # This pass generates the routing resource graph specification for VPR
+        # to place and route designs onto this FPGA
+        VPR_RRG_Generation("vpr/rrg.xml"),
+
+        # This pass create Verilog rendering tasks in the renderer. The second
+        # argument is the directory for all output files
+        VerilogCollection(r, 'rtl'),
+
+        # This pass analyzes the primitives in the FPGA and generates synthesis
+        # script for Yosys
+        YosysScriptsCollection(r, "syn"),
+        )
+
+    # Run the flow on our context
+    flow.run(ctx, renderer)
+
+After running the flow, all the models and information about our FPGA are stored
+in the context, and all the file are generated. As the final step, we make a
+persistent copy of the context by `pickling`_ it onto the disk. This pickled
+database will be used by the FPGA implementation toolchain, e.g. the bitstream
+assembler.
+
+.. _pickling: https://docs.python.org/3/library/pickle.html
+
+.. code-block:: python
+
+    # Pickle the context
+    ctx.pickle("ctx.pkl")

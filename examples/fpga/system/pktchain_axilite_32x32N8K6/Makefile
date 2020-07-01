@@ -1,0 +1,20 @@
+PICKLED_CTX := ctx.pkl
+ts := $(shell /bin/date "+%Y-%m-%d-%H-%M-%S")
+
+.PHONY: all clean backup clean-backup
+all: $(PICKLED_CTX)
+
+clean:
+	rm -rf $(PICKLED_CTX) rtl syn vpr constraints
+
+backup:
+	cp $(PICKLED_CTX) $(PICKLED_CTX).$(ts)
+	cp -r rtl rtl.$(ts)
+	cp -r syn syn.$(ts)
+	cp -r vpr vpr.$(ts)
+
+clean-backup:
+	rm -rf $(PICKLED_CTX).* rtl.* syn.* vpr.*
+
+$(PICKLED_CTX): build.py
+	python $< $@

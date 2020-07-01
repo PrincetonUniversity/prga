@@ -21,7 +21,7 @@ copyright = '2019, Ang Li'
 author = 'Ang Li'
 
 # The full version, including alpha/beta/rc tags
-release = 'Alpha 0.3'
+release = 'Alpha 0.3.3'
 
 # -- General configuration ---------------------------------------------------
 

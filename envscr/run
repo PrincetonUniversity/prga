@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+function err() {
+    >&2 echo -e "\033[0;31m[ERROR]\033[0m" $@
+    exit 1
+}
+
+function info() {
+    echo -e "\033[0;34m[INFO]\033[0m" $@
+}
+
+if [ ! -z "${VIRTUAL_ENV}" ]; then
+    err "Already in a Python virtualenv"
+fi
+
+CWD=${PWD}
+cd "$( dirname "${BASH_SOURCE[0]}" )"/..    # move to PRGA_ROOT
+
+# choose the correct binaries
+OLD_PATH=$PATH
+info "Setting \$PATH"
+export PATH=${PWD}/local/bin:$PATH
+
+# activate virtual env
+cd prga.py
+info "Entering virtual environment ..."
+PIPENV_VENV_IN_PROJECT=1 pipenv run $*
+info "Leaving virtual environment ..."
+
+# roll back to the old state
+info "Reverting \$PATH"
+export PATH=$OLD_PATH
+cd $CWD
+
+info "Thanks for using PRGA. We look forward to your next use :)"
+
+# vim: set ft=sh:

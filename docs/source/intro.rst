@@ -20,7 +20,7 @@ Installation
 ------------
 
 PRGA includes `Yosys <http://www.clifford.at/yosys/>`_ and `VTR
-<http://www.clifford.at/yosys/>`_ as submodules, 
+<http://www.clifford.at/yosys/>`_ as submodules,
 uses `pyenv <https://github.com/pyenv/pyenv>`_ and `pipenv
 <https://github.com/pypa/pipenv>`_ to manage Python interpretter and
 dependecies, and simplifies the installation with one single bash script that
@@ -43,7 +43,7 @@ To build an FPGA, run the following commands:
 .. code-block:: bash
 
     cd /path/to/prga/                           # cd to the root 
-    ./envscr/activate                           # activate the virtual environment
+    . ./envscr/activate                         # activate the virtual environment
     cd examples/fpga/tiny/k4_N2_8x8             # choose one FPGA building example
     make                                        # build the FPGA!
 
@@ -52,7 +52,8 @@ following commands:
 
 .. code-block:: bash
 
-    cd /path/to/prga/                           # cd to the root 
-    ./envscr/activate                           # activate the virtual environment
+    # Re-activate virtual environment if you exited or started a new terminal session
+    #   cd /path/to/prga/                           # cd to the root 
+    #   ./envscr/activate                           # activate the virtual environment
     cd examples/target/bcd2bin/tiny_k4_N2_8x8   # choose one design and one FPGA
     make                                        # run all the way to verification
