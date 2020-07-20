@@ -6,7 +6,7 @@ TEST_WRAPPER ?= testwrapper.v
 SYNTH_SCRIPT ?= synth.ys
 IO_CONSTRAINTS ?= io.partial
 
-TARGET := sha256_axilite_slave
+TARGET := sha256_ureg
 PICKLED_CONTEXT := $(FPGA_DIR)/ctx.pkl
 DESIGN_SRCS := ../testbench/$(TARGET).v ../sha256/src/rtl/sha256_core.v ../sha256/src/rtl/sha256_k_constants.v ../sha256/src/rtl/sha256_w_mem.v
 DESIGN_TEST_SRCS := ../testbench/$(TARGET)_host.v
@@ -33,7 +33,7 @@ $(project_files) &: $(PICKLED_CONTEXT) $(deps)
 		--fix_io $(IO_CONSTRAINTS) \
 		-t $(DESIGN_TEST_SRCS) \
 		--testbench_plus_args max_cycle=10000000 quiet \
-		-m $(DESIGN_SRCS) --model_top sha256_axilite_slave \
+		-m $(DESIGN_SRCS) --model_top $(TARGET) \
 		--summary $(PICKLED_SUMMARY) \
 		--makefile $(SIM_MAKEFILE) \
 		--wrapper $(TEST_WRAPPER) \

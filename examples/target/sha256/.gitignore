@@ -1,5 +1,5 @@
-testbench/build
 */*
+!testbench/*.v
 !*/Makefile
 
 !testsys/Makefile
