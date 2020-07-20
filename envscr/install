@@ -102,7 +102,7 @@ info "'pip' and 'setuptools' upgraded"
 
 # install pipenv
 info "Installing 'pipenv'"
-pip install pipenv || exit 1
+pip install --upgrade pipenv || exit 1
 info "'pipenv' installed"
 
 # check out submodules
@@ -137,16 +137,8 @@ info "'vpr' and 'genfasm' linked to ${PWD}/local/bin"
 
 # build a virtualenv for prga.py
 cd prga.py
-if [ ! -d ".venv" ]; then
-    info "Creating a virtual environment for prga.py"
-    PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e . || exit 1
-elif ["`PIPENV_VENV_IN_PROJECT=1 pipenv run python --version`" -ne "python ${PYTHON_VERSION}"]; then
-    info "Virtual environment exists but version doesn't match"
-    PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e . || exit 1
-else
-    info "Virtual environment exists. Run update"
-    PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} update || exit 1
-fi
+info "Creating a virtual environment for prga.py"
+PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e .[cocotb] || exit 1
 cd ..
 info "Virtual environment setup completed for prga.py"
 
