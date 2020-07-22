@@ -31,8 +31,10 @@ clean:
 	if [ -f $(SIM_MAKEFILE) ]; then $(MAKE) -f $(SIM_MAKEFILE) cleanall; fi
 	rm -rf $(project_files)
 
-$(project_files) &: $(PICKLED_CONTEXT) $(deps)
-	python -m prga.tools.$(CONFIG).simproj \
+$(SIM_MAKEFILE): $(PICKLED_CONTEXT) $(PARTIAL_IOBINDING) ../$(TARGET)_host.v ../$(TARGET).v
+	python -m prga_tools.bitchain.simproj \
+		-c $(COMPILER) \
+
 		--fix_io $(PARTIAL_IOBINDING) \
 		-t $(DESIGN_TEST_SRCS) --testbench_top picorv32_wrapper \
 		--testbench_plus_args firmware=../firmware.hex max_cycle=10000000 quiet \
