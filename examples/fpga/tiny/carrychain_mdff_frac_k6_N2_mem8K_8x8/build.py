@@ -1,5 +1,6 @@
 from prga import *
 
+from prga.passes.test import Tester
 from itertools import product
 import sys
 
@@ -20,7 +21,7 @@ adder = builder.instantiate(ctx.primitives["adder"], "fa")
 builder.connect(builder.create_clock("clk"), [ffA.pins['clk'], ffB.pins['clk']], fully = True)
 builder.connect(builder.create_input("ce", 1), [ffA.pins["ce"], ffB.pins['ce']], fully = True)
 builder.connect(builder.create_input("sr", 1), [ffA.pins["sr"], ffB.pins['sr']], fully = True)
-builder.connect(builder.create_input("ia", 6), lut.pins['in'])
+builder.connect(builder.create_input("ia", 6), lut.pins['bits_in'])
 builder.connect(lut.pins['o6'], o[0])
 builder.connect(lut.pins['o5'], o[2])
 builder.connect(lut.pins['o6'], ffA.pins['D'], vpr_pack_patterns = ['lut6_dff', 'lut5A_dff'])
@@ -124,6 +125,7 @@ flow = Flow(
         VPRScalableArchGeneration("vpr/arch.scal.xml", scalable),
         VerilogCollection("rtl"),
         YosysScriptsCollection("syn"),
+        Tester("rtl","unit_tests")
         )
 flow.run(ctx, Scanchain.new_renderer())
 

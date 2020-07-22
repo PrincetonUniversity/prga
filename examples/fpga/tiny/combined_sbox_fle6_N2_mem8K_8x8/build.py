@@ -1,5 +1,5 @@
 from prga import *
-
+from prga.passes.test import *
 from itertools import product
 import sys
 
@@ -83,15 +83,22 @@ scalable.add_layout_rule("col", 2, iotiles[Orientation.west],  startx = 0)
 scalable.add_layout_rule("col", 2, iotiles[Orientation.east],  startx = "W - 1")
 scalable.add_layout_rule("col", 1, bramtile, startx = 6, repeatx = 8)
 
-flow = Flow(
-        TranslationPass(),
-        Scanchain.InjectConfigCircuitry(),
-        VPRArchGeneration("vpr/arch.xml"),
-        VPR_RRG_Generation("vpr/rrg.xml"),
-        VPRScalableArchGeneration("vpr/arch.scal.xml", scalable),
-        VerilogCollection("rtl"),
-        YosysScriptsCollection("syn"),
-        )
-flow.run(ctx, Scanchain.new_renderer())
+
+TranslationPass(top, create_blackbox_for_undefined_primitives = True).run(ctx)
+
+Scanchain.complete_scanchain(ctx, ctx.database[ModuleView.logical, top.key])
+Scanchain.annotate_user_view(ctx)
+
+VPRArchGeneration('vpr/arch.xml').run(ctx)
+VPR_RRG_Generation("vpr/rrg.xml").run(ctx)
+
+r = Scanchain.new_renderer()
+ 
+VerilogCollection(r, 'rtl').run(ctx)
+YosysScriptsCollection(r, "syn").run(ctx)
+Tester(r,'rtl','unit_tests').run(ctx)
+
+r.render()
+r.render_test()
 
 ctx.pickle(sys.argv[1])

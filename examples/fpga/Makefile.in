@@ -5,7 +5,7 @@ ts := $(shell /bin/date "+%Y-%m-%d-%H-%M-%S")
 all: $(PICKLED_CTX)
 
 clean:
-	rm -rf $(PICKLED_CTX) rtl syn vpr
+	rm -rf $(PICKLED_CTX) rtl syn vpr unit_tests
 
 backup:
 	cp $(PICKLED_CTX) $(PICKLED_CTX).$(ts)
@@ -14,7 +14,12 @@ backup:
 	cp -r vpr vpr.$(ts)
 
 clean-backup:
-	rm -rf $(PICKLED_CTX).* rtl.* syn.* vpr.*
+	rm -rf $(PICKLED_CTX) rtl syn vpr
+
+unit_test:
+	rm -rf unit_tests
+	python temp.py
+
 
 $(PICKLED_CTX): build.py
 	python -O $< $@

@@ -1,7 +1,10 @@
 from prga import *
-
+# from prga.passes.test import Tester
 from itertools import product
 import sys
+from prga.compatible import *
+from prga.netlist.net.util import NetUtils
+from itertools import chain
 
 ctx = Scanchain.new_context(1)
 gbl_clk = ctx.create_global("clk", is_clock = True)
@@ -16,7 +19,7 @@ o = builder.create_output("o", 1)
 lut = builder.instantiate(ctx.primitives["lut4"], "lut")
 ff = builder.instantiate(ctx.primitives["flipflop"], "ff")
 builder.connect(clk, ff.pins['clk'])
-builder.connect(i, lut.pins['in'])
+builder.connect(i, lut.pins['bits_in'])
 builder.connect(lut.pins['out'], o)
 builder.connect(lut.pins['out'], ff.pins['D'], vpr_pack_patterns = ('lut_dff', ))
 builder.connect(ff.pins['Q'], o)
@@ -62,6 +65,7 @@ for x, y in product(range(width), range(height)):
         builder.instantiate(subarray, (x, y))
 top = builder.fill( SwitchBoxPattern.cycle_free ).auto_connect().commit()
 
+
 flow = Flow(
         TranslationPass(),
         Scanchain.InjectConfigCircuitry(),
@@ -69,6 +73,7 @@ flow = Flow(
         VPR_RRG_Generation('vpr/rrg.xml'),
         VerilogCollection('rtl'),
         YosysScriptsCollection('syn'),
+        # Tester('rtl','unit_tests')
         )
 flow.run(ctx, Scanchain.new_renderer())
 

@@ -1,8 +1,13 @@
 from prga import *
-
+from prga.passes.test import Tester
 from itertools import product
 import sys
+from itertools import chain
+from prga.compatible import *
+from prga.netlist.net.util import NetUtils
 
+import pdb
+# pdb.set_trace()
 ctx = Scanchain.new_context(1)
 gbl_clk = ctx.create_global("clk", is_clock = True)
 gbl_clk.bind((0, 1), 0)
@@ -25,7 +30,7 @@ out = builder.create_output("out", 4, Orientation.east)
 cin = builder.create_input("cin", 1, Orientation.south)
 for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"], "cluster", 2)):
     builder.connect(clk, inst.pins['clk'])
-    builder.connect(in_[6 * i: 6 * (i + 1)], inst.pins['in'])
+    builder.connect(in_[6 * i: 6 * (i + 1)], inst.pins['bits_in'])
     builder.connect(inst.pins['out'], out[2 * i: 2 * (i + 1)])
     builder.connect(cin, inst.pins["cin"], vpr_pack_patterns = ["carrychain"])
     cin = inst.pins["cout"]
@@ -83,6 +88,7 @@ scalable.add_layout_rule("col", 2, iotiles[Orientation.west],  startx = 0)
 scalable.add_layout_rule("col", 2, iotiles[Orientation.east],  startx = "W - 1")
 scalable.add_layout_rule("col", 1, bramtile, startx = 6, repeatx = 8)
 
+
 flow = Flow(
         TranslationPass(),
         Scanchain.InjectConfigCircuitry(),
@@ -91,7 +97,17 @@ flow = Flow(
         VPRScalableArchGeneration("vpr/arch.scal.xml", scalable),
         VerilogCollection("rtl"),
         YosysScriptsCollection("syn"),
+        Tester('rtl','unit_tests')
         )
-flow.run(ctx, Scanchain.new_renderer())
-
+r= Scanchain.new_renderer()
+flow.run(ctx, r)
 ctx.pickle(sys.argv[1])
+
+
+for sink_bus in chain(iter(oport for oport in itervalues(clb.ports) if oport.direction.is_output),
+                     iter(ipin for instance in itervalues(clb.instances) for ipin in itervalues(instance.pins) if ipin.model.direction.is_input)):
+    for sink_net in sink_bus:
+        for src_net in NetUtils.get_multisource(sink_net):
+            conn = NetUtils.get_connection(src_net,sink_net)
+            cfg_bits = conn.get("cfg_bits",tuple())
+            print("Conn::",src_net,"->",sink_net,"::",cfg_bits)
