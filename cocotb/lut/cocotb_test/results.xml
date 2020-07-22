@@ -1,7 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all" tests="0">
-    <property name="random_seed" value="1592144776" />
-    <testcase classname="test" name="changing_config" ratio_time="37482227387020.05" sim_time_ns="526000000000" time="0.014033317565917969" />
-    <testcase classname="test" name="simple_test" ratio_time="58510980529761.65" sim_time_ns="326000000000" time="0.005571603775024414" />
-  </testsuite>
-</testsuites>

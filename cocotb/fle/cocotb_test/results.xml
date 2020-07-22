@@ -1,8 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all" tests="0">
-    <property name="random_seed" value="1592146919" />
-    <testcase classname="test" name="test_ARITH" ratio_time="8811038489615.48" sim_time_ns="1341000000000" time="0.15219545364379883" />
-    <testcase classname="test" name="test_LUT5X2" ratio_time="8663648140674.724" sim_time_ns="1341000000000" time="0.1547846794128418" />
-    <testcase classname="test" name="test_LUT6X1" ratio_time="16647827754658.947" sim_time_ns="702000000000" time="0.04216766357421875" />
-  </testsuite>
-</testsuites>
