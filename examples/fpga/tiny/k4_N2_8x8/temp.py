@@ -64,11 +64,11 @@ flow.run(ctx, Scanchain.new_renderer())
 #                     cfg_bits = conn.get("cfg_bits",tuple())
 #                     print("Conn::",src_net,"->",sink_net,"::",cfg_bits)
 #         print()
-G=nx.Graph()
-for sink_bus in chain(iter(oport for oport in itervalues(tile_clb.ports) if oport.direction.is_output),
-                     iter(ipin for instance in itervalues(tile_clb.instances) for ipin in itervalues(instance.pins) if ipin.model.direction.is_input)):
-    for sink_net in sink_bus:
-        for src_net in NetUtils.get_source(sink_net):
+# G=nx.Graph()
+# for sink_bus in chain(iter(oport for oport in itervalues(tile_clb.ports) if oport.direction.is_output),
+#                      iter(ipin for instance in itervalues(tile_clb.instances) for ipin in itervalues(instance.pins) if ipin.model.direction.is_input)):
+#     for sink_net in sink_bus:
+#         for src_net in NetUtils.get_source(sink_net):
                 # G.add_edge(src_net.anem, sink_net)
         #     conn = NetUtils.get_connection(src_net,sink_net)
         #     cfg_bits = conn.get("cfg_bits",tuple())
