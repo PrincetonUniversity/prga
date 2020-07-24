@@ -4,4 +4,4 @@
 
 !testsys/Makefile
 !testsys/src
-!testsys/test.py
+!testsys/*.py

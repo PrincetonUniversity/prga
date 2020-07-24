@@ -3,12 +3,12 @@
 # ============================================================================
 FPGA_DIR := $(shell pwd)/../../../fpga/system/pktchain_axilite_32x32N8K6
 TOPLEVEL_LANG := verilog
-MODULE := test
+MODULE := test_ureg
 TESTSUITE ?= system
 SIM ?= vcs
 
 BUDDY_DIR := $(shell pwd)/../system_pktchain_axilite_32x32N8K6
-BITSTREAM := sha256_axilite_slave.memh
+BITSTREAM := sha256_ureg.memh
 
 $(BITSTREAM):
 	$(MAKE) -C $(BUDDY_DIR) bitgen
@@ -20,35 +20,33 @@ CUSTOM_SIM_DEPS := $(BITSTREAM)
 ifeq ($(TESTSUITE),system)
 
 TOPLEVEL = prga_system
-VERILOG_SOURCES = $(FPGA_DIR)/rtl/*.v
 TESTCASE = full_system
+VERILOG_SOURCES = $(FPGA_DIR)/rtl/*.v
 
 else ifeq ($(TESTSUITE),app)
 
 TOPLEVEL = app
+TESTCASE = uprot
 VERILOG_SOURCES = $(shell pwd)/src/app.v
-VERILOG_SOURCES += $(FPGA_DIR)/rtl/pktchain_axilite_intf.v
-VERILOG_SOURCES += $(FPGA_DIR)/rtl/pktchain_axilite_intf_be_cfg.v
-VERILOG_SOURCES += $(FPGA_DIR)/rtl/pktchain_axilite_intf_be_uprot.v
-VERILOG_SOURCES += $(FPGA_DIR)/rtl/pktchain_axilite_intf_fe.v
-VERILOG_SOURCES += $(FPGA_DIR)/rtl/pktchain_frame_assemble.v
-VERILOG_SOURCES += $(FPGA_DIR)/rtl/pktchain_frame_disassemble.v
+VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_sysintf.v
+VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_ctrl.v
+VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_sax.v
+VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_uprot.v
+VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_mprot.v
+VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_ecc_parity.v
 VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_clkdiv.v
 VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_async_fifo.v
-VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_async_tokenfifo.v
 VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_byteaddressable_reg.v
-VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_tokenfifo.v
 VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_fifo.v
 VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_fifo_lookahead_buffer.v
 VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_fifo_resizer.v
 VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_fifo_adapter.v
 VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_ram_1r1w.v
 VERILOG_SOURCES += $(FPGA_DIR)/rtl/prga_ram_1r1w_dc.v
-VERILOG_SOURCES += $(shell pwd)/../testbench/sha256_axilite_slave.v
+VERILOG_SOURCES += $(shell pwd)/../testbench/sha256_ureg.v
 VERILOG_SOURCES += $(shell pwd)/../sha256/src/rtl/sha256_core.v
 VERILOG_SOURCES += $(shell pwd)/../sha256/src/rtl/sha256_k_constants.v
 VERILOG_SOURCES += $(shell pwd)/../sha256/src/rtl/sha256_w_mem.v
-TESTCASE = uprot
 
 else
 
@@ -77,7 +75,7 @@ COCOTB_PY_DIR := $(shell cocotb-config --prefix)
 export COCOTB_SHARE_DIR
 export COCOTB_PY_DIR
 
-include $(shell cocotb-config --makefiles)/Makefile.inc
+# include $(shell cocotb-config --makefiles)/Makefile.inc
 include $(shell cocotb-config --makefiles)/Makefile.sim
 
 .DEFAULT_GOAL := sim
