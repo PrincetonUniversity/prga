@@ -25,7 +25,7 @@ iob = builder.commit()
 
 builder = ctx.build_logic_block("clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
-in_ = builder.create_input("in", 12, Orientation.west)
+in_ = builder.create_input("bits_in", 12, Orientation.west)
 out = builder.create_output("out", 4, Orientation.east)
 cin = builder.create_input("cin", 1, Orientation.south)
 for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"], "cluster", 2)):

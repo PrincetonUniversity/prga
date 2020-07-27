@@ -6,8 +6,7 @@ from itertools import chain
 from bitarray import bitarray
 from prga.passes.test import Tester
 ctx = Context.unpickle("ctx.pkl")
-clb= ctx._database[0,"clb"]
-cluster= ctx._database[0,"cluster"]
+
 # subarray= ctx._database[0,"subarray"]
 
 # for sink_bus in chain(iter(oport for oport in itervalues(cluster.ports) if oport.direction.is_output),
