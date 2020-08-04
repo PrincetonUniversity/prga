@@ -27,11 +27,11 @@ for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"], "cluster", 
     builder.connect(clk, inst.pins['clk'])
     if i % 2 == 0:
         i = i // 2
-        builder.connect(iw[6 * i: 6 * (i + 1)], inst.pins["in"])
+        builder.connect(iw[6 * i: 6 * (i + 1)], inst.pins["bits_in"])
         builder.connect(inst.pins['out'], oe[2 * i: 2 * (i + 1)])
     else:
         i = i // 2
-        builder.connect(ie[6 * i: 6 * (i + 1)], inst.pins["in"])
+        builder.connect(ie[6 * i: 6 * (i + 1)], inst.pins["bits_in"])
         builder.connect(inst.pins['out'], ow[2 * i: 2 * (i + 1)])
     builder.connect(cin, inst.pins["cin"], vpr_pack_patterns = ["carrychain"])
     cin = inst.pins["cout"]

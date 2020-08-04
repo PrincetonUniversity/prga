@@ -1,5 +1,4 @@
 from prga import *
-from prga.passes.test import Tester
 from itertools import product
 import sys
 from itertools import chain
@@ -96,18 +95,9 @@ flow = Flow(
         VPR_RRG_Generation("vpr/rrg.xml"),
         VPRScalableArchGeneration("vpr/arch.scal.xml", scalable),
         VerilogCollection("rtl"),
-        YosysScriptsCollection("syn"),
-        Tester('rtl','unit_tests')
+        YosysScriptsCollection("syn")
         )
 r= Scanchain.new_renderer()
 flow.run(ctx, r)
 ctx.pickle(sys.argv[1])
 
-
-for sink_bus in chain(iter(oport for oport in itervalues(clb.ports) if oport.direction.is_output),
-                     iter(ipin for instance in itervalues(clb.instances) for ipin in itervalues(instance.pins) if ipin.model.direction.is_input)):
-    for sink_net in sink_bus:
-        for src_net in NetUtils.get_multisource(sink_net):
-            conn = NetUtils.get_connection(src_net,sink_net)
-            cfg_bits = conn.get("cfg_bits",tuple())
-            print("Conn::",src_net,"->",sink_net,"::",cfg_bits)

@@ -24,8 +24,6 @@ ctx = Context.unpickle("ctx.pkl")
 #         print(x.model.cfg_bitcount)
 
 flow = Flow(
-        TranslationPass(),
-        VerilogCollection('rtl'),
         Tester('rtl','unit_tests')
         )
 flow.run(ctx, Scanchain.new_renderer())

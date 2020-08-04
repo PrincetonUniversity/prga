@@ -1,5 +1,5 @@
 from prga import *
-from prga.passes.test import *
+
 from itertools import product
 import sys
 
@@ -20,12 +20,12 @@ iob = builder.commit()
 
 builder = ctx.build_logic_block("clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
-in_ = builder.create_input("in", 12, Orientation.west)
+in_ = builder.create_input("bits_in", 12, Orientation.west)
 out = builder.create_output("out", 4, Orientation.east)
 cin = builder.create_input("cin", 1, Orientation.south)
 for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"], "cluster", 2)):
     builder.connect(clk, inst.pins['clk'])
-    builder.connect(in_[6 * i: 6 * (i + 1)], inst.pins['in'])
+    builder.connect(in_[6 * i: 6 * (i + 1)], inst.pins['bits_in'])
     builder.connect(inst.pins['out'], out[2 * i: 2 * (i + 1)])
     builder.connect(cin, inst.pins["cin"], vpr_pack_patterns = ["carrychain"])
     cin = inst.pins["cout"]
@@ -83,22 +83,15 @@ scalable.add_layout_rule("col", 2, iotiles[Orientation.west],  startx = 0)
 scalable.add_layout_rule("col", 2, iotiles[Orientation.east],  startx = "W - 1")
 scalable.add_layout_rule("col", 1, bramtile, startx = 6, repeatx = 8)
 
-
-TranslationPass(top, create_blackbox_for_undefined_primitives = True).run(ctx)
-
-Scanchain.complete_scanchain(ctx, ctx.database[ModuleView.logical, top.key])
-Scanchain.annotate_user_view(ctx)
-
-VPRArchGeneration('vpr/arch.xml').run(ctx)
-VPR_RRG_Generation("vpr/rrg.xml").run(ctx)
-
-r = Scanchain.new_renderer()
- 
-VerilogCollection(r, 'rtl').run(ctx)
-YosysScriptsCollection(r, "syn").run(ctx)
-Tester(r,'rtl','unit_tests').run(ctx)
-
-r.render()
-r.render_test()
+flow = Flow(
+        TranslationPass(),
+        Scanchain.InjectConfigCircuitry(),
+        VPRArchGeneration("vpr/arch.xml"),
+        VPR_RRG_Generation("vpr/rrg.xml"),
+        VPRScalableArchGeneration("vpr/arch.scal.xml", scalable),
+        VerilogCollection("rtl"),
+        YosysScriptsCollection("syn"),
+        )
+flow.run(ctx, Scanchain.new_renderer())
 
 ctx.pickle(sys.argv[1])
