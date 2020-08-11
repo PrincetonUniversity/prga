@@ -53,7 +53,7 @@ for pos in product(range(1), range(1)):
     builder.instantiate(clbtile, pos)
 subarray = builder.fill(SwitchBoxPattern.cycle_free).auto_connect().commit()
 
-width, height = 7, 7
+width, height = 8, 8
 builder = ctx.build_array('top', width, height, set_as_top = True)
 for x, y in product(range(width), range(height)):
     if x in (0, width - 1) and y in (0, height - 1):
