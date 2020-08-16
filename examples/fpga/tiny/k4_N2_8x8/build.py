@@ -72,8 +72,7 @@ flow = Flow(
         VPRArchGeneration('vpr/arch.xml'),
         VPR_RRG_Generation('vpr/rrg.xml'),
         VerilogCollection('rtl'),
-        YosysScriptsCollection('syn'),
-        # Tester('rtl','unit_tests')
+        YosysScriptsCollection('syn')
         )
 flow.run(ctx, Scanchain.new_renderer())
 
