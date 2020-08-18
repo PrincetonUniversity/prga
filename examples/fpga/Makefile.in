@@ -18,7 +18,7 @@ clean-backup:
 
 unit_test:
 	rm -rf unit_tests
-	python temp.py
+	python test.py
 
 $(PICKLED_CTX): build.py
 	python -O $< $@
