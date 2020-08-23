@@ -10,7 +10,6 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.tools.analysis
    prga.tools.pktchain
@@ -20,7 +19,6 @@ Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.tools.iobind
    prga.tools.util

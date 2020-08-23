@@ -10,7 +10,6 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.algorithm
    prga.cfg
@@ -24,7 +23,6 @@ Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.compatible
    prga.exception

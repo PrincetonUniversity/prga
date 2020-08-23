@@ -10,7 +10,6 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.core.builder.array
    prga.core.builder.box
@@ -19,7 +18,6 @@ Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.core.builder.base
    prga.core.builder.block

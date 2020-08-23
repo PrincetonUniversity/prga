@@ -10,7 +10,6 @@ Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.tools.pktchain.simproj.mkgen
    prga.tools.pktchain.simproj.tbgen

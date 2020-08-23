@@ -10,7 +10,6 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.tools.pktchain.simproj
 
@@ -18,6 +17,5 @@ Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.tools.pktchain.bitgen

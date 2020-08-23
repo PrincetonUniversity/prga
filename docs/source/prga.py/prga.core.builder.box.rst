@@ -10,7 +10,6 @@ Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.core.builder.box.base
    prga.core.builder.box.cbox

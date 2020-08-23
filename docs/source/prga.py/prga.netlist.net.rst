@@ -10,7 +10,6 @@ Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 4
 
    prga.netlist.net.bus
    prga.netlist.net.common
