@@ -89,3 +89,9 @@ Example:
 
     cd unit_tests/test_cluster
     make
+
+To test routes,  
+.. code-block:: bash
+
+    cd unit_tests/test_route_1
+    make
