@@ -224,15 +224,18 @@ async def sha256_testcase(dut, blocks, expected):
 
 @cocotb.coroutine
 async def sha256_test(dut):
+    # Enable UREG interface
+    await block_write(dut, 0x820, 0xff, 0x1)
+
     # Update timeout
     await block_write(dut, 0xC08, 0xff, 200)
 
     # Reset application
     await block_write(dut, 0xC00, 0xff, 200)
 
-    # wait 1000 cycles
-    for i in range(1000):
-        await RisingEdge(dut.clk)
+    # # wait 1000 cycles
+    # for i in range(1000):
+    #     await RisingEdge(dut.clk)
 
     # test 0
     await sha256_testcase(dut,
@@ -287,9 +290,8 @@ async def full_system(dut):
     dut.reg_req_addr <= 0
     dut.reg_req_strb <= 0
     dut.reg_req_data <= make_data(0, 64)
-    dut.sax_val <= 0
-    dut.sax_data <= make_data(0, 144)
-    dut.asx_rdy <= 0
+    dut.ccm_req_rdy <= 0
+    dut.ccm_resp_val <= 0
     dut.rst_n <= 1
 
     await RisingEdge(dut.clk)
@@ -345,9 +347,6 @@ async def uprot(dut):
     dut.reg_req_addr <= 0
     dut.reg_req_strb <= 0
     dut.reg_req_data <= make_data(0, 64)
-    dut.sax_val <= 0
-    dut.sax_data <= make_data(0, 144)
-    dut.asx_rdy <= 0
     dut.rst_n <= 1
 
     await RisingEdge(dut.clk)

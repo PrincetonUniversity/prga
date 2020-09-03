@@ -20,7 +20,7 @@ try:
 
 except FileNotFoundError:
     ctx = Pktchain.new_context(phit_width = 32, cfg_width = 1)
-    
+
     # ============================================================================
     # -- Routing Resources -------------------------------------------------------
     # ============================================================================
@@ -28,12 +28,12 @@ except FileNotFoundError:
     gbl_clk.bind((0, 16), 0)
     l1a = ctx.create_segment('L1', 40, 1)
     l4a = ctx.create_segment('L4', 20, 4)
-    
+
     # ============================================================================
     # -- Primitives --------------------------------------------------------------
     # ============================================================================
     memory = ctx.build_memory("prga_RAM", maw, mdw).commit()
-    
+
     # ============================================================================
     # -- Blocks ------------------------------------------------------------------
     # ============================================================================
@@ -44,7 +44,7 @@ except FileNotFoundError:
     builder.connect(builder.instances['io'].pins['inpad'], i)
     builder.connect(o, builder.instances['io'].pins['outpad'])
     iob = builder.commit()
-    
+
     # -- CLB ---------------------------------------------------------------------
     builder = ctx.build_logic_block("prga_clb")
     clk = builder.create_global(gbl_clk, Orientation.south)
@@ -63,9 +63,9 @@ except FileNotFoundError:
     # crossbar
     builder.connect(xbar_i, xbar_o, fully = True)
     clb = builder.commit()
-    
+
     ctx.create_tunnel("carrychain", clb.ports["cout"], clb.ports["cin"], (0, -1))
-    
+
     # -- BRAM --------------------------------------------------------------------
     builder = ctx.build_logic_block("prga_bram", 1, subarray_height)
     inst = builder.instantiate(memory, "i_ram")
@@ -85,25 +85,25 @@ except FileNotFoundError:
         builder.connect(inst.pins["out1"][slice_], builder.create_output("out1_"+str(i), ww, Orientation.east, (0, i)))
         builder.connect(inst.pins["out2"][slice_], builder.create_output("out2_"+str(i), ww, Orientation.east, (0, i)))
     bram = builder.commit()
-    
+
     # ============================================================================
     # -- Tiles -------------------------------------------------------------------
     # ============================================================================
     iotile = ctx.build_tile(iob, 16, edge = OrientationTuple(False, west = True)).fill( (.5, .5) ).auto_connect().commit()
     clbtile = ctx.build_tile(clb).fill( (0.25, 0.15) ).auto_connect().commit()
     bramtile = ctx.build_tile(bram).fill( (0.4, 0.25) ).auto_connect().commit()
-    
+
     # ============================================================================
     # -- Subarrays ---------------------------------------------------------------
     # ============================================================================
     pattern = SwitchBoxPattern.cycle_free
-    
+
     # -- CLB Subarray ------------------------------------------------------------
     builder = ctx.build_array("prga_logic_region", subarray_width, subarray_height, set_as_top = False)
     for x, y in product(range(builder.width), range(builder.height)):
         builder.instantiate(clbtile, (x, y))
     logicregion = builder.fill( pattern ).auto_connect().commit()
-    
+
     # -- RAM Subarray ------------------------------------------------------------
     builder = ctx.build_array("prga_mem_region", subarray_width, subarray_height, set_as_top = False)
     for x, y in product(range(builder.width), range(builder.height)):
@@ -113,14 +113,14 @@ except FileNotFoundError:
         else:
             builder.instantiate(clbtile, (x, y))
     memregion = builder.fill( pattern ).auto_connect().commit()
-    
+
     # -- IOs ---------------------------------------------------------------------
     builder = ctx.build_array("prga_io_region", 1, subarray_height,
             set_as_top = False, edge = OrientationTuple(False, west = True))
     for x, y in product(range(builder.width), range(builder.height)):
         builder.instantiate(iotile, (x, y))
     ioregion = builder.fill( pattern ).auto_connect().commit()
-    
+
     # -- Edge Fillers ------------------------------------------------------------
     edgefillers = {}
     for ori in Orientation:
@@ -131,14 +131,14 @@ except FileNotFoundError:
                 1 if ori.dimension.is_y else subarray_height,
                 set_as_top = False, edge = OrientationTuple(False, **{ori.name: True}))
         edgefillers[ori] = builder.fill( pattern ).auto_connect().commit()
-    
+
     # -- Corner Fillers ----------------------------------------------------------
     cornerregions = {}
     for corner in Corner:
         builder = ctx.build_array("prga_corner_region_{}".format(corner.case("ne", "nw", "se", "sw")), 1, 1,
                 set_as_top = False, edge = OrientationTuple(False, **{ori.name: True for ori in corner.decompose()}))
         cornerregions[corner] = builder.fill( pattern ).auto_connect().commit()
-    
+
     # ============================================================================
     # -- Fabric ------------------------------------------------------------------
     # ============================================================================
@@ -245,20 +245,22 @@ except FileNotFoundError:
         else:
             for i in module.instances.values():
                 yield i
-    
+
     flow = Flow(
         TranslationPass(),
         Pktchain.InjectConfigCircuitry(iter_instances = iter_instances),
         VPRArchGeneration("vpr/arch.xml"),
         VPR_RRG_Generation("vpr/rrg.xml"),
-        VerilogCollection('rtl'),
-        YosysScriptsCollection("syn"),
         )
     flow.run(ctx, Pktchain.new_renderer())
 
     ctx.pickle("ctx.tmp.pkl")
 
-Flow(Pktchain.BuildSystem("constraints/io.pads"),
-        VerilogCollection("rtl")).run(ctx, Pktchain.new_renderer())
+Flow(
+        Pktchain.BuildSystem("constraints/io.pads", core = True, cfg_in_core = True),
+        VPRArchGeneration("vpr/arch.xml"),
+        VerilogCollection("rtl"),
+        YosysScriptsCollection("syn"),
+        ).run(ctx, Pktchain.new_renderer())
 
 ctx.pickle(sys.argv[1])

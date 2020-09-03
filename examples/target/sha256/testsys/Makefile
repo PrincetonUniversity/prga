@@ -10,9 +10,11 @@ SIM ?= vcs
 BUDDY_DIR := $(shell pwd)/../system_pktchain_axilite_32x32N8K6
 BITSTREAM := sha256_ureg.memh
 
-$(BITSTREAM):
+$(BUDDY_DIR)/$(BITSTREAM):
 	$(MAKE) -C $(BUDDY_DIR) bitgen
-	cp $(BUDDY_DIR)/$(BITSTREAM) $@
+
+$(BITSTREAM): $(BUDDY_DIR)/$(BITSTREAM)
+	cp $< $@
 
 CUSTOM_SIM_DEPS := $(BITSTREAM)
 
