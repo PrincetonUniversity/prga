@@ -1,9 +1,33 @@
+module mux8to1(out,sel,data_in);
+output out;     
+input[7:0] data_in;
+input[3:0] sel;
+reg out;
+always @(data_in or sel)
+case(sel)
+3'b000 :out<=data_in[0];
+3'b001 :out<=data_in[1];
+3'b010 :out<=data_in[2];
+3'b011 :out<=data_in[3];
+3'b100 :out<=data_in[4];
+3'b101 :out<=data_in[5];
+3'b110 :out<=data_in[6];
+3'b111 :out<=data_in[7];
+
+endcase
+
+endmodule
+
+
 module bcd2bin (
     input wire clk,
     input wire reset,
     input wire start,
     input wire [3:0] bcd1,
     input wire [3:0] bcd0,
+    input [7:0] a,
+    input [3:0] b,
+    output c,
     output reg ready,
     output reg done_tick,
     output wire [6:0] bin
@@ -79,5 +103,5 @@ module bcd2bin (
 
     // assign output
     assign bin = bin_reg;
-
+    mux8to1 U1(.out(c),.data_in(a),.sel(b));
 endmodule
