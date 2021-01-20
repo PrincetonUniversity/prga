@@ -1,3 +1,4 @@
-*/*
-!*/Makefile
-!*/io.partial
+/*/*
+!/src/*
+!/*/Makefile
+!/*/config

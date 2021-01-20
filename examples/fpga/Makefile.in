@@ -1,20 +1,32 @@
 PICKLED_CTX := ctx.pkl
-ts := $(shell /bin/date "+%Y-%m-%d-%H-%M-%S")
+BACKUP ?= $(shell bin/date "+%Y-%m-%d-%H-%M")
 
-.PHONY: all clean backup clean-backup
+SHELL = /bin/bash
+.SHELLFLAGS = -o pipefail -c
+
+.PHONY: all clean backup recover clean-backup
 all: $(PICKLED_CTX)
 
 clean:
-	rm -rf $(PICKLED_CTX) rtl syn vpr
+	rm -rf rtl syn vpr *.log *.pkl
 
 backup:
-	cp $(PICKLED_CTX) $(PICKLED_CTX).$(ts)
-	cp -r rtl rtl.$(ts)
-	cp -r syn syn.$(ts)
-	cp -r vpr vpr.$(ts)
+	if [[ -d backup-$(BACKUP) ]]; then echo "Backup $(BACKUP) already exists"; exit 1; fi
+	mkdir backup-$(BACKUP)
+	cp $(PICKLED_CTX) backup-$(BACKUP)
+	cp -r rtl backup-$(BACKUP)
+	cp -r syn backup-$(BACKUP)
+	cp -r vpr backup-$(BACKUP)
+
+recover:
+	if [[ ! -d backup-$(BACKUP) ]]; then echo "Backup $(BACKUP) does not exist"; exit 1; fi
+	rm -rf $(PICKLED_CTX) && cp backup-$(BACKUP)/$(PICKLED_CTX) .
+	rm -rf rtl && cp -r backup-$(BACKUP)/rtl .
+	rm -rf syn && cp -r backup-$(BACKUP)/syn .
+	rm -rf vpr && cp -r backup-$(BACKUP)/vpr .
 
 clean-backup:
-	rm -rf $(PICKLED_CTX).* rtl.* syn.* vpr.*
+	rm -rf backup-*
 
 $(PICKLED_CTX): build.py
-	python -O $< $@
+	python -O $< $@ | tee build.log

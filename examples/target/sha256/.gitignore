@@ -1,7 +1,0 @@
-*/*
-!testbench/*.v
-!*/Makefile
-
-!testsys/Makefile
-!testsys/src
-!testsys/*.py
