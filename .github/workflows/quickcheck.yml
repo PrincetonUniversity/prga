@@ -1,19 +1,15 @@
-# This is a basic workflow to help you get started with Actions
-
-name: dev-install
+# quickcheck
+name: quickcheck
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the release branch
+
   push:
-    branches: [ dev ]
-  pull_request:
     branches: [ dev ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
   # Install PRGA
@@ -30,8 +26,20 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: sudo apt-get install tcl8.6-dev
+        run: sudo apt-get install tcl8.6-dev autoconf
           
       # Install PRGA
       - name: Install PRGA
         run: bash envscr/install
+
+      # Checkout iverilog
+      - uses: actions/checkout@v2.3.4
+        with:
+          repository: steveicarus/iverilog
+          path: iverilog
+
+      # compile and install iverilog
+      - name: Install iverilog
+        run: pushd iverilog && sh autoconf.sh --prefix=${GITHUB_WORKSPACE}/local && ./configure && make && make install
+
+  # Run test

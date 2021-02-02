@@ -107,7 +107,7 @@ info "'pipenv' installed"
 
 # check out submodules
 info "Checking out submodules"
-# ${GIT} submodule update --init --recursive || exit 1
+${GIT} submodule update --init --recursive || exit 1
 info "Submodules checked out"
 
 mkdir -p local
