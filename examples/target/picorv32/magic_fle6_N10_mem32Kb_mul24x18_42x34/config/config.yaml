@@ -1,0 +1,22 @@
+context: ../../../../fpga/magic/fle6_N10_mem32Kb_mul24x18_42x34/ctx.pkl
+compiler: vcs
+design:
+    name: picorv32_axi
+    sources:
+        - ../../src/picorv32.v
+    parameters:
+        COMPRESSED_ISA: 1
+        ENABLE_MUL: 1
+        ENABLE_FAST_MUL: 1
+        ENABLE_DIV: 1
+        ENABLE_IRQ: 1
+        ENABLE_TRACE: 1
+constraints:
+    io: io.partial
+tests:
+    picorv32_test_basic:
+        sources:
+            - ../../src/picorv32_test_basic.v
+        run_flags:
+            - +firmware=${PRGA_ROOT}/examples/target/picorv32/src/firmware.hex
+            - +max_cycle=1000000

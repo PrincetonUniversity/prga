@@ -1,4 +1,4 @@
 /*/*
-!/src/*.v
+!/src/*
 !/*/Makefile
 !/*/config
