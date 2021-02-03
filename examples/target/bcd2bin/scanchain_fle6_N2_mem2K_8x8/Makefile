@@ -1,4 +1,5 @@
-CONFIG := config/config.yaml
+COMP ?= ivl
+CONFIG := config/config.${COMP}.yaml
 PROJECTS := design tests
 
 $(PROJECTS): $(CONFIG)
