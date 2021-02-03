@@ -17,7 +17,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Steps
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2.3.4
@@ -26,12 +26,8 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: sudo apt-get install tcl8.6-dev autoconf
+        run: sudo apt-get install tcl8.6-dev gperf autoconf
           
-      # Install PRGA
-      - name: Install PRGA
-        run: bash envscr/install
-
       # Checkout iverilog
       - uses: actions/checkout@v2.3.4
         with:
@@ -40,6 +36,388 @@ jobs:
 
       # compile and install iverilog
       - name: Install iverilog
-        run: pushd iverilog && sh autoconf.sh --prefix=${GITHUB_WORKSPACE}/local && ./configure && make && make install
+        run: pushd iverilog && sh autoconf.sh && ./configure --prefix=${GITHUB_WORKSPACE}/local && make && make install
 
-  # Run test
+      # Install PRGA
+      - name: Install PRGA
+        run: bash envscr/install
+
+  # Run tests
+  build-magic-k4_N2_8x8:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ install ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Build FPGA: magic/k4_N2_8x8"
+        run: make -C examples/fpga/magic/k4_N2_8x8
+
+  run-bcd2bin-magic-k4_N2_8x8:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ build-magic-k4_N2_8x8 ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Make project for design bcd2bin on FPGA: magic/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/magic_k4_N2_8x8
+
+      # generate bitstream
+      - name: "Generate bitstream for design bcd2bin on FPGA: magic/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/magic_k4_N2_8x8/design
+
+      # run behavioral simulation
+      - name: "Behavioral simulation of design bcd2bin on FPGA: magic/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic behav
+
+      # run post-synthesis simulation 
+      - name: "Post-Synthesis simulation of design bcd2bin on FPGA: magic/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic postsyn
+
+      # run post-implentation simulation
+      - name: "Post-Implementation simulation of design bcd2bin on FPGA: magic/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic postimpl
+
+  build-magic-grady18_N2_10x6:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ install ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Build FPGA: magic/grady18_N2_10x6"
+        run: make -C examples/fpga/magic/grady18_N2_10x6
+
+  run-bcd2bin-magic-grady18_N2_10x6:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ build-magic-grady18_N2_10x6 ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Make project for design bcd2bin on FPGA: magic/grady18_N2_10x6"
+        run: make -C examples/target/bcd2bin/magic_grady18_N2_10x6
+
+      # generate bitstream
+      - name: "Generate bitstream for design bcd2bin on FPGA: magic/grady18_N2_10x6"
+        run: make -C examples/target/bcd2bin/magic_grady18_N2_10x6/design
+
+      # run behavioral simulation
+      - name: "Behavioral simulation of design bcd2bin on FPGA: magic/grady18_N2_10x6"
+        run: make -C examples/target/bcd2bin/magic_grady18_N2_10x6/tests/basic behav
+
+      # run post-synthesis simulation 
+      - name: "Post-Synthesis simulation of design bcd2bin on FPGA: magic/grady18_N2_10x6"
+        run: make -C examples/target/bcd2bin/magic_grady18_N2_10x6/tests/basic postsyn
+
+      # run post-implentation simulation
+      - name: "Post-Implementation simulation of design bcd2bin on FPGA: magic/grady18_N2_10x6"
+        run: make -C examples/target/bcd2bin/magic_grady18_N2_10x6/tests/basic postimpl
+
+  build-magic-grady18v2_N2_8x8_hier:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ install ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Build FPGA: magic/grady18v2_N2_8x8_hier"
+        run: make -C examples/fpga/magic/grady18v2_N2_8x8_hier
+
+  run-bcd2bin-magic-grady18v2_N2_8x8_hier:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ build-magic-grady18v2_N2_8x8_hier ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Make project for design bcd2bin on FPGA: magic/grady18v2_N2_8x8_hier"
+        run: make -C examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier
+
+      # generate bitstream
+      - name: "Generate bitstream for design bcd2bin on FPGA: magic/grady18v2_N2_8x8_hier"
+        run: make -C examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/design
+
+      # run behavioral simulation
+      - name: "Behavioral simulation of design bcd2bin on FPGA: magic/grady18v2_N2_8x8_hier"
+        run: make -C examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/tests/basic behav
+
+      # run post-synthesis simulation 
+      - name: "Post-Synthesis simulation of design bcd2bin on FPGA: magic/grady18v2_N2_8x8_hier"
+        run: make -C examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/tests/basic postsyn
+
+      # run post-implentation simulation
+      - name: "Post-Implementation simulation of design bcd2bin on FPGA: magic/grady18v2_N2_8x8_hier"
+        run: make -C examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/tests/basic postimpl
+
+  build-magic-fle6_N2_mem2K_8x8:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ install ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Build FPGA: magic/fle6_N2_mem2K_8x8"
+        run: make -C examples/fpga/magic/fle6_N2_mem2K_8x8
+
+  run-bcd2bin-magic-fle6_N2_mem2K_8x8:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ build-magic-fle6_N2_mem2K_8x8 ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Make project for design bcd2bin on FPGA: magic/fle6_N2_mem2K_8x8"
+        run: make -C examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8
+
+      # generate bitstream
+      - name: "Generate bitstream for design bcd2bin on FPGA: magic/fle6_N2_mem2K_8x8"
+        run: make -C examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/design
+
+      # run behavioral simulation
+      - name: "Behavioral simulation of design bcd2bin on FPGA: magic/fle6_N2_mem2K_8x8"
+        run: make -C examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/tests/basic behav
+
+      # run post-synthesis simulation 
+      - name: "Post-Synthesis simulation of design bcd2bin on FPGA: magic/fle6_N2_mem2K_8x8"
+        run: make -C examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/tests/basic postsyn
+
+      # run post-implentation simulation
+      - name: "Post-Implementation simulation of design bcd2bin on FPGA: magic/fle6_N2_mem2K_8x8"
+        run: make -C examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/tests/basic postimpl
+
+  build-scanchain-k4_N2_8x8:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ install ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Build FPGA: scanchain/k4_N2_8x8"
+        run: make -C examples/fpga/scanchain/k4_N2_8x8
+
+  run-bcd2bin-scanchain-k4_N2_8x8:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ build-scanchain-k4_N2_8x8 ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Make project for design bcd2bin on FPGA: scanchain/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/scanchain_k4_N2_8x8
+
+      # generate bitstream
+      - name: "Generate bitstream for design bcd2bin on FPGA: scanchain/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/scanchain_k4_N2_8x8/design
+
+      # run behavioral simulation
+      - name: "Behavioral simulation of design bcd2bin on FPGA: scanchain/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/scanchain_k4_N2_8x8/tests/basic behav
+
+      # run post-synthesis simulation 
+      - name: "Post-Synthesis simulation of design bcd2bin on FPGA: scanchain/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/scanchain_k4_N2_8x8/tests/basic postsyn
+
+      # run post-implentation simulation
+      - name: "Post-Implementation simulation of design bcd2bin on FPGA: scanchain/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/scanchain_k4_N2_8x8/tests/basic postimpl
+
+  build-scanchain-grady18_N2_10x6:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ install ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Build FPGA: scanchain/grady18_N2_10x6"
+        run: make -C examples/fpga/scanchain/grady18_N2_10x6
+
+  run-bcd2bin-scanchain-grady18_N2_10x6:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ build-scanchain-grady18_N2_10x6 ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Make project for design bcd2bin on FPGA: scanchain/grady18_N2_10x6"
+        run: make -C examples/target/bcd2bin/scanchain_grady18_N2_10x6
+
+      # generate bitstream
+      - name: "Generate bitstream for design bcd2bin on FPGA: scanchain/grady18_N2_10x6"
+        run: make -C examples/target/bcd2bin/scanchain_grady18_N2_10x6/design
+
+      # run behavioral simulation
+      - name: "Behavioral simulation of design bcd2bin on FPGA: scanchain/grady18_N2_10x6"
+        run: make -C examples/target/bcd2bin/scanchain_grady18_N2_10x6/tests/basic behav
+
+      # run post-synthesis simulation 
+      - name: "Post-Synthesis simulation of design bcd2bin on FPGA: scanchain/grady18_N2_10x6"
+        run: make -C examples/target/bcd2bin/scanchain_grady18_N2_10x6/tests/basic postsyn
+
+      # run post-implentation simulation
+      - name: "Post-Implementation simulation of design bcd2bin on FPGA: scanchain/grady18_N2_10x6"
+        run: make -C examples/target/bcd2bin/scanchain_grady18_N2_10x6/tests/basic postimpl
+
+  build-scanchain-grady18v2_N2_8x8_hier:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ install ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Build FPGA: scanchain/grady18v2_N2_8x8_hier"
+        run: make -C examples/fpga/scanchain/grady18v2_N2_8x8_hier
+
+  run-bcd2bin-scanchain-grady18v2_N2_8x8_hier:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ build-scanchain-grady18v2_N2_8x8_hier ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Make project for design bcd2bin on FPGA: scanchain/grady18v2_N2_8x8_hier"
+        run: make -C examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier
+
+      # generate bitstream
+      - name: "Generate bitstream for design bcd2bin on FPGA: scanchain/grady18v2_N2_8x8_hier"
+        run: make -C examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/design
+
+      # run behavioral simulation
+      - name: "Behavioral simulation of design bcd2bin on FPGA: scanchain/grady18v2_N2_8x8_hier"
+        run: make -C examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/tests/basic behav
+
+      # run post-synthesis simulation 
+      - name: "Post-Synthesis simulation of design bcd2bin on FPGA: scanchain/grady18v2_N2_8x8_hier"
+        run: make -C examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/tests/basic postsyn
+
+      # run post-implentation simulation
+      - name: "Post-Implementation simulation of design bcd2bin on FPGA: scanchain/grady18v2_N2_8x8_hier"
+        run: make -C examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/tests/basic postimpl
+
+  build-scanchain-fle6_N2_mem2K_8x8:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ install ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Build FPGA: scanchain/fle6_N2_mem2K_8x8"
+        run: make -C examples/fpga/scanchain/fle6_N2_mem2K_8x8
+
+  run-bcd2bin-scanchain-fle6_N2_mem2K_8x8:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ build-scanchain-fle6_N2_mem2K_8x8 ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Make project for design bcd2bin on FPGA: scanchain/fle6_N2_mem2K_8x8"
+        run: make -C examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8
+
+      # generate bitstream
+      - name: "Generate bitstream for design bcd2bin on FPGA: scanchain/fle6_N2_mem2K_8x8"
+        run: make -C examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/design
+
+      # run behavioral simulation
+      - name: "Behavioral simulation of design bcd2bin on FPGA: scanchain/fle6_N2_mem2K_8x8"
+        run: make -C examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/tests/basic behav
+
+      # run post-synthesis simulation 
+      - name: "Post-Synthesis simulation of design bcd2bin on FPGA: scanchain/fle6_N2_mem2K_8x8"
+        run: make -C examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/tests/basic postsyn
+
+      # run post-implentation simulation
+      - name: "Post-Implementation simulation of design bcd2bin on FPGA: scanchain/fle6_N2_mem2K_8x8"
+        run: make -C examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/tests/basic postimpl
+
+  build-pktchain-k4_N2_8x8:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ install ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Build FPGA: pktchain/k4_N2_8x8"
+        run: make -C examples/fpga/pktchain/k4_N2_8x8
+
+  run-bcd2bin-pktchain-k4_N2_8x8:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ build-pktchain-k4_N2_8x8 ]
+
+    # Steps
+    steps:
+      # build the FPGA
+      - name: "Make project for design bcd2bin on FPGA: pktchain/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/pktchain_k4_N2_8x8
+
+      # generate bitstream
+      - name: "Generate bitstream for design bcd2bin on FPGA: pktchain/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/pktchain_k4_N2_8x8/design
+
+      # run behavioral simulation
+      - name: "Behavioral simulation of design bcd2bin on FPGA: pktchain/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/pktchain_k4_N2_8x8/tests/basic behav
+
+      # run post-synthesis simulation 
+      - name: "Post-Synthesis simulation of design bcd2bin on FPGA: pktchain/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/pktchain_k4_N2_8x8/tests/basic postsyn
+
+      # run post-implentation simulation
+      - name: "Post-Implementation simulation of design bcd2bin on FPGA: pktchain/k4_N2_8x8"
+        run: make -C examples/target/bcd2bin/pktchain_k4_N2_8x8/tests/basic postimpl
+
