@@ -137,10 +137,10 @@ info "'vpr' and 'genfasm' linked to ${PWD}/local/bin"
 
 # build a virtualenv for prga.py
 cd prga.py
-info "Creating a virtual environment for prga.py"
+info "Creating a virtualenv for prga.py"
 PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e .[cocotb] || exit 1
 cd ..
-info "Virtual environment setup completed for prga.py"
+info "Virtualenv setup completed for prga.py"
 
 info "Installation finished successfully"
 

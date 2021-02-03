@@ -36,7 +36,7 @@ jobs:
 
       # compile and install iverilog
       - name: Install iverilog
-        run: pushd iverilog && sh autoconf.sh && ./configure --prefix=${GITHUB_WORKSPACE}/local && make && make install
+        run: pushd iverilog && sh autoconf.sh && ./configure --prefix=${GITHUB_WORKSPACE}/local && make && make install && popd
 
       # Install PRGA
       - name: Install PRGA
@@ -54,7 +54,7 @@ jobs:
     steps:
       # build the FPGA
       - name: "Build FPGA: magic/k4_N2_8x8"
-        run: make -C examples/fpga/magic/k4_N2_8x8
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/fpga/magic/k4_N2_8x8 && popd
 
   run-bcd2bin-magic-k4_N2_8x8:
     # The type of runner that the job will run on
@@ -67,23 +67,23 @@ jobs:
     steps:
       # build the FPGA
       - name: "Make project for design bcd2bin on FPGA: magic/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/magic_k4_N2_8x8
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_k4_N2_8x8 && popd
 
       # generate bitstream
       - name: "Generate bitstream for design bcd2bin on FPGA: magic/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/magic_k4_N2_8x8/design
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_k4_N2_8x8/design && popd
 
       # run behavioral simulation
       - name: "Behavioral simulation of design bcd2bin on FPGA: magic/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic behav
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic behav && popd
 
       # run post-synthesis simulation 
       - name: "Post-Synthesis simulation of design bcd2bin on FPGA: magic/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic postsyn
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic postsyn && popd
 
       # run post-implentation simulation
       - name: "Post-Implementation simulation of design bcd2bin on FPGA: magic/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic postimpl
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic postimpl && popd
 
   build-magic-grady18_N2_10x6:
     # The type of runner that the job will run on
@@ -96,7 +96,7 @@ jobs:
     steps:
       # build the FPGA
       - name: "Build FPGA: magic/grady18_N2_10x6"
-        run: make -C examples/fpga/magic/grady18_N2_10x6
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/fpga/magic/grady18_N2_10x6 && popd
 
   run-bcd2bin-magic-grady18_N2_10x6:
     # The type of runner that the job will run on
@@ -109,23 +109,23 @@ jobs:
     steps:
       # build the FPGA
       - name: "Make project for design bcd2bin on FPGA: magic/grady18_N2_10x6"
-        run: make -C examples/target/bcd2bin/magic_grady18_N2_10x6
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_grady18_N2_10x6 && popd
 
       # generate bitstream
       - name: "Generate bitstream for design bcd2bin on FPGA: magic/grady18_N2_10x6"
-        run: make -C examples/target/bcd2bin/magic_grady18_N2_10x6/design
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_grady18_N2_10x6/design && popd
 
       # run behavioral simulation
       - name: "Behavioral simulation of design bcd2bin on FPGA: magic/grady18_N2_10x6"
-        run: make -C examples/target/bcd2bin/magic_grady18_N2_10x6/tests/basic behav
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_grady18_N2_10x6/tests/basic behav && popd
 
       # run post-synthesis simulation 
       - name: "Post-Synthesis simulation of design bcd2bin on FPGA: magic/grady18_N2_10x6"
-        run: make -C examples/target/bcd2bin/magic_grady18_N2_10x6/tests/basic postsyn
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_grady18_N2_10x6/tests/basic postsyn && popd
 
       # run post-implentation simulation
       - name: "Post-Implementation simulation of design bcd2bin on FPGA: magic/grady18_N2_10x6"
-        run: make -C examples/target/bcd2bin/magic_grady18_N2_10x6/tests/basic postimpl
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_grady18_N2_10x6/tests/basic postimpl && popd
 
   build-magic-grady18v2_N2_8x8_hier:
     # The type of runner that the job will run on
@@ -138,7 +138,7 @@ jobs:
     steps:
       # build the FPGA
       - name: "Build FPGA: magic/grady18v2_N2_8x8_hier"
-        run: make -C examples/fpga/magic/grady18v2_N2_8x8_hier
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/fpga/magic/grady18v2_N2_8x8_hier && popd
 
   run-bcd2bin-magic-grady18v2_N2_8x8_hier:
     # The type of runner that the job will run on
@@ -151,23 +151,23 @@ jobs:
     steps:
       # build the FPGA
       - name: "Make project for design bcd2bin on FPGA: magic/grady18v2_N2_8x8_hier"
-        run: make -C examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier && popd
 
       # generate bitstream
       - name: "Generate bitstream for design bcd2bin on FPGA: magic/grady18v2_N2_8x8_hier"
-        run: make -C examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/design
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/design && popd
 
       # run behavioral simulation
       - name: "Behavioral simulation of design bcd2bin on FPGA: magic/grady18v2_N2_8x8_hier"
-        run: make -C examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/tests/basic behav
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/tests/basic behav && popd
 
       # run post-synthesis simulation 
       - name: "Post-Synthesis simulation of design bcd2bin on FPGA: magic/grady18v2_N2_8x8_hier"
-        run: make -C examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/tests/basic postsyn
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/tests/basic postsyn && popd
 
       # run post-implentation simulation
       - name: "Post-Implementation simulation of design bcd2bin on FPGA: magic/grady18v2_N2_8x8_hier"
-        run: make -C examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/tests/basic postimpl
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_grady18v2_N2_8x8_hier/tests/basic postimpl && popd
 
   build-magic-fle6_N2_mem2K_8x8:
     # The type of runner that the job will run on
@@ -180,7 +180,7 @@ jobs:
     steps:
       # build the FPGA
       - name: "Build FPGA: magic/fle6_N2_mem2K_8x8"
-        run: make -C examples/fpga/magic/fle6_N2_mem2K_8x8
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/fpga/magic/fle6_N2_mem2K_8x8 && popd
 
   run-bcd2bin-magic-fle6_N2_mem2K_8x8:
     # The type of runner that the job will run on
@@ -193,23 +193,23 @@ jobs:
     steps:
       # build the FPGA
       - name: "Make project for design bcd2bin on FPGA: magic/fle6_N2_mem2K_8x8"
-        run: make -C examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8 && popd
 
       # generate bitstream
       - name: "Generate bitstream for design bcd2bin on FPGA: magic/fle6_N2_mem2K_8x8"
-        run: make -C examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/design
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/design && popd
 
       # run behavioral simulation
       - name: "Behavioral simulation of design bcd2bin on FPGA: magic/fle6_N2_mem2K_8x8"
-        run: make -C examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/tests/basic behav
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/tests/basic behav && popd
 
       # run post-synthesis simulation 
       - name: "Post-Synthesis simulation of design bcd2bin on FPGA: magic/fle6_N2_mem2K_8x8"
-        run: make -C examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/tests/basic postsyn
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/tests/basic postsyn && popd
 
       # run post-implentation simulation
       - name: "Post-Implementation simulation of design bcd2bin on FPGA: magic/fle6_N2_mem2K_8x8"
-        run: make -C examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/tests/basic postimpl
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_fle6_N2_mem2K_8x8/tests/basic postimpl && popd
 
   build-scanchain-k4_N2_8x8:
     # The type of runner that the job will run on
@@ -222,7 +222,7 @@ jobs:
     steps:
       # build the FPGA
       - name: "Build FPGA: scanchain/k4_N2_8x8"
-        run: make -C examples/fpga/scanchain/k4_N2_8x8
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/fpga/scanchain/k4_N2_8x8 && popd
 
   run-bcd2bin-scanchain-k4_N2_8x8:
     # The type of runner that the job will run on
@@ -235,23 +235,23 @@ jobs:
     steps:
       # build the FPGA
       - name: "Make project for design bcd2bin on FPGA: scanchain/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/scanchain_k4_N2_8x8
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_k4_N2_8x8 && popd
 
       # generate bitstream
       - name: "Generate bitstream for design bcd2bin on FPGA: scanchain/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/scanchain_k4_N2_8x8/design
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_k4_N2_8x8/design && popd
 
       # run behavioral simulation
       - name: "Behavioral simulation of design bcd2bin on FPGA: scanchain/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/scanchain_k4_N2_8x8/tests/basic behav
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_k4_N2_8x8/tests/basic behav && popd
 
       # run post-synthesis simulation 
       - name: "Post-Synthesis simulation of design bcd2bin on FPGA: scanchain/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/scanchain_k4_N2_8x8/tests/basic postsyn
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_k4_N2_8x8/tests/basic postsyn && popd
 
       # run post-implentation simulation
       - name: "Post-Implementation simulation of design bcd2bin on FPGA: scanchain/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/scanchain_k4_N2_8x8/tests/basic postimpl
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_k4_N2_8x8/tests/basic postimpl && popd
 
   build-scanchain-grady18_N2_10x6:
     # The type of runner that the job will run on
@@ -264,7 +264,7 @@ jobs:
     steps:
       # build the FPGA
       - name: "Build FPGA: scanchain/grady18_N2_10x6"
-        run: make -C examples/fpga/scanchain/grady18_N2_10x6
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/fpga/scanchain/grady18_N2_10x6 && popd
 
   run-bcd2bin-scanchain-grady18_N2_10x6:
     # The type of runner that the job will run on
@@ -277,23 +277,23 @@ jobs:
     steps:
       # build the FPGA
       - name: "Make project for design bcd2bin on FPGA: scanchain/grady18_N2_10x6"
-        run: make -C examples/target/bcd2bin/scanchain_grady18_N2_10x6
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_grady18_N2_10x6 && popd
 
       # generate bitstream
       - name: "Generate bitstream for design bcd2bin on FPGA: scanchain/grady18_N2_10x6"
-        run: make -C examples/target/bcd2bin/scanchain_grady18_N2_10x6/design
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_grady18_N2_10x6/design && popd
 
       # run behavioral simulation
       - name: "Behavioral simulation of design bcd2bin on FPGA: scanchain/grady18_N2_10x6"
-        run: make -C examples/target/bcd2bin/scanchain_grady18_N2_10x6/tests/basic behav
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_grady18_N2_10x6/tests/basic behav && popd
 
       # run post-synthesis simulation 
       - name: "Post-Synthesis simulation of design bcd2bin on FPGA: scanchain/grady18_N2_10x6"
-        run: make -C examples/target/bcd2bin/scanchain_grady18_N2_10x6/tests/basic postsyn
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_grady18_N2_10x6/tests/basic postsyn && popd
 
       # run post-implentation simulation
       - name: "Post-Implementation simulation of design bcd2bin on FPGA: scanchain/grady18_N2_10x6"
-        run: make -C examples/target/bcd2bin/scanchain_grady18_N2_10x6/tests/basic postimpl
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_grady18_N2_10x6/tests/basic postimpl && popd
 
   build-scanchain-grady18v2_N2_8x8_hier:
     # The type of runner that the job will run on
@@ -306,7 +306,7 @@ jobs:
     steps:
       # build the FPGA
       - name: "Build FPGA: scanchain/grady18v2_N2_8x8_hier"
-        run: make -C examples/fpga/scanchain/grady18v2_N2_8x8_hier
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/fpga/scanchain/grady18v2_N2_8x8_hier && popd
 
   run-bcd2bin-scanchain-grady18v2_N2_8x8_hier:
     # The type of runner that the job will run on
@@ -319,23 +319,23 @@ jobs:
     steps:
       # build the FPGA
       - name: "Make project for design bcd2bin on FPGA: scanchain/grady18v2_N2_8x8_hier"
-        run: make -C examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier && popd
 
       # generate bitstream
       - name: "Generate bitstream for design bcd2bin on FPGA: scanchain/grady18v2_N2_8x8_hier"
-        run: make -C examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/design
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/design && popd
 
       # run behavioral simulation
       - name: "Behavioral simulation of design bcd2bin on FPGA: scanchain/grady18v2_N2_8x8_hier"
-        run: make -C examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/tests/basic behav
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/tests/basic behav && popd
 
       # run post-synthesis simulation 
       - name: "Post-Synthesis simulation of design bcd2bin on FPGA: scanchain/grady18v2_N2_8x8_hier"
-        run: make -C examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/tests/basic postsyn
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/tests/basic postsyn && popd
 
       # run post-implentation simulation
       - name: "Post-Implementation simulation of design bcd2bin on FPGA: scanchain/grady18v2_N2_8x8_hier"
-        run: make -C examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/tests/basic postimpl
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_grady18v2_N2_8x8_hier/tests/basic postimpl && popd
 
   build-scanchain-fle6_N2_mem2K_8x8:
     # The type of runner that the job will run on
@@ -348,7 +348,7 @@ jobs:
     steps:
       # build the FPGA
       - name: "Build FPGA: scanchain/fle6_N2_mem2K_8x8"
-        run: make -C examples/fpga/scanchain/fle6_N2_mem2K_8x8
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/fpga/scanchain/fle6_N2_mem2K_8x8 && popd
 
   run-bcd2bin-scanchain-fle6_N2_mem2K_8x8:
     # The type of runner that the job will run on
@@ -361,23 +361,23 @@ jobs:
     steps:
       # build the FPGA
       - name: "Make project for design bcd2bin on FPGA: scanchain/fle6_N2_mem2K_8x8"
-        run: make -C examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8 && popd
 
       # generate bitstream
       - name: "Generate bitstream for design bcd2bin on FPGA: scanchain/fle6_N2_mem2K_8x8"
-        run: make -C examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/design
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/design && popd
 
       # run behavioral simulation
       - name: "Behavioral simulation of design bcd2bin on FPGA: scanchain/fle6_N2_mem2K_8x8"
-        run: make -C examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/tests/basic behav
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/tests/basic behav && popd
 
       # run post-synthesis simulation 
       - name: "Post-Synthesis simulation of design bcd2bin on FPGA: scanchain/fle6_N2_mem2K_8x8"
-        run: make -C examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/tests/basic postsyn
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/tests/basic postsyn && popd
 
       # run post-implentation simulation
       - name: "Post-Implementation simulation of design bcd2bin on FPGA: scanchain/fle6_N2_mem2K_8x8"
-        run: make -C examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/tests/basic postimpl
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/scanchain_fle6_N2_mem2K_8x8/tests/basic postimpl && popd
 
   build-pktchain-k4_N2_8x8:
     # The type of runner that the job will run on
@@ -390,7 +390,7 @@ jobs:
     steps:
       # build the FPGA
       - name: "Build FPGA: pktchain/k4_N2_8x8"
-        run: make -C examples/fpga/pktchain/k4_N2_8x8
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/fpga/pktchain/k4_N2_8x8 && popd
 
   run-bcd2bin-pktchain-k4_N2_8x8:
     # The type of runner that the job will run on
@@ -403,21 +403,21 @@ jobs:
     steps:
       # build the FPGA
       - name: "Make project for design bcd2bin on FPGA: pktchain/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/pktchain_k4_N2_8x8
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/pktchain_k4_N2_8x8 && popd
 
       # generate bitstream
       - name: "Generate bitstream for design bcd2bin on FPGA: pktchain/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/pktchain_k4_N2_8x8/design
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/pktchain_k4_N2_8x8/design && popd
 
       # run behavioral simulation
       - name: "Behavioral simulation of design bcd2bin on FPGA: pktchain/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/pktchain_k4_N2_8x8/tests/basic behav
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/pktchain_k4_N2_8x8/tests/basic behav && popd
 
       # run post-synthesis simulation 
       - name: "Post-Synthesis simulation of design bcd2bin on FPGA: pktchain/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/pktchain_k4_N2_8x8/tests/basic postsyn
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/pktchain_k4_N2_8x8/tests/basic postsyn && popd
 
       # run post-implentation simulation
       - name: "Post-Implementation simulation of design bcd2bin on FPGA: pktchain/k4_N2_8x8"
-        run: make -C examples/target/bcd2bin/pktchain_k4_N2_8x8/tests/basic postimpl
+        run: pushd ${GITHUB_WORKSPACE} && bash envscr/run make -C ${PWD}/examples/target/bcd2bin/pktchain_k4_N2_8x8/tests/basic postimpl && popd
 
