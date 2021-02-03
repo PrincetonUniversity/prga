@@ -1,4 +1,5 @@
-CONFIG := config/config.yaml
+COMPILER ?= ivl
+CONFIG := config/config.${COMPILER}.yaml
 PROJECTS := design tests
 
 $(PROJECTS): $(CONFIG)
