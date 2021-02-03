@@ -1,0 +1,64 @@
+name: Run an example
+description: Build an FPGA example, then run an example design on it
+inputs:
+  fpga_path:
+    description: Path to the FPGA example relative to the examples/fpga directory
+    required: true
+    default: ""
+  design_path:
+    description: Path to the design example relative to the examples/target directory
+    required: true
+    default: ""
+  test:
+    description: ID of the test to be ran. Currently only one test is supported
+    required: true
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: executables
+
+    - name: Build the FPGA
+      run: |
+        pushd ${GITHUB_WORKSPACE}
+        bash envscr/run make -C ${PWD}/examples/fpga/${{ inputs.fpga_path }}
+        popd
+  
+    - name: Make project for the target design
+      run: |
+        pushd ${GITHUB_WORKSPACE}
+        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}
+        popd
+
+    - name: Run behavioral simulation of the target design
+      run: |
+        pushd ${GITHUB_WORKSPACE}
+        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/tests/${{ inputs.test }} behav
+        popd
+
+    - name: Run synthesis for the target design
+      run: |
+        pushd ${GITHUB_WORKSPACE}
+        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/design syn
+        popd
+
+    - name: Run post-synthesis simulation of the target design
+      run: |
+        pushd ${GITHUB_WORKSPACE}
+        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/tests/${{ inputs.test }} postsyn
+        popd
+
+    - name: Run the full RTL-to-bitstream flow for the target design
+      run: |
+        pushd ${GITHUB_WORKSPACE}
+        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/design
+        popd
+
+    - name: Run post-implementation simulation of the target design
+      run: |
+        pushd ${GITHUB_WORKSPACE}
+        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/tests/${{ inputs.test }} postimpl
+        popd

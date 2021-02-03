@@ -130,8 +130,8 @@ info "Yosys built successfully"
 # link all binaries
 info "Linking binaries to ${PWD}/local/bin"
 cd local/bin
-ln -s -f ../../vtr/vpr/vpr vpr
-ln -s -f ../../vtr/build/utils/fasm/genfasm genfasm
+cp ../../vtr/vpr/vpr vpr
+cp ../../vtr/build/utils/fasm/genfasm genfasm
 cd ../..
 info "'vpr' and 'genfasm' linked to ${PWD}/local/bin"
 
