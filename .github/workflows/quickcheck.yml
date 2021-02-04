@@ -79,7 +79,9 @@ jobs:
         if: ${{ ! steps.cache-vtr.outputs.cache-hit }}
         run: |
           git submodule update --init --recursive vtr
-          make -C vtr -j8
+          pushd vtr
+          make -j8
+          popd
           mkdir -p local/bin
           cp vtr/vpr/vpr local/bin/vpr
           cp vtr/build/utils/fasm/genfasm local/bin/genfasm
@@ -100,17 +102,16 @@ jobs:
         run: |
           sudo apt-get install tcl8.6-dev
           git submodule update --init --recursive yosys
-          make -C yosys -j8 CONFIG=gcc
-          make -C yosys install CONFIG=gcc PREFIX=${GITHUB_WORKSPACE}/local
+          pushd yosys
+          make -j8 CONFIG=gcc
+          make install CONFIG=gcc PREFIX=${GITHUB_WORKSPACE}/local
+          popd
 
       # ======================
       # == Upload artifacts ==
       # ======================
       - name: Make a list of executables
-        run: |
-          pushd local
-          find . -type f -perm -u=x > executables
-          popd
+        run: find local -type f -perm -u=x > local/executables
 
       - name: Upload PRGA artifact
         uses: actions/upload-artifact@v2
@@ -184,10 +185,8 @@ jobs:
 
       - name: Add executables into system path
         run: |
-          pushd local
-          chmod u+x $( cat executables )
-          echo "${PWD}/bin" >> $GITHUB_PATH
-          popd
+          chmod u+x $( cat local/executables )
+          echo "${PWD}/local/bin" >> $GITHUB_PATH
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
