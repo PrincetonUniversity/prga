@@ -16,11 +16,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Download artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: executables
-
     - name: Build the FPGA
       run: |
         pushd ${GITHUB_WORKSPACE}
