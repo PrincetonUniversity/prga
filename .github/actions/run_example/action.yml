@@ -17,42 +17,49 @@ runs:
   using: composite
   steps:
     - name: Build the FPGA
+      shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
         bash envscr/run make -C ${PWD}/examples/fpga/${{ inputs.fpga_path }}
         popd
   
     - name: Make project for the target design
+      shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
         bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}
         popd
 
     - name: Run behavioral simulation of the target design
+      shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
         bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/tests/${{ inputs.test }} behav
         popd
 
     - name: Run synthesis for the target design
+      shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
         bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/design syn
         popd
 
     - name: Run post-synthesis simulation of the target design
+      shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
         bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/tests/${{ inputs.test }} postsyn
         popd
 
     - name: Run the full RTL-to-bitstream flow for the target design
+      shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
         bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/design
         popd
 
     - name: Run post-implementation simulation of the target design
+      shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
         bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/tests/${{ inputs.test }} postimpl
