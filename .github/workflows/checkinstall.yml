@@ -1,0 +1,52 @@
+name: checkinstall
+description: |
+  Checks if `envscr/install` script works as intended.
+
+on:
+
+  # weekly
+  schedule:
+    - cron: '0 0 * * FRI'
+
+  # and also manually
+  workflow_dispatch:
+
+  # and whenever key files/submodules change
+  push:
+    branches:
+      - release
+      - dev
+    paths:
+      - envscr/install
+      - vtr
+      - yosys
+
+  pull_request:
+    branches:
+      - release
+      - dev
+    paths:
+      - envscr/install
+      - vtr
+      - yosys
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PRGA
+        uses: actions/checkout@v2
+
+      - name: Install iverilog
+        uses: ./.github/actions/iverilog_install
+
+      - name: Install PRGA
+        run: bash envscr/install
+
+      - name: Run a quick check
+        run: |
+          bash envscr/run make -C ${PWD}/examples/fpga/magic/k4_N2_8x8
+          bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_k4_N2_8x8
+          bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_k4_N2_8x8/design
+          bash envscr/run make -C ${PWD}/examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic

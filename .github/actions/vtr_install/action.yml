@@ -1,0 +1,33 @@
+name: Install VTR
+
+description: |
+  Check if VTR executables (vpr and genfasm) are cached. If so, check if the
+  cached copies match the submodule commit SHA-1 of the latest commit. If so,
+  use cache; otherwise, reinstall.
+
+runs:
+  using: composite
+  steps:
+    - name: Check submodule's commit SHA-1
+      id: sha
+      run: echo "::set-output name=sha::$(git submodule status vtr | awk '{print $1}')"
+
+    - name: Cache VTR executables
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          local/bin/vpr
+          local/bin/genfasm
+        key: vtr-${{ steps.sha.outputs.sha }}
+
+    - name: Checkout submodule VTR, compile, and install
+      if: ${{ ! steps.cache.outputs.cache-hit }}
+      run: |
+        git submodule update --init --recursive vtr
+        pushd vtr
+        make -j8
+        popd
+        mkdir -p local/bin
+        cp vtr/vpr/vpr local/bin/vpr
+        cp vtr/build/utils/fasm/genfasm local/bin/genfasm

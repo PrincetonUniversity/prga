@@ -1,0 +1,33 @@
+name: Install Yosys
+
+description: |
+  Check if yosys executables and libraries are cached. If so, check if the
+  cached copies match the submodule commit SHA-1 of the latest commit. If so,
+  use cache; otherwise, reinstall.
+
+runs:
+  using: composite
+  steps:
+    - name: Check submodule's commit SHA-1
+      id: sha
+      run: echo "::set-output name=sha::$(git submodule status yosys | awk '{print $1}')"
+
+    - name: Cache Yosys executables and libraries
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          local/bin/yosys
+          local/bin/yosys-*
+          local/share/yosys
+        key: yosys-${{ steps.sha.outputs.sha }}
+
+    - name: Checkout submodule yosys, compile, and install
+      if: ${{ ! steps.cache.outputs.cache-hit }}
+      run: |
+        sudo apt-get install tcl8.6-dev
+        git submodule update --init --recursive yosys
+        pushd yosys
+        make -j8 CONFIG=gcc
+        make install CONFIG=gcc PREFIX=${GITHUB_WORKSPACE}/local
+        popd

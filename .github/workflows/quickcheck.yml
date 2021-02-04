@@ -1,5 +1,5 @@
-# quickcheck
-name: quickcheck
+# CI on the dev branch
+name: dev-ci
 
 # Controls when the action will run. 
 on:
@@ -25,69 +25,23 @@ jobs:
         with:
           ref: dev
 
-      # Install dependencies
-      - name: Install dependencies
-        run: sudo apt-get install tcl8.6-dev gperf autoconf
-
-      # Cache iverilog
-      - name: Cache iverilog
-        id: cache-ivl
-        uses: actions/cache@v2
-        with:
-          path: iverilog
-          key: iverilog
-          
-      # Checkout iverilog if not cached
-      - name: Checkout iverilog
-        uses: actions/checkout@v2
-        if: ${{ ! steps.cache-ivl.outputs.cache-hit }}
-        with:
-          repository: steveicarus/iverilog
-          path: iverilog
-
-      # Configure and compile iverilog if not cached
-      - name: Copmile iverilog
-        if: ${{ ! steps.cache-ivl.outputs.cache-hit }}
-        run: |
-          pushd iverilog
-          sh autoconf.sh
-          ./configure --prefix=${GITHUB_WORKSPACE}/local
-          make -j8
-          popd
-
       # Install iverilog
       - name: Install iverilog
-        run: |
-          pushd iverilog
-          make install
-          popd
+        uses: ./.github/actions/iverilog_install
 
-      # Check submodules' commit SHA-1
-      - name: Check Submodules' Commit SHA-1
-        id: sha-submodules
-        run: |
-          echo "::set-output name=vtr::$(git submodule status vtr | awk '{print $1}')"
-          echo "::set-output name=yosys::$(git submodule status yosys | awk '{print $1}')"
+      # Install VTR
+      - name: Install VTR
+        uses: ./.github/actions/vtr_install
 
-      # Cache VTR
-      - name: Cache VTR
-        id: cache-vtr
-        uses: actions/cache@v2
+      # Install Yosys
+      - name: Install Yosys
+        uses: ./.github/actions/yosys_install
+
+      # Install prga.py (core)
+      - name: Install prga.py (core)
+        uses: ./.github/actions/core_install
         with:
-          path: vtr
-          key: ${{ steps.sha-submodules.outputs.vtr }}
-
-      # Cache Yosys
-      - name: Cache Yosys
-        id: cache-yosys
-        uses: actions/cache@v2
-        with:
-          path: yosys
-          key: ${{ steps.sha-submodules.outputs.yosys }}
-
-      # Install PRGA
-      - name: Install PRGA
-        run: bash envscr/install
+          python-version: 3.8.2
 
       # Upload Artifact
       - name: Upload PRGA artifact
