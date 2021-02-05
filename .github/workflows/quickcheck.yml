@@ -119,8 +119,8 @@ jobs:
           name: executables
           path: local
 
-  # Run tests
-  tests:
+  # Run small tests
+  small-tests:
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -131,43 +131,19 @@ jobs:
     # strategy
     strategy:
       matrix:
-        python-version: [ 3.8.2 ]
+        python-version:
+          - 3.8.2
         test:
-          - fpga_path: magic/k4_N2_8x8
-            design_path: bcd2bin/magic_k4_N2_8x8
+          - design: bcd2bin
             test: basic
-
-          - fpga_path: magic/grady18_N2_10x6
-            design_path: bcd2bin/magic_grady18_N2_10x6
-            test: basic
-
-          - fpga_path: magic/grady18v2_N2_8x8_hier
-            design_path: bcd2bin/magic_grady18v2_N2_8x8_hier
-            test: basic
-
-          - fpga_path: magic/fle6_N2_mem2K_8x8
-            design_path: bcd2bin/magic_fle6_N2_mem2K_8x8
-            test: basic
-
-          - fpga_path: scanchain/k4_N2_8x8
-            design_path: bcd2bin/scanchain_k4_N2_8x8
-            test: basic
-
-          - fpga_path: scanchain/grady18_N2_10x6
-            design_path: bcd2bin/scanchain_grady18_N2_10x6
-            test: basic
-
-          - fpga_path: scanchain/grady18v2_N2_8x8_hier
-            design_path: bcd2bin/scanchain_grady18v2_N2_8x8_hier
-            test: basic
-
-          - fpga_path: scanchain/fle6_N2_mem2K_8x8
-            design_path: bcd2bin/scanchain_fle6_N2_mem2K_8x8
-            test: basic
-
-          - fpga_path: pktchain/k4_N2_8x8
-            design_path: bcd2bin/pktchain_k4_N2_8x8
-            test: basic
+        fpga:
+          - k4_N2_8x8
+          - grady18_N2_10x6
+          - grady18v2_N2_8x8_hier
+          - fle6_N2_mem2K_8x8
+        prog:
+          - magic
+          - scanchain
 
     # Steps
     steps:
@@ -204,22 +180,22 @@ jobs:
           pipenv install -e prga.py[cocotb]
 
       - name: Build the FPGA
-        run: pipenv run make -C examples/fpga/${{ matrix.test.fpga_path }}
+        run: pipenv run make -C examples/fpga/${{ matrix.prog }}/${{ matrix.fpga }}
 
       - name: Make project for the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design_path }}
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}
 
       - name: Run behavioral simulation of the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design_path }}/tests/${{ matrix.test.test }} behav
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} behav
 
       - name: Run synthesis for the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design_path }}/design syn
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/design syn
 
       - name: Run post-synthesis simulation of the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design_path }}/tests/${{ matrix.test.test }} postsyn
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postsyn
 
       - name: Run the full RTL-to-bitstream flow for the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design_path }}/design
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/design
 
       - name: Run post-implementation simulation of the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design_path }}/tests/${{ matrix.test.test }} postimpl
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postimpl
