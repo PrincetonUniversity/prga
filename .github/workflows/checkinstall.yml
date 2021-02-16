@@ -1,7 +1,4 @@
 name: checkinstall
-description: |
-  Checks if `envscr/install` script works as intended.
-
 on:
 
   # weekly
