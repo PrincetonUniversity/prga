@@ -4,7 +4,14 @@ from itertools import product
 import sys
 import os
 
+# ============================================================================
+# -- Create Context ----------------------------------------------------------
+# ============================================================================
 ctx = Magic.new_context()
+
+# ============================================================================
+# -- Routing Resources -------------------------------------------------------
+# ============================================================================
 gbl_clk = ctx.create_global("clk", is_clock = True)
 gbl_clk.bind((0, 1), 0)
 
@@ -13,7 +20,10 @@ l1 = ctx.create_segment('L1', 20, 1)
 l4 = ctx.create_segment('L4', 16, 4)
 l16 = ctx.create_segment('L16', 1, 16)
 
-# picorv32 IP core
+# ============================================================================
+# -- Primitives --------------------------------------------------------------
+# ============================================================================
+# -- picorv32 IP core --------------------------------------------------------
 builder = ctx.build_primitive("picorv32",
         vpr_model = "picorv32",
         # Use absolute path here, so the file is not copied into our generated RTL directory
@@ -47,7 +57,7 @@ builder = builder.build_design_view_counterpart(
         verilog_src = os.path.join(os.path.abspath(os.path.dirname(__file__)), "src/picorv32.v"))
 builder.commit()
 
-# negedge DFF
+# -- negedge DFF ------------------------------------------------------------
 builder = ctx.build_primitive("dffn",
         vpr_model = "dffn",
         # Use absolute path here, so the file is not copied into our generated RTL directory
@@ -70,7 +80,10 @@ builder = builder.build_design_view_counterpart(
         verilog_src = os.path.join(os.path.abspath(os.path.dirname(__file__)), "src/dffn.v"))
 builder.commit()
 
-# IOB
+# ============================================================================
+# -- Blocks ------------------------------------------------------------------
+# ============================================================================
+# -- IOB ---------------------------------------------------------------------
 builder = ctx.build_io_block("iob")
 o = builder.create_input("outpad", 1)
 i = builder.create_output("inpad", 1)
@@ -78,7 +91,7 @@ builder.connect(builder.instances['io'].pins['inpad'], i)
 builder.connect(o, builder.instances['io'].pins['outpad'])
 iob = builder.commit()
 
-# CLB
+# -- CLB ---------------------------------------------------------------------
 builder = ctx.build_logic_block("clb")
 grady18v2 = ctx.primitives["grady18v2"]
 N = 4
@@ -110,6 +123,7 @@ for (i, pxin), (j, pxout) in product(enumerate(xin), enumerate(xout)):
         builder.connect(pxin, pxout)
 clb = builder.commit()
 
+# -- CLB (2) -----------------------------------------------------------------
 # Special negedge DFF block: step 1 - build slice
 builder = ctx.build_slice("lut6dffn")
 clk = builder.create_clock ("clk")
@@ -149,6 +163,7 @@ for (i, pxin), (j, pxout) in product(enumerate(xin), enumerate(xout)):
         builder.connect(pxin, pxout)
 dffn_clb = builder.commit()
 
+# -- BRAM --------------------------------------------------------------------
 # BRAM (1Kb): 128x8, 256x4, 512x2, 1K1b
 builder = ctx.build_logic_block("bram", 1, 2)
 inst = builder.instantiate(
@@ -162,21 +177,26 @@ builder.connect(builder.create_input("raddr", 10, Orientation.west, (0, 1)), ins
 builder.connect(inst.pins["dout"], builder.create_output("dout", 8, Orientation.east, (0, 1)))
 bram = builder.commit()
 
+# -- Pico Core Block ---------------------------------------------------------
 # Hard pico core: takes 8x8 tiles, no routing tracks over it
 builder = ctx.build_logic_block("bpico", 8, 8, )
 inst = builder.instantiate(ctx.primitives["picorv32"], "i_core",
-        verilog_parameters = {
-            "BARREL_SHIFTER":   1,
-            "COMPRESSED_ISA":   1,
-            "ENABLE_MUL":       1,
-            "ENABLE_DIV":       1,
-            "ENABLE_COUNTERS":  1,
-            "ENABLE_IRQ":       1,
-            "ENABLE_IRQ_QREGS": 1,
-            "STACKADDR":        1024,
-            "PROGADDR_RESET":   "32'h0010_0000",
-            "PROGADDR_IRQ":     "32'h0000_0000",
-            })
+        translate_attrs = {
+            "verilog_parameters":  {
+                "BARREL_SHIFTER":   1,
+                "COMPRESSED_ISA":   1,
+                "ENABLE_MUL":       1,
+                "ENABLE_DIV":       1,
+                "ENABLE_COUNTERS":  1,
+                "ENABLE_IRQ":       1,
+                "ENABLE_IRQ_QREGS": 1,
+                "STACKADDR":        1024,
+                "PROGADDR_RESET":   "32'h0010_0000",
+                "PROGADDR_IRQ":     "32'h0000_0000",
+                },
+            },
+        )
+        
 builder.connect(builder.create_global(gbl_clk, Orientation.east, (7, 0)), inst.pins["clk"])
 builder.connect(builder.create_input("resetn", 1, Orientation.east, (7, 0)), inst.pins["resetn"])
 builder.connect(inst.pins["mem_valid"], builder.create_output("mem_valid", 1, Orientation.east, (7, 0)))
@@ -193,34 +213,43 @@ builder.connect(builder.create_input("irq_l", 16, Orientation.east, (7, 6)), ins
 builder.connect(builder.create_input("irq_h", 16, Orientation.east, (7, 7)), inst.pins["irq"][31:16])
 bpico = builder.commit()
 
-# CLB tile
+# ============================================================================
+# -- Tiles -------------------------------------------------------------------
+# ============================================================================
+# -- CLB tile ----------------------------------------------------------------
 ctx.create_tunnel("carrychain", clb.ports["cout"], clb.ports["cin"], (0, -1))
 clbtile = ctx.build_tile(clb).fill( (0.15, 0.25) ).auto_connect().commit()
 
 # the other type of CLB tile
 dffntile = ctx.build_tile(dffn_clb).fill( (0.15, 0.25) ).auto_connect().commit()
 
-# IO tile
+# -- IOB tile ----------------------------------------------------------------
 iotiles = {}
 for ori in Orientation:
     builder = ctx.build_tile(iob, 4, name = "t_io_{}".format(ori.name[0]),
             edge = OrientationTuple(False, **{ori.name: True}))
     iotiles[ori] = builder.fill( (1., 1.) ).auto_connect().commit()
 
-# BRAM tile
+# -- BRAM tile ---------------------------------------------------------------
 bramtile = ctx.build_tile(bram).fill( (0.15, 0.25) ).auto_connect().commit()
 
-# PICO tile
+# -- PICO tile ---------------------------------------------------------------
 picotile = ctx.build_tile(bpico, disallow_segments_passthru = True,
         ).fill( (0.15, 0.25) ).auto_connect().commit()
 
-# Subarrays: basic type (only CLBs) and advanced type (w/ BRAM and dffn)
+# ============================================================================
+# -- Subarrays ---------------------------------------------------------------
+# ============================================================================
+# use single-corner cycle-free switch boxes
+pattern = SwitchBoxPattern.cycle_free(fill_corners = [Corner.northeast])
+
+# basic type (only CLBs)
 builder = ctx.build_array("a_basic", 4, 4, set_as_top = False)
 for x, y in product(range(builder.width), range(builder.height)):
     builder.instantiate(clbtile, (x, y))
-pattern = SwitchBoxPattern.cycle_free(fill_corners = [Corner.northeast, Corner.southeast])
 basic = builder.fill( pattern ).auto_connect().commit()
 
+# advanced type (CLB + BRAM + dffn-CLB)
 builder = ctx.build_array("a_advanced", 4, 4, set_as_top = False)
 for x, y in product(range(builder.width), range(builder.height)):
     if x == 1:
@@ -232,6 +261,9 @@ for x, y in product(range(builder.width), range(builder.height)):
         builder.instantiate(clbtile, (x, y))
 advanced = builder.fill( pattern ).auto_connect().commit()
 
+# ============================================================================
+# -- Fabric ------------------------------------------------------------------
+# ============================================================================
 builder = ctx.build_array('top', 18, 18, set_as_top = True)
 for x, y in product(range(builder.width), range(builder.height)):
     if x in (0, builder.width - 1) and y in (0, builder.height - 1):
@@ -257,6 +289,9 @@ for x, y in product(range(builder.width), range(builder.height)):
             builder.instantiate(advanced, (x, y))
 top = builder.fill( pattern ).auto_connect().commit()
 
+# ============================================================================
+# -- Workflow ----------------------------------------------------------------
+# ============================================================================
 Flow(
         Translation(),
         SwitchPathAnnotation(),
