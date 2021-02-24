@@ -1,0 +1,31 @@
+.feature__section {
+    display: -ms-flexbox;
+    display: flex;
+    margin-bottom: 1em;
+
+    @media only screen and (max-width: 801px) {
+      -ms-flex-direction: column;
+      flex-direction: column;
+    }
+
+    .feature__image {
+        margin: 1em;
+    }
+
+    .feature__body {
+        &:not(:only-child) {
+            -ms-flex: 0 0 60%;
+            flex: 0 0 60%;
+            max-width: 60%;
+        }
+
+        margin: 0.5em;
+    }
+}
+
+.feature__section-swap {
+  @media only screen and (min-width: 800px) {
+    -ms-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+  }
+}

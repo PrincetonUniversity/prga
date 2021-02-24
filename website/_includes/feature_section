@@ -1,0 +1,30 @@
+{% if include.id %}
+  {% assign section = page[include.id] %}
+{% else %}
+  {% assign section = page.feature_section %}
+{% endif %}
+
+<div class="feature__wrapper">
+  <div class="feature__section{% if section.image_path and section.image_position == 'right' %} feature__section-swap{% endif %}">
+    {% if section.image_path %}
+      <div class="feature__image{% if section.image_class %} {{ section.image_class }}{% endif %}">
+        <img src="{{ section.image_path | relative_url }}"
+             alt="{% if section.alt %}{{ section.alt }}{% endif %}">
+      </div>
+    {% endif %}
+
+    <div class="feature__body">
+      {% if section.title %}
+        <div class="feature__header">
+            <h2>{{ section.title }}</h2>
+        </div>
+      {% endif %}
+
+      {% if section.excerpt %}
+        <div class="feature__content">
+          {{ section.excerpt | markdownify }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
