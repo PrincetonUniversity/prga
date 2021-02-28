@@ -1,0 +1,85 @@
+name: checkinstall
+on:
+
+  # weekly
+  schedule:
+    - cron: '0 0 * * FRI'
+
+  # and also manually
+  workflow_dispatch:
+
+  # and whenever key files/submodules change
+  push:
+    branches:
+      - release
+      - dev
+    paths:
+      - envscr/install
+      - vtr
+      - yosys
+
+  pull_request:
+    branches:
+      - release
+      - dev
+    paths:
+      - envscr/install
+      - vtr
+      - yosys
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PRGA
+        uses: actions/checkout@v2
+
+      # ========================================================
+      # == Restore iverilog from cache, or build from scratch ==
+      # ========================================================
+      - name: Cache iverilog
+        id: cache-ivl
+        uses: actions/cache@v2
+        with:
+          path: iverilog
+          key: iverilog
+
+      - name: Checkout iverilog
+        uses: actions/checkout@v2
+        if: ${{ ! steps.cache-ivl.outputs.cache-hit }}
+        with:
+          repository: steveicarus/iverilog
+          path: iverilog
+
+      - name: Compile iverilog
+        if: ${{ ! steps.cache-ivl.outputs.cache-hit }}
+        run: |
+          sudo apt-get install gperf autoconf
+          pushd iverilog
+          sh autoconf.sh
+          ./configure --prefix=${GITHUB_WORKSPACE}/local
+          make -j8
+          popd
+
+      - name: Install iverilog
+        run: |
+          pushd iverilog
+          make install
+          popd
+
+      # ==================
+      # == Install PRGA ==
+      # ==================
+      - name: Install PRGA
+        run: bash envscr/install
+
+      # =======================
+      # == Run a quick check ==
+      # =======================
+      - name: Run a quick check
+        uses: ./.github/actions/run_example
+        with:
+          fpga_path: magic/k4_N2_8x8
+          design_path: bcd2bin/magic_k4_N2_8x8
+          test: basic

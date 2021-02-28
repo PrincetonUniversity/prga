@@ -1,32 +1,201 @@
-# This is a basic workflow to help you get started with Actions
-
-name: dev-install
+# CI on the dev branch
+name: dev-ci
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the release branch
+
   push:
-    branches: [ dev ]
-  pull_request:
     branches: [ dev ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
   # Install PRGA
   install:
+
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Steps
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2.3.4
+      # Checks-out repository
+      - name: Checkout PRGA
+        uses: actions/checkout@v2
         with:
           ref: dev
-          
-      - name: Run the installation script
-        run: bash envscr/install
+
+      # ========================================================
+      # == Restore iverilog from cache, or build from scratch ==
+      # ========================================================
+      - name: Cache iverilog
+        id: cache-ivl
+        uses: actions/cache@v2
+        with:
+          path: iverilog
+          key: iverilog
+
+      - name: Checkout iverilog
+        uses: actions/checkout@v2
+        if: ${{ ! steps.cache-ivl.outputs.cache-hit }}
+        with:
+          repository: steveicarus/iverilog
+          path: iverilog
+
+      - name: Compile iverilog
+        if: ${{ ! steps.cache-ivl.outputs.cache-hit }}
+        run: |
+          sudo apt-get install gperf autoconf
+          pushd iverilog
+          sh autoconf.sh
+          ./configure --prefix=${GITHUB_WORKSPACE}/local
+          make -j8
+          popd
+
+      - name: Install iverilog
+        run: make -C iverilog install
+
+      # =========================================================
+      # == Restore VTR/Yosys from cache, or build from scratch ==
+      # =========================================================
+      - name: Check submodule's commit SHA-1
+        id: submodule-sha
+        run: |
+          echo "::set-output name=vtr::$(git submodule status vtr | awk '{print $1}')"
+          echo "::set-output name=yosys::$(git submodule status yosys | awk '{print $1}')"
+
+      # == Restore VTR ==
+      - name: Cache VTR executables
+        id: cache-vtr
+        uses: actions/cache@v2
+        with:
+          path: |
+            local/bin/vpr
+            local/bin/genfasm
+          key: vtr-${{ steps.submodule-sha.outputs.vtr }}
+
+      - name: Checkout submodule VTR, compile, and install
+        if: ${{ ! steps.cache-vtr.outputs.cache-hit }}
+        run: |
+          git submodule update --init --recursive vtr
+          pushd vtr
+          make -j8
+          popd
+          mkdir -p local/bin
+          cp vtr/vpr/vpr local/bin/vpr
+          cp vtr/build/utils/fasm/genfasm local/bin/genfasm
+
+      # == Restore Yosys ==
+      - name: Cache Yosys executables and libraries
+        id: cache-yosys
+        uses: actions/cache@v2
+        with:
+          path: |
+            local/bin/yosys
+            local/bin/yosys-*
+            local/share/yosys
+          key: yosys-${{ steps.submodule-sha.outputs.yosys }}
+
+      - name: Checkout submodule yosys, compile, and install
+        if: ${{ ! steps.cache-yosys.outputs.cache-hit }}
+        run: |
+          sudo apt-get install tcl8.6-dev
+          git submodule update --init --recursive yosys
+          pushd yosys
+          make -j8 CONFIG=gcc
+          make install CONFIG=gcc PREFIX=${GITHUB_WORKSPACE}/local
+          popd
+
+      # ======================
+      # == Upload artifacts ==
+      # ======================
+      - name: Make a list of executables
+        run: find local -type f -perm -u=x > local/executables
+
+      - name: Upload PRGA artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: executables
+          path: local
+
+  # Run small tests
+  small-tests:
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # job dependency
+    needs: [ install ]
+
+    # strategy
+    strategy:
+      matrix:
+        python-version:
+          - 3.8.2
+        test:
+          - design: bcd2bin
+            test: basic
+        fpga:
+          - k4_N2_8x8
+          - grady18_N2_10x6
+          - grady18v2_N2_8x8_hier
+          - fle6_N2_mem2K_8x8
+        prog:
+          - magic
+          - scanchain
+
+    # Steps
+    steps:
+
+      - name: Checkout PRGA
+        uses: actions/checkout@v2
+        with:
+          ref: dev
+
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: executables
+          path: local
+
+      - name: Add executables into system path
+        run: |
+          chmod u+x $( cat local/executables )
+          echo "${PWD}/local/bin" >> $GITHUB_PATH
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade setuptools pip
+          pip install --upgrade pipenv
+
+      - name: Checkout prga.py
+        run: |
+          git submodule update --init --recursive prga.py
+          pipenv install -e prga.py[cocotb]
+
+      - name: Build the FPGA
+        run: pipenv run make -C examples/fpga/${{ matrix.prog }}/${{ matrix.fpga }}
+
+      - name: Make project for the target design
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}
+
+      - name: Run behavioral simulation of the target design
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} behav
+
+      - name: Run synthesis for the target design
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/design syn
+
+      - name: Run post-synthesis simulation of the target design
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postsyn
+
+      - name: Run the full RTL-to-bitstream flow for the target design
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/design
+
+      - name: Run post-implementation simulation of the target design
+        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postimpl

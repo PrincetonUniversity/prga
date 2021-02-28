@@ -13,8 +13,9 @@ Subpackages
    :maxdepth: 4
 
    prga.tools.analysis
-   prga.tools.pktchain
-   prga.tools.scanchain
+   prga.tools.bitgen
+   prga.tools.ioplan
+   prga.tools.wizard
 
 Submodules
 ----------
@@ -22,6 +23,4 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   prga.tools.iobind
    prga.tools.util
-   prga.tools.ysgen

@@ -54,8 +54,9 @@ html_theme = 'sphinx_materialdesign_theme'
 html_logo = '_static/images/logo.png'
 html_theme_options = {
         'header_links' : [
-            ('Home', 'index', False, 'home'),
+            ('Home', 'http://parallel.princeton.edu/prga/', True, 'home'),
             ('Github', "https://github.com/PrincetonUniversity/prga", True, 'link'),
+            ('Documentation', "index", False, 'description'),
             ], 
         'fixed_drawer': True,
         'fixed_header': True,

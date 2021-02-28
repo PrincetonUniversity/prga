@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+PYTHON_VERSION=3.8.2
+
 if [ "${BASH_SOURCE-}" = "$0" ]; then
     sourced=0
 else
@@ -18,11 +20,7 @@ function info() {
 
 if [ ! -z "${VIRTUAL_ENV}" ]; then
     err "Already in a Python virtualenv"
-    if [ "$sourced" = "1" ]; then
-        return 0
-    else
-        exit 1
-    fi
+    if [ "$sourced" = "1" ]; then return 0; else exit 1; fi
 fi
 
 # choose the correct binaries
@@ -30,23 +28,62 @@ info "Setting \$PATH"
 OLD_PATH=$PATH
 export PATH=$PRGA_ROOT/local/bin:$PATH
 
-# activate virtual env
+# activate virtualenv
 if [[ "$sourced" == "1" ]]; then
-    info "Activating virtual environment ..."
-    source $PRGA_ROOT/prga.py/.venv/bin/activate
+    info "'envscr/activate' sourced ..."
+
+    if [ ! -f $PRGA_ROOT/prga.py/.venv/bin/activate ]; then
+        err "Python virtualenv not created yet. Please run envscr/install first"
+        export PATH=${OLD_PATH}
+    else
+        info "Activating Python virtualenv ..."
+        source $PRGA_ROOT/prga.py/.venv/bin/activate
+    fi
+
 else
+    info "'envscr/activate' executed ..."
+
     CWD=${PWD}
+    trap "cd ${CWD} && export PATH=${OLD_PATH}" EXIT
+    trap "cd ${CWD} && export PATH=${OLD_PATH}" SIGINT
+
+    pushd $PRGA_ROOT
+
+    # find pyenv
+    info "Finding 'pyenv'"
+    if command -v pyenv 2>&1 >/dev/null; then
+        info "Active 'pyenv' found"
+    elif [ ! -f pyenv/bin/pyenv ]; then
+        err "'pyenv' not found. Please run envscr/install first"
+        exit 1
+    else
+        export PYENV_ROOT=${PWD}/pyenv
+        export PATH=${PWD}/pyenv/bin:$PATH
+
+        info "Activating local-installed pyenv"
+        eval "$( pyenv init - )"
+        info "Local-installed pyenv activated"
+    fi
+
+    # select Python version
+    if $( pyenv local ${PYTHON_VERSION} ); then
+        info "Python ${PYTHON_VERSION} selected"
+    else
+        err "Python ${PYTHON_VERSION} not installed. Please run envscr/install first"
+        exit 1
+    fi
+
+    # run with virtualenv
     cd $PRGA_ROOT/prga.py
 
-    info "Entering virtual environment in a subshell ..."
+    info "Entering Python virtualenv in a subshell ..."
     PIPENV_VENV_IN_PROJECT=1 pipenv shell cd ${CWD}
-    info "Leaving virtual environment ..."
+    info "Leaving Python virtualenv ..."
 
     # roll back to the old state
     info "Reverting \$PATH"
-    export PRGA_ROOT=
     export PATH=$OLD_PATH
-    cd $CWD
+    popd
 
     info "Thanks for using PRGA. We look forward to your next use :)"
 fi

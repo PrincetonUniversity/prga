@@ -1,0 +1,7 @@
+main:
+  - title: GitHub
+    url: https://github.com/PrincetonUniversity/prga
+  - title: Documentation
+    url: https://prga.readthedocs.io
+  - title: Publications
+    url: /publications

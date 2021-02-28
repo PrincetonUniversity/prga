@@ -107,7 +107,7 @@ info "'pipenv' installed"
 
 # check out submodules
 info "Checking out submodules"
-# ${GIT} submodule update --init --recursive || exit 1
+${GIT} submodule update --init --recursive || exit 1
 info "Submodules checked out"
 
 mkdir -p local
@@ -121,26 +121,24 @@ info "VTR built successfully"
 
 # build yosys
 info "Building Yosys"
-cd yosys
-${MAKE} -j${MAKE_JOBCOUNT} CONFIG=${COMP} || exit 1
-${MAKE} install CONFIG=${COMP} PREFIX=${PWD}/../local || exit 1
-cd ..
+${MAKE} -C yosys -j${MAKE_JOBCOUNT} CONFIG=${COMP} PREFIX=${PWD}/local || exit 1
+${MAKE} -C yosys install CONFIG=${COMP} PREFIX=${PWD}/local || exit 1
 info "Yosys built successfully"
 
 # link all binaries
 info "Linking binaries to ${PWD}/local/bin"
 cd local/bin
-ln -s -f ../../vtr/vpr/vpr vpr
-ln -s -f ../../vtr/build/utils/fasm/genfasm genfasm
+cp ../../vtr/vpr/vpr vpr
+cp ../../vtr/build/utils/fasm/genfasm genfasm
 cd ../..
 info "'vpr' and 'genfasm' linked to ${PWD}/local/bin"
 
 # build a virtualenv for prga.py
 cd prga.py
-info "Creating a virtual environment for prga.py"
+info "Creating a virtualenv for prga.py"
 PIPENV_VENV_IN_PROJECT=1 pipenv --python ${PYTHON_VERSION} install -e .[cocotb] || exit 1
 cd ..
-info "Virtual environment setup completed for prga.py"
+info "Virtualenv setup completed for prga.py"
 
 info "Installation finished successfully"
 

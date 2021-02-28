@@ -1,3 +1,4 @@
-*/*/*
-!*/*/build.py
-!*/*/Makefile
+/*/*/*
+!/*/*/build.py
+!/*/*/Makefile
+!/*/*/src
