@@ -22,10 +22,8 @@ title: PRGA
 name: Princeton University
 description: >- # this means to ignore newlines until "baseurl:"
   Princeton Reconfigurable Gate Array
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://parallel.princeton.edu/prga" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  jekyll
+baseurl: /prga # the subpath of your site, e.g. /blog
+url: "https://parallel.princeton.edu" # the base hostname & protocol for your site, e.g. http://example.com
 
 # Build settings
 theme: minimal-mistakes-jekyll
@@ -42,13 +40,17 @@ footer:
     - label: "Github"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/PrincetonUniversity/prga"
-    - label: "Docs"
+    - label: "Documentation"
       icon: "fas fa-book"
       url: "https://prga.readthedocs.io"
 
 exclude:
   - .gitignore
   - README.md
+
+# hide feed button in footer
+atom_feed:
+  hide: true
 
 # Exclude from processing.
 # The following items will not be processed, by default.
