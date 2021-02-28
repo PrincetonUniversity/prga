@@ -1,7 +1,7 @@
-prga.tools.iobind module
+prga.renderer.lib module
 ========================
 
-.. automodule:: prga.tools.iobind
+.. automodule:: prga.renderer.lib
    :members:
    :undoc-members:
    :show-inheritance:

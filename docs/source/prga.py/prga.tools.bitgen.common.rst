@@ -1,7 +1,7 @@
-prga.cfg.pktchain.system module
+prga.tools.bitgen.common module
 ===============================
 
-.. automodule:: prga.cfg.pktchain.system
+.. automodule:: prga.tools.bitgen.common
    :members:
    :undoc-members:
    :show-inheritance:

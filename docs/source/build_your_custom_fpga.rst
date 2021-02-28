@@ -2,7 +2,7 @@ Build Your Custom FPGA
 ======================
 
 This tutorial introduces how to build a custom FPGA. The full script can be
-found at ``examples/fpga/medium/fle6_N4_mem8K_42x34``.
+found at ``examples/fpga/scanchain/fle6_N2_mem2K_8x8/build.py``.
 
 Describe the architecture
 -------------------------
@@ -23,19 +23,16 @@ uses D-Flipflops.
 .. code-block:: python
 
     from prga import *
+    from itertools import product
+    
+    import sys
 
-    N = 6
-    subarray_width, subarray_height = 8, 8
-    subarray_col, subarray_row = 5, 4
-
-    # The argument ``1`` here specifies the width of the scanchain. This
-    # argument is specific to `Scanchain`.
-    ctx = Scanchain.new_context(1)
+    # Use single-bit scanchain configuration circuitry
+    ctx = Scanchain.new_context()
 
 After creating the `Context` object, we can start to describe our custom FPGA.
 Here, we first describe the routing resources in the FPGA: the routing wire
-segments and the global wires. Currently PRGA only supports uni-directional,
-straight wires.
+segments and the global wires.
 
 .. code-block:: python
     
@@ -48,23 +45,16 @@ straight wires.
     gbl_clk.bind( (0, 1), 0)
 
     # create wire segments: name, width, length
-    ctx.create_segment(     'L1', 40,    1)
-    ctx.create_segment(     'L4', 20,    4)
+    ctx.create_segment(     'L2', 20,    2)
 
 Note that ``width`` is the number of the specific type of wire segments in each
 routing channel in one direction. In the example above, each horizontal channel
-contains 240 tracks:
+contains 80 tracks:
 
-- 40 ``L1`` tracks that run from west to east
-- 40 ``L1`` tracks that run from east to west
-- 20 ``L4`` tracks that run from west to east, starting from the current tile
-- 20 ``L4`` tracks that run from west to east, starting from 1 tiles west to the current tile
-- 20 ``L4`` tracks that run from west to east, starting from 2 tiles west to the current tile
-- 20 ``L4`` tracks that run from west to east, starting from 3 tiles west to the current tile
-- 20 ``L4`` tracks that run from east to west, starting from the current tile
-- 20 ``L4`` tracks that run from east to west, starting from 1 tiles east to the current tile
-- 20 ``L4`` tracks that run from east to west, starting from 2 tiles east to the current tile
-- 20 ``L4`` tracks that run from east to west, starting from 3 tiles east to the current tile
+- 20 ``L2`` tracks that run from west to east, starting from the current tile
+- 20 ``L2`` tracks that run from west to east, starting from 1 tiles west to the current tile
+- 20 ``L2`` tracks that run from east to west, starting from the current tile
+- 20 ``L2`` tracks that run from east to west, starting from 1 tiles east to the current tile
 
 Before describing the CLB/IOBs in our custom FPGA, we can add custom logic
 elements (or primitive cells, hardwired IP blocks, etc.) to our `Context` and
@@ -73,12 +63,7 @@ a memory module:
 
 .. code-block:: python
     
-    # `build_memory` returns a builder object which wraps the module we're
-    # designing and provides the API for designing the module
-    #
-    # the `commit` method of a builder object commits the module into the
-    # context database
-    memory = ctx.build_memory("dpram_a10d8", 10, 8).commit()
+    memory = ctx.create_memory("dpram_a8d8", 8, 8).commit()
 
 PRGA also provides API for adding and using arbitrary Verilog modules in the FPGA,
 for example `Context.build_primitive`. Multi-modal primitives are also supported
@@ -111,37 +96,30 @@ the module into the `Context` database.
 
     # create other block inputs/outputs
     #                         name, width,      on which side of the block is the port
-    iw = builder.create_input("iw", N // 2 * 6, Orientation.west)
-    ie = builder.create_input("ie", N // 2 * 6, Orientation.east)
-    ow = builder.create_output("ow", N // 2 * 2, Orientation.west)
-    oe = builder.create_output("oe", N // 2 * 2, Orientation.east)
-    cin = builder.create_input("cin", 1, Orientation.south)
+    in_  = builder.create_input ("in",  12, Orientation.west)
+    out  = builder.create_output("out",  4, Orientation.east)
+    cin  = builder.create_input ("cin",  1, Orientation.south)
+    cout = builder.create_output("cout", 1, Orientation.north)
 
     # Instantiate logic primitives
-    #                                            module to be instantiated, name,      number of instances
-    for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"],    "cluster", N)):
+    #                                            module to be instantiated, name,        number of instances
+    for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"],    "i_cluster", 2)):
         
         # connect nets
-        builder.connect(clk, inst.pins['clk'])
-        if i % 2 == 0:
-            i = i // 2
-            builder.connect(iw[6 * i: 6 * (i + 1)], inst.pins["in"])
-            builder.connect(inst.pins['out'], oe[2 * i: 2 * (i + 1)])
-        else:
-            i = i // 2
-            builder.connect(ie[6 * i: 6 * (i + 1)], inst.pins["in"])
-            builder.connect(inst.pins['out'], ow[2 * i: 2 * (i + 1)])
+        builder.connect( clk,                inst.pins['clk'] )
+        builder.connect( in_[6*i : 6*(i+1)], inst.pins['in']  )
+        builder.connect( inst.pins['out'],   out[2*i : 2*(i+1)] )
 
         # 'vpr_pack_pattern' is a keyword-only argument. See
         # "https://docs.verilogtorouting.org/en/latest/arch/reference/#tag-%3Cpack_patternname="
         # for more information
-        builder.connect(cin, inst.pins["cin"], vpr_pack_patterns = ["carrychain"])
+        builder.connect( cin,                inst.pins['cin'], vpr_pack_patterns = ['carrychain'] )
 
         cin = inst.pins["cout"]
 
-    builder.connect(cin, builder.create_output("cout", 1, Orientation.north), vpr_pack_patterns = ["carrychain"])
+    builder.connect(cin, cout, vpr_pack_patterns = ["carrychain"])
 
-    # Commit the described CLB. The module is also accessible as `ctx.blocks["clb"]`
+    # Commit the described CLB. The module is now accessible as `ctx.blocks["clb"]`
     clb = builder.commit()
 
     # =======================================================================
@@ -173,16 +151,21 @@ the module into the `Context` database.
     builder = ctx.build_logic_block("bram", 1, 2)
 
     # Instantiate the memory module
-    inst = builder.instantiate(ctx.primitives["dpram_a10d8"], "bram_inst")
+    inst = builder.instantiate(memory, "i_ram")
 
     # create and connect ports/pins
-    builder.connect(builder.create_global(gbl_clk, Orientation.south), inst.pins["clk"])
-    for port in ("addr1", "we1", "data1"):
-        builder.connect(builder.create_input(port, len(inst.pins[port]), Orientation.west, (0, 0)), inst.pins[port])
-    for port in ("addr2", "we2", "data2"):
-        builder.connect(builder.create_input(port, len(inst.pins[port]), Orientation.west, (0, 1)), inst.pins[port])
-    builder.connect(inst.pins["out1"], builder.create_output("out1", len(inst.pins["out1"]), Orientation.east, (0, 0)))
-    builder.connect(inst.pins["out2"], builder.create_output("out2", len(inst.pins["out2"]), Orientation.east, (0, 1)))
+    builder.connect( builder.create_global(gbl_clk, Orientation.south),
+                     inst.pins["clk"])
+    builder.connect( builder.create_input("we", 1, Orientation.west, (0, 0)),
+                     inst.pins["we"])
+    builder.connect( builder.create_input("waddr", len(inst.pins["waddr"]), Orientation.west, (0, 0)),
+                     inst.pins["waddr"])
+    builder.connect( builder.create_input("din", len(inst.pins["din"]), Orientation.east, (0, 0)),
+                     inst.pins["din"])
+    builder.connect( builder.create_input("raddr", len(inst.pins["raddr"]), Orientation.west, (0, 1)),
+                     inst.pins["raddr"])
+    builder.connect( inst.pins["dout"],
+                     builder.create_output("dout", len(inst.pins["dout"]), Orientation.east, (0, 1)))
 
     # commit the BRAM block. The module is also accessible as `ctx.blocks["bram"]`
     bram = builder.commit()
@@ -214,8 +197,8 @@ by calling `TileBuilder.fill` and `ArrayBuilder.fill` methods.
     iotiles = {}
     for ori in Orientation:
         builder = ctx.build_tile(iob,                                   # block to be instantiated in this tile
-                8,                                                      # number of block instances in this tile
-                name = "tile_io_{}".format(ori.name[0]),                # name of the tile
+                4,                                                      # number of block instances in this tile
+                name = "t_io_{}".format(ori.name[0]),                   # name of the tile
                 edge = OrientationTuple(False, **{ori.name: True}))     # on which edge of the FPGA
 
         # auto-generate connection boxes and fill connection box patterns
@@ -245,10 +228,10 @@ and switch box slots:
     pattern = SwitchBoxPattern.wilton
     
     # Create an array builder
-    #                         name,       width,          height
-    builder = ctx.build_array('subarray', subarray_width, subarray_height, set_as_top = False)
+    #                         name,       width, height
+    builder = ctx.build_array('subarray', 3,     3,     set_as_top = False)
     for x, y in product(range(builder.width), range(builder.height)):
-        if x == 6:
+        if x == 1:
             if y % 2 == 0:
                 builder.instantiate(bramtile, (x, y))
         else:
@@ -258,20 +241,24 @@ and switch box slots:
     subarray = builder.fill( pattern ).auto_connect().commit()
 
     # Create the top-level array builder
-    top_width = subarray_width * subarray_col + 2
-    top_height = subarray_height * subarray_row + 2
-    builder = ctx.build_array('top', top_width, top_height, set_as_top = True)
-    for x, y in product(range(top_width), range(top_height)):
-        # leave the 4 corners empty
-        if x in (0, top_width - 1) and y in (0, top_height - 1):
+    builder = ctx.build_array('top', 8, 8, set_as_top = True)
+    for x, y in product(range(builder.width), range(top_height)):
+        # leave the corners empty
+        if x in (0, builder.width - 1) and y in (0, builder.height - 1):
             pass
-        elif (x in (0, top_width - 1) and 0 < y < top_height - 1) or (y in (0, top_height - 1) and 0 < x < top_width - 1):
-            builder.instantiate(iotiles[
-                    Orientation.west if x == 0 else
-                    Orientation.east if x == top_width - 1 else
-                    Orientation.south if y == 0 else Orientation.north
-                    ], (x, y))
-        elif 0 < x < top_width - 1 and 0 < y < top_height - 1 and x % subarray_width == 1 and y % subarray_height == 1:
+
+        # fill edges with IO tiles
+        elif x == 0:
+            builder.instantiate(iotiles[Orientation.west], (x, y))
+        elif x == builder.width - 1:
+            builder.instantiate(iotiles[Orientation.east], (x, y))
+        elif y == 0:
+            builder.instantiate(iotiles[Orientation.south], (x, y))
+        elif y == builder.height - 1:
+            builder.instantiate(iotiles[Orientation.north], (x, y))
+
+        # subarrays
+        elif x % 3 == 1 and y % 3 == 1:
             builder.instantiate(subarray, (x, y))
 
     # commit the top-level array
@@ -299,7 +286,7 @@ PRGA adopts a pass-based flow to complete, modify, optimize the FPGA
 architecture as well as generate all files for the architecture. A `Flow` object
 is used to manage and run all the passes. It also checks and resolves the
 dependences between the passes. For example, the `VerilogCollection` pass
-requires `TranslationPass` as a dependency. Even if a `TranslationPass` pass is
+requires `Translation` as a dependency. Even if a `Translation` pass is
 added after a `VerilogCollection` pass, it will be executed before the
 `VerilogCollection` pass.
 
@@ -308,10 +295,13 @@ added after a `VerilogCollection` pass, it will be executed before the
     flow = Flow(
 
         # This pass converts user-defined modules to Verilog modules
-        TranslationPass(),
+        Translation(),
 
-        # This pass injects configuration circuitry into the FPGA
-        Scanchain.InjectConfigCircuitry(),
+        # Analyze how configurable connections are implemented with switches
+        SwitchPathAnnotation(),
+
+        # This pass inserts configuration circuitry into the FPGA
+        Scanchain.InsertProgCircuitry(),
 
         # This pass generates the architecture specification for VPR to place
         # and route designs onto this FPGA
@@ -321,9 +311,8 @@ added after a `VerilogCollection` pass, it will be executed before the
         # to place and route designs onto this FPGA
         VPR_RRG_Generation("vpr/rrg.xml"),
 
-        # This pass create Verilog rendering tasks in the renderer. The second
-        # argument is the directory for all output files
-        VerilogCollection(r, 'rtl'),
+        # This pass create Verilog rendering tasks in the renderer.
+        VerilogCollection('rtl'),
 
         # This pass analyzes the primitives in the FPGA and generates synthesis
         # script for Yosys

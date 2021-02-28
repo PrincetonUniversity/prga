@@ -1,7 +1,7 @@
-prga.tools.scanchain.bitgen module
+prga.tools.bitgen.scanchain module
 ==================================
 
-.. automodule:: prga.tools.scanchain.bitgen
+.. automodule:: prga.tools.bitgen.scanchain
    :members:
    :undoc-members:
    :show-inheritance:

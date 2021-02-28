@@ -42,10 +42,10 @@ To build an FPGA, run the following commands:
 
 .. code-block:: bash
 
-    cd /path/to/prga/                           # cd to the root 
-    . ./envscr/activate                         # activate the virtual environment
-    cd examples/fpga/tiny/k4_N2_8x8             # choose one FPGA building example
-    make                                        # build the FPGA!
+    cd /path/to/prga/                               # cd to the root 
+    . ./envscr/activate                             # activate the virtual environment
+    cd examples/fpga/scanchain/k4_N2_8x8            # choose one FPGA building example
+    make                                            # build the FPGA!
 
 To implement a target design and simulate it with an FPGA design, run the
 following commands:
@@ -55,5 +55,10 @@ following commands:
     # Re-activate virtual environment if you exited or started a new terminal session
     #   cd /path/to/prga/                           # cd to the root 
     #   ./envscr/activate                           # activate the virtual environment
-    cd examples/target/bcd2bin/tiny_k4_N2_8x8   # choose one design and one FPGA
-    make                                        # run all the way to verification
+
+    cd examples/target/bcd2bin/scanchain_k4_N2_8x8  # choose one design and one FPGA
+    make                                            # make project
+    make -C design                                  # run RTL-to-bitstream flow
+    make -C tests/basic behav                       # run behavioral verification
+    make -C tests/basic postsyn                     # run post-synthesis verification
+    make -C tests/basic postimpl                    # run post-implementation verification

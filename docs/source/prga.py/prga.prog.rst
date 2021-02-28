@@ -1,7 +1,7 @@
-prga.tools.pktchain package
-===========================
+prga.prog package
+=================
 
-.. automodule:: prga.tools.pktchain
+.. automodule:: prga.prog
    :members:
    :undoc-members:
    :show-inheritance:
@@ -12,7 +12,9 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   prga.tools.pktchain.simproj
+   prga.prog.magic
+   prga.prog.pktchain
+   prga.prog.scanchain
 
 Submodules
 ----------
@@ -20,4 +22,4 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   prga.tools.pktchain.bitgen
+   prga.prog.common

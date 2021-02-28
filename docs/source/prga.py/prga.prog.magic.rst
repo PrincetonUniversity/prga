@@ -1,7 +1,7 @@
-prga.passes.vpr package
+prga.prog.magic package
 =======================
 
-.. automodule:: prga.passes.vpr
+.. automodule:: prga.prog.magic
    :members:
    :undoc-members:
    :show-inheritance:
@@ -12,6 +12,4 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   prga.passes.vpr.arch
-   prga.passes.vpr.delegate
-   prga.passes.vpr.rrg
+   prga.prog.magic.lib

@@ -1,7 +1,7 @@
-prga.tools.ysgen module
+prga.prog.common module
 =======================
 
-.. automodule:: prga.tools.ysgen
+.. automodule:: prga.prog.common
    :members:
    :undoc-members:
    :show-inheritance:

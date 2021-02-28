@@ -13,10 +13,11 @@ Subpackages
    :maxdepth: 4
 
    prga.algorithm
-   prga.cfg
    prga.core
+   prga.integration
    prga.netlist
    prga.passes
+   prga.prog
    prga.renderer
    prga.tools
 
@@ -26,7 +27,6 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   prga.compatible
    prga.exception
    prga.util
    prga.xml

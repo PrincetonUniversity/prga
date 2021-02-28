@@ -12,4 +12,5 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   prga.renderer.lib
    prga.renderer.renderer

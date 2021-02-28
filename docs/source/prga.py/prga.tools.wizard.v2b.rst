@@ -1,7 +1,7 @@
-prga.cfg.pktchain.lib module
+prga.tools.wizard.v2b module
 ============================
 
-.. automodule:: prga.cfg.pktchain.lib
+.. automodule:: prga.tools.wizard.v2b
    :members:
    :undoc-members:
    :show-inheritance:

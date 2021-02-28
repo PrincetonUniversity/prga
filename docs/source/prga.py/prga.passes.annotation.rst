@@ -1,7 +1,7 @@
-prga.cfg.scanchain.lib module
+prga.passes.annotation module
 =============================
 
-.. automodule:: prga.cfg.scanchain.lib
+.. automodule:: prga.passes.annotation
    :members:
    :undoc-members:
    :show-inheritance:
