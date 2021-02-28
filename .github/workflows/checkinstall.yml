@@ -71,6 +71,9 @@ jobs:
       # ==================
       # == Install PRGA ==
       # ==================
+      - name: Install PRGA dependencies
+        run: sudo apt-get install tcl8.6-dev
+
       - name: Install PRGA
         run: bash envscr/install
 
