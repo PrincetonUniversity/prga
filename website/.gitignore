@@ -10,3 +10,6 @@ vendor
 .bundle
 Gemfile.lock
 **/vendor/bundle
+
+# Deployment
+prga.tar.gz
