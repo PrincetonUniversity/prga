@@ -186,34 +186,6 @@ body:hover .visually-hidden button {
   }
 }
 
-@for $i from 1 through 9 {
-  .fixwidth--#{$i}p {
-      width: percentage($i/10);
-  }
-}
-
-@for $i from 1 through 160 {
-  .fixwidth--#{$i}0px {
-      width: $i * 10px;
-  }
-}
-
-@for $i from 1 through 100 {
-  .fixheight--#{$i}0px {
-      height: $i * 10px;
-  }
-}
-
-@for $i from 0 through 1 {
-    @for $j from 0 through 9 {
-        .fixheight--#{$i}p#{$j}em {
-            vertical-align: middle;
-            display: inline;
-            height: ($i + $j / 10.0) * 1em;
-        }
-    }
-}
-
 /*
    Icons
    ========================================================================== */

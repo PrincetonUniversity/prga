@@ -23,11 +23,14 @@ header:
   Field-Programmable Gate Arrays ([FPGA '21](https://isfpga.org/)),
   Feburary/March 2021.
 
-  [![ACM DL Logo](http://identitystandards.acm.org/acmdl/DL_logo_rev_small.jpg){: .link-dl}](https://doi.org/10.1145/3431920.3439294)
-  [<i class="far fa-file-video fa-2x link-icon"></i>](https://dl.acm.org/doi/10.1145/3431920.3439294#)
-  [<i class="far fa-file-pdf fa-2x link-icon"></i>](http://parallel.princeton.edu/papers/FPGA21-Li.pdf)
+  [<img src="http://identitystandards.acm.org/acmdl/DL_logo_rev_small.jpg"
+        alt="ACM DL Logo"
+        style="display:inline;height:50px;vertical-align:middle;margin-right:1em;">](https://doi.org/10.1145/3431920.3439294)
+  [<i class="far fa-file-video fa-2x"
+        style="display:inline;margin-right:0.5em;vertical-align:middle;"></i>](https://dl.acm.org/doi/10.1145/3431920.3439294#)
+  [<i class="far fa-file-pdf fa-2x"
+        style="display:inline;margin-right:0.5em;vertical-align:middle;"></i>](http://parallel.princeton.edu/papers/FPGA21-Li.pdf)
   <br/>
-  {: .publications}
 
 ## Other Publications
 
@@ -36,7 +39,9 @@ header:
   Field-Programmable Logic and Applications
   ([FPL '20](https://www.fpl2020.org/)), August/September 2020.
 
-  [![IEEE Xplore Logo](https://ieeexplore.ieee.org/assets/img/xplore_logo_white.png){: .link-dl}](https://doi.org/10.1109/FPL50879.2020.00042)
-  [<i class="far fa-file-pdf fa-2x link-icon"></i>](http://parallel.princeton.edu/papers/FPL20-Li.pdf)
+  [<img src="https://ieeexplore.ieee.org/assets/img/xplore_logo_white.png"
+        alt="IEEE Xplore Logo"
+        style="display:inline;height:50px;vertical-align:middle;margin-right:1em;">](https://doi.org/10.1109/FPL50879.2020.00042)
+  [<i class="far fa-file-pdf fa-2x"
+        style="display:inline;margin-right:0.5em;vertical-align:middle;"></i>](http://parallel.princeton.edu/papers/FPL20-Li.pdf)
   <br/>
-  {: .publications}
