@@ -18,7 +18,6 @@
         &:not(:only-child) {
             -ms-flex: 0 0 60%;
             flex: 0 0 60%;
-
             @media only screen and (min-width: 800px) {
                 max-width: 60%;
             }

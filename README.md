@@ -4,7 +4,8 @@
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![Documentation Status](https://readthedocs.org/projects/prga/badge/?version=latest)](https://prga.readthedocs.io/en/latest/?badge=latest)
-![dev-ci](https://github.com/PrincetonUniversity/prga/workflows/dev-ci/badge.svg?branch=dev&event=push)
+[![ci-install](https://github.com/PrincetonUniversity/prga/actions/workflows/checkinstall.yml/badge.svg?branch=release)](https://github.com/PrincetonUniversity/prga/actions/workflows/checkinstall.yml)
+[![ci-dev](https://github.com/PrincetonUniversity/prga/actions/workflows/quickcheck.yml/badge.svg?branch=dev)](https://github.com/PrincetonUniversity/prga/actions/workflows/quickcheck.yml)
 
 Build your own FPGA Chip or embedded FPGA IP with Python, and enjoy a fully
 open-source, auto-generated CAD flow specifically for your custom FPGA.
