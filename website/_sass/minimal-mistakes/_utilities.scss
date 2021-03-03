@@ -186,12 +186,6 @@ body:hover .visually-hidden button {
   }
 }
 
-@for $i from 1 through 9 {
-  .fixwidth--#{$i} {
-      width: percentage($i/10);
-  }
-}
-
 /*
    Icons
    ========================================================================== */

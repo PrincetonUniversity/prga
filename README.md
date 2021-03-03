@@ -3,6 +3,7 @@
 # **P**rinceton **R**econfigurable **G**ate **A**rray
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Documentation Status](https://readthedocs.org/projects/prga/badge/?version=latest)](https://prga.readthedocs.io/en/latest/?badge=latest)
 [![ci-install](https://github.com/PrincetonUniversity/prga/actions/workflows/checkinstall.yml/badge.svg?branch=release)](https://github.com/PrincetonUniversity/prga/actions/workflows/checkinstall.yml)
 [![ci-dev](https://github.com/PrincetonUniversity/prga/actions/workflows/quickcheck.yml/badge.svg?branch=dev)](https://github.com/PrincetonUniversity/prga/actions/workflows/quickcheck.yml)
 

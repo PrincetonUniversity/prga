@@ -47,6 +47,8 @@ footer:
 exclude:
   - .gitignore
   - README.md
+  - Makefile
+  - prga.tar.gz
 
 # hide feed button in footer
 atom_feed:
