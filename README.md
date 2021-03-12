@@ -32,8 +32,8 @@ source ./envscr/activate
 make -C examples/fpga/magic/k4_N2_8x8
 
 # create CAD & verification project
-make -C examples/target/bcd2bin/magic_k4_N2_8x8
+make -C examples/app/bcd2bin/magic_k4_N2_8x8
 
 # run RTL-to-bitstream flow and post-implementation simulation
-make -C examples/target/bcd2bin/magic_k4_N2_8x8/tests/basic
+make -C examples/app/bcd2bin/magic_k4_N2_8x8/tests/basic
 ```

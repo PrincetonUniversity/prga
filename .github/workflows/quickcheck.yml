@@ -182,20 +182,20 @@ jobs:
       - name: Build the FPGA
         run: pipenv run make -C examples/fpga/${{ matrix.prog }}/${{ matrix.fpga }}
 
-      - name: Make project for the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}
+      - name: Make project for the application
+        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}
 
-      - name: Run behavioral simulation of the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} behav
+      - name: Run behavioral simulation of the application
+        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} behav
 
-      - name: Run synthesis for the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/design syn
+      - name: Run synthesis for the application
+        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/design syn
 
-      - name: Run post-synthesis simulation of the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postsyn
+      - name: Run post-synthesis simulation of the application
+        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postsyn
 
-      - name: Run the full RTL-to-bitstream flow for the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/design
+      - name: Run the full RTL-to-bitstream flow for the application
+        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/design
 
-      - name: Run post-implementation simulation of the target design
-        run: pipenv run make -C examples/target/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postimpl
+      - name: Run post-implementation simulation of the application
+        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postimpl

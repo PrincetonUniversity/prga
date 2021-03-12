@@ -6,7 +6,7 @@ inputs:
     required: true
     default: ""
   design_path:
-    description: Path to the design example relative to the examples/target directory
+    description: Path to the design example relative to the examples/app directory
     required: true
     default: ""
   test:
@@ -23,44 +23,44 @@ runs:
         bash envscr/run make -C ${PWD}/examples/fpga/${{ inputs.fpga_path }}
         popd
   
-    - name: Make project for the target design
+    - name: Make project for the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}
         popd
 
-    - name: Run behavioral simulation of the target design
+    - name: Run behavioral simulation of the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/tests/${{ inputs.test }} behav
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}/tests/${{ inputs.test }} behav
         popd
 
-    - name: Run synthesis for the target design
+    - name: Run synthesis for the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/design syn
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}/design syn
         popd
 
-    - name: Run post-synthesis simulation of the target design
+    - name: Run post-synthesis simulation of the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/tests/${{ inputs.test }} postsyn
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}/tests/${{ inputs.test }} postsyn
         popd
 
-    - name: Run the full RTL-to-bitstream flow for the target design
+    - name: Run the full RTL-to-bitstream flow for the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/design
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}/design
         popd
 
-    - name: Run post-implementation simulation of the target design
+    - name: Run post-implementation simulation of the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/target/${{ inputs.design_path }}/tests/${{ inputs.test }} postimpl
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}/tests/${{ inputs.test }} postimpl
         popd

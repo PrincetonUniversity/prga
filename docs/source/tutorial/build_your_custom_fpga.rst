@@ -2,7 +2,10 @@ Build Your Custom FPGA
 ======================
 
 This tutorial introduces how to build a custom FPGA. The full script can be
-found at ``examples/fpga/scanchain/fle6_N2_mem2K_8x8/build.py``.
+found at
+`examples/fpga/scanchain/fle6_N2_mem2K_8x8/build.py`_.
+
+.. _examples/fpga/scanchain/fle6_N2_mem2K_8x8/build.py: https://github.com/PrincetonUniversity/prga/blob/release/examples/fpga/scanchain/fle6_N2_mem2K_8x8/build.py
 
 Describe the architecture
 -------------------------

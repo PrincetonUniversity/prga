@@ -28,9 +28,10 @@ Contents
    :maxdepth: 2
    :caption: Contents:
 
-   intro
-   build_your_custom_fpga
-   prga.py/modules
+   quickstart
+   workflow
+   tutorial/index
+   API Reference <prga.py/modules>
 
 
 Indices and tables
