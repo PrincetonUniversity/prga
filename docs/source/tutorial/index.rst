@@ -8,3 +8,4 @@ This page lists PRGA tutorials.
    :caption: Contents:
 
    build_your_custom_fpga
+   bring_your_own_ip
