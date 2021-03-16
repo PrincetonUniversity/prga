@@ -30,6 +30,7 @@ Contents
 
    quickstart
    workflow
+   arch
    tutorial/index
    API Reference <prga.py/modules>
 

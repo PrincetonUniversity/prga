@@ -66,8 +66,8 @@ etc.
 However, FPGA designers often want to add custom components into the
 FPGA, for example, real SRAM macros, hard arithmetic units, or even large,
 complex IP cores like hard CPUs, memory controllers, PCIe interfaces, etc.
-All these components are classified as ``Logic Primitive`` s in PRGA, and PRGA
-users can easily add custom ``Logic Primitive`` s at the beginning of their
+All these components are classified as :ref:`Logic Primitive` s in PRGA, and PRGA
+users can easily add custom :ref:`Logic Primitive` s at the beginning of their
 Python script.
 An example FPGA with a hard `PicoRV32`_ CPU and custom negative-edge-triggered
 flipflops can be found at `examples/fpga/magic/hardpico`_.
@@ -86,13 +86,16 @@ Architecture Customization
 After database preparation, FPGA designers can design and customize the desired
 FPGA architecture by creating programmable blocks and assembling them in a
 hierarchical manner.
-As shown in the figure above, the FPGA is organized as a 2-dimensional ``Array``
-of ``Tile`` s, ``Switch Box`` es, and nested ``Array`` s.
-Each ``Tile`` contains one ``Logic Block`` or multiple ``IO Block`` s, in
-addition to various numbers of ``Connection Box`` es.
-Each ``Logic Block`` or ``IO Block`` consists of zero to many ``Slice`` s
-and ``Logic Primitive`` s.
-``Slice`` s are composed of nested ``Slice`` s and ``Logic Primitive`` s.
+As shown in the figure above, the FPGA is organized as a 2-dimensional
+:ref:`Array` of :ref:`Tile` s, :ref:`Switch Box<Connection and Switch Box>` es,
+and nested :ref:`Array` s.
+Each :ref:`Tile` contains one :ref:`Logic Block<Logic and IO Block>` or multiple
+:ref:`IO Block<Logic and IO Block>` s, in addition to various numbers of
+:ref:`Connection Box<Connection and Switch Box>` es.
+Each :ref:`Logic Block<Logic and IO Block>` or :ref:`IO Block<Logic and IO
+Block>` consists of zero to many :ref:`Slice` s and :ref:`Logic Primitive` s.
+:ref:`Slice` s are composed of nested :ref:`Slice` s and
+:ref:`Logic Primitive` s.
 Readers familiar with `VPR`_ should find these concept pretty intuitive.
 
 One key feature of PRGA is the decoupling of the functional abstraction of an
@@ -107,6 +110,7 @@ specifying how the MUX/BUFFER tree should be constructed.
 
 This decoupling is enabled by using different `ModuleView` s of the same modules in
 different steps.
+This is covered in more detail in the :ref:`Module View` section.
 During the architecture customization step, all modules are customized in
 the `ModuleView.abstract` view.
 
@@ -122,7 +126,7 @@ conflict and ordering between ``Pass`` es.
 Here's a list of the most commonly used ``Pass`` es:
 
 - `Translation`: This pass generates the `ModuleView.design` view for modules in
-  the `ModuleView.abstract` view by linking ``Logic Primitive`` s and implementing the
+  the `ModuleView.abstract` view by linking :ref:`Logic Primitive` s and implementing the
   abstract configuratble connections with switch modules.
 - `SwitchPathAnnotation`: This pass analyzes the switch modules instantiated
   in the `ModuleView.design` view, and annotate the MUX/BUFFER paths back to the
@@ -228,9 +232,9 @@ generator, etc.
 It takes a YAML configuration file that lists the RTL sources and tests, then
 creates project directories and Makefiles for both the RTL-to-bitstream flow and
 the verification flow.
-Examples can be found and ran under the `examples/target`_ directory.
+Examples can be found and ran under the `examples/app`_ directory.
 
-.. _examples/target: https://github.com/PrincetonUniversity/prga/tree/release/examples/target
+.. _examples/app: https://github.com/PrincetonUniversity/prga/tree/release/examples/app
 
 The following is an example YAML configuration file:
 
