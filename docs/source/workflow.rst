@@ -112,7 +112,10 @@ This decoupling is enabled by using different `ModuleView` s of the same modules
 different steps.
 This is covered in more detail in the :ref:`Module View` section.
 During the architecture customization step, all modules are customized in
-the `ModuleView.abstract` view.
+the `abstract`_ view.
+
+.. _abstract: :py:obj:`ModuleView.abstract`
+.. _design: :py:obj:`ModuleView.design`
 
 Flow and Passes
 ^^^^^^^^^^^^^^^
@@ -125,16 +128,16 @@ conflict and ordering between ``Pass`` es.
 
 Here's a list of the most commonly used ``Pass`` es:
 
-- `Translation`: This pass generates the `ModuleView.design` view for modules in
-  the `ModuleView.abstract` view by linking :ref:`Logic Primitive` s and implementing the
+- `Translation`: This pass generates the `design`_ view for modules in
+  the `abstract`_ view by linking :ref:`Logic Primitive` s and implementing the
   abstract configuratble connections with switch modules.
 - `SwitchPathAnnotation`: This pass analyzes the switch modules instantiated
-  in the `ModuleView.design` view, and annotate the MUX/BUFFER paths back to the
-  `ModuleView.abstract` view.
+  in the `design`_ view, and annotate the MUX/BUFFER paths back to the
+  `abstract`_ view.
   This information is used by ``FASM`` metadata generation during `VPR`_ script
   generation.
 - ``*.InsertProgCircuitry``: This pass inserts configuration memory into the
-  `ModuleView.design` view.
+  `design`_ view.
   This pass is specific to configuration circuitry types, e.g.
   `Scanchain.InsertProgCircuitry` and `Pktchain.InsertProgCircuitry`.
 - `VPRArchGeneration` and `VPR_RRG_Generation`: These two passes
@@ -142,7 +145,7 @@ Here's a list of the most commonly used ``Pass`` es:
   specification, respectively.
 - `VerilogCollection`: This pass inspects the `Context` object and creates
   RTL generation tasks for all the modules in a `FileRenderer` object.
-  RTL Verilog files are generated based on the `ModuleView.design` views.
+  RTL Verilog files are generated based on the `design`_ views.
 - `YosysScriptsCollection`: This pass inspects the `Context` object and
   creates `Yosys`_ script generation tasks, including the main synthesis script,
   technology mapping script, block RAM inferrence script, and so on.
