@@ -1,23 +1,36 @@
 Architecture & Customizability
 ==============================
 
-.. image:: /_static/images/zoomx3.png
-   :width: 100 %
-   :alt: PRGA Architecture Hierarchy
+PRGA Tile Grid
+--------------
+
+.. image:: /_static/images/grid.png
+   :alt: PRGA Tile Grid
    :align: center
 
-The FPGA architecture supported by PRGA is highly customizable and flexible.
-As shown in the figure above, the FPGA is organized as a 2-dimensional
-:ref:`Array` of :ref:`Tile` s, :ref:`Switch Box<Connection and Switch Box>`
-es, and nested :ref:`Array` s.
-Each :ref:`Tile` contains one :ref:`Logic Block<Logic and IO Block>` or
-multiple :ref:`IO Block<Logic and IO Block>` s, in addition to various
-numbers of :ref:`Connection Box<Connection and Switch Box>` es.
-Each :ref:`Logic Block<Logic and IO Block>` or :ref:`IO Block<Logic and IO
-Block>` consists of zero to many :ref:`Slice` s
-and :ref:`Logic Primitive` s.
-:ref:`Slice` s are composed of nested :ref:`Slice` s and :ref:`Logic Primitive` s.
-Readers familiar with `VPR`_ should find these concept pretty intuitive.
+The figure above shows PRGA's grid.
+Each tile in the grid (not to be confused with :ref:`Tile`) contains four
+:ref:`Switch Box<Connection and Switch Box>` slots (one per corner) and one
+:ref:`Tile` slot (the blue cross-shaped box in the center).
+The :ref:`Tile` slot contains four :ref:`Connection Box<Connection and Switch Box>`
+slots (one per edge) and one :ref:`block<Logic and IO Block>` slot.
+Note that we are using the word "slot" here, because the actual usage depends on
+the architecture.
+For example, a 2x2 block occupies 4 block slots, and
+obstructs certain switch box and connection box slots.
+
+**TODO**: explain why we need the redundant slots.
+In a nutshell, the redundant slots are related to design regularity and silicon
+implementation flexibility.
+
+It's still possible to emulate the conventional FPGA grid which contains only
+one connection box per routing channel, and one switch box per routing channel
+crosspoint.
+This is done by leaving the unused slots empty, as shown in the figure below.
+
+.. image:: /_static/images/convgrid.png
+   :alt: Conventional FPGA Grid Emulated by the PRGA Tile Grid
+   :align: center
 
 .. _VPR: https://verilogtorouting.org/
 
