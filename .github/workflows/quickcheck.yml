@@ -134,7 +134,7 @@ jobs:
         python-version:
           - 3.8.2
         test:
-          - design: bcd2bin
+          - app: bcd2bin
             test: basic
         fpga:
           - k4_N2_8x8
@@ -183,19 +183,19 @@ jobs:
         run: pipenv run make -C examples/fpga/${{ matrix.prog }}/${{ matrix.fpga }}
 
       - name: Make project for the application
-        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}
+        run: pipenv run make -C examples/app/${{ matrix.test.app }}/${{ matrix.prog }}_${{ matrix.fpga }}
 
       - name: Run behavioral simulation of the application
-        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} behav
+        run: pipenv run make -C examples/app/${{ matrix.test.app }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} behav
 
       - name: Run synthesis for the application
-        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/design syn
+        run: pipenv run make -C examples/app/${{ matrix.test.app }}/${{ matrix.prog }}_${{ matrix.fpga }}/app syn
 
       - name: Run post-synthesis simulation of the application
-        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postsyn
+        run: pipenv run make -C examples/app/${{ matrix.test.app }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postsyn
 
       - name: Run the full RTL-to-bitstream flow for the application
-        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/design
+        run: pipenv run make -C examples/app/${{ matrix.test.app }}/${{ matrix.prog }}_${{ matrix.fpga }}/app
 
       - name: Run post-implementation simulation of the application
-        run: pipenv run make -C examples/app/${{ matrix.test.design }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postimpl
+        run: pipenv run make -C examples/app/${{ matrix.test.app }}/${{ matrix.prog }}_${{ matrix.fpga }}/tests/${{ matrix.test.test }} postimpl

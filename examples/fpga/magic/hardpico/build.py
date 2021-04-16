@@ -42,15 +42,15 @@ mem_rdata   = builder.create_input ("mem_rdata", 32)
 irq         = builder.create_input ("irq",       32)
 
 # timing arcs
-builder.create_timing_arc(TimingArcType.seq_end,   clk, resetn)
-builder.create_timing_arc(TimingArcType.seq_start, clk, mem_valid)
-builder.create_timing_arc(TimingArcType.seq_start, clk, mem_instr)
-builder.create_timing_arc(TimingArcType.seq_end,   clk, mem_ready)
-builder.create_timing_arc(TimingArcType.seq_start, clk, mem_addr)
-builder.create_timing_arc(TimingArcType.seq_start, clk, mem_wdata)
-builder.create_timing_arc(TimingArcType.seq_start, clk, mem_wstrb)
-builder.create_timing_arc(TimingArcType.seq_end,   clk, mem_rdata)
-builder.create_timing_arc(TimingArcType.seq_end,   clk, irq)
+builder.create_timing_arc("seq_end",    clk, resetn)
+builder.create_timing_arc("seq_start",  clk, mem_valid)
+builder.create_timing_arc("seq_start",  clk, mem_instr)
+builder.create_timing_arc("seq_end",    clk, mem_ready)
+builder.create_timing_arc("seq_start",  clk, mem_addr)
+builder.create_timing_arc("seq_start",  clk, mem_wdata)
+builder.create_timing_arc("seq_start",  clk, mem_wstrb)
+builder.create_timing_arc("seq_end",    clk, mem_rdata)
+builder.create_timing_arc("seq_end",    clk, irq)
 
 builder = builder.build_design_view_counterpart(
         # Use absolute path here, so the file is not copied into our generated RTL directory
