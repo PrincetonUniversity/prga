@@ -355,7 +355,7 @@ Run the script
 --------------
 
 To run this Python script, you first need to enable the PRGA virtual environment
-(see :ref:`Run a Quick Test`).
+(see :ref:`quickstart:Run a Quick Test`).
 Then, you may either run the script directly with Python, or run ``make`` inside
 the ``examples/fpga/scanchain/fle6_N2_mem2K_8x8`` directory.
 You may also copy the script to any directory you like, and simply execute

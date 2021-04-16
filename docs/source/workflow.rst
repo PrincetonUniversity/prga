@@ -3,13 +3,13 @@ PRGA Workflow
 
 A typical PRGA workflow consists of three major steps:
 
-1. :ref:`FPGA Design`: Design and customize FPGA architecture, then generate
+1. :ref:`workflow:FPGA Design`: Design and customize FPGA architecture, then generate
    ASIC-compatible RTL for the FPGA. PRGA also generates all the CAD scripts
-   needed by the :ref:`Application Development` step.
-2. :ref:`Application Development`: Use `Yosys`_ and `VPR`_ to synthesize, place
+   needed by the :ref:`workflow:Application Development` step.
+2. :ref:`workflow:Application Development`: Use `Yosys`_ and `VPR`_ to synthesize, place
    and route an RTL application, then use PRGA to generate the
    bitstream for the custom FPGA.
-3. :ref:`Incremental Verification`: Run behavioral simulation with
+3. :ref:`workflow:Incremental Verification`: Run behavioral simulation with
    user-provided testbench,
    then post-synthesis (LUT-based) simulation, and ultimately full-fabric,
    post-implementation simulation.
@@ -28,7 +28,7 @@ FPGA Design
 The first major step, **FPGA Design** flow, is driven by a user-written Python
 script using the PRGA API.
 Example scripts can be found and ran under the `examples/fpga`_ directory.
-More information can be found at :ref:`Tutorials`.
+More information can be found at :ref:`tutorial/index:Tutorials`.
 
 .. _examples/fpga: https://github.com/PrincetonUniversity/prga/tree/release/examples/fpga
 
@@ -66,8 +66,8 @@ etc.
 However, FPGA designers often want to add custom components into the
 FPGA, for example, real SRAM macros, hard arithmetic units, or even large,
 complex IP cores like hard CPUs, memory controllers, PCIe interfaces, etc.
-All these components are classified as :ref:`Logic Primitive` s in PRGA, and PRGA
-users can easily add custom :ref:`Logic Primitive` s at the beginning of their
+All these components are classified as :ref:`arch:Logic Primitive` s in PRGA, and PRGA
+users can easily add custom :ref:`arch:Logic Primitive` s at the beginning of their
 Python script.
 An example FPGA with a hard `PicoRV32`_ CPU and custom negative-edge-triggered
 flipflops can be found at `examples/fpga/magic/hardpico`_.
@@ -87,16 +87,20 @@ After database preparation, FPGA designers can design and customize the desired
 FPGA architecture by creating programmable blocks and assembling them in a
 hierarchical manner.
 As shown in the figure above, the FPGA is organized as a 2-dimensional
-:ref:`Array` of :ref:`Tile` s, :ref:`Switch Box<Connection and Switch Box>` es,
-and nested :ref:`Array` s.
-Each :ref:`Tile` contains one :ref:`Logic Block<Logic and IO Block>` or multiple
-:ref:`IO Block<Logic and IO Block>` s, in addition to various numbers of
-:ref:`Connection Box<Connection and Switch Box>` es.
-Each :ref:`Logic Block<Logic and IO Block>` or :ref:`IO Block<Logic and IO
-Block>` consists of zero to many :ref:`Slice` s and :ref:`Logic Primitive` s.
-:ref:`Slice` s are composed of nested :ref:`Slice` s and
-:ref:`Logic Primitive` s.
+:ref:`arch:Array` of :ref:`arch:Tile` s,
+:ref:`Switch Box<arch:Connection and Switch Box>` es,
+and nested :ref:`arch:Array` s.
+Each :ref:`arch:Tile` contains one
+:ref:`Logic Block<arch:Logic and IO Block>` or multiple
+:ref:`IO Block<arch:Logic and IO Block>` s, in addition to various numbers of
+:ref:`Connection Box<arch:Connection and Switch Box>` es.
+Each :ref:`Logic Block<arch:Logic and IO Block>` or
+:ref:`IO Block<arch:Logic and IO Block>` consists of zero to many
+:ref:`arch:Slice` s and :ref:`arch:Logic Primitive` s.
+:ref:`arch:Slice` s are composed of nested :ref:`arch:Slice` s and
+:ref:`arch:Logic Primitive` s.
 Readers familiar with `VPR`_ should find these concept pretty intuitive.
+For more information, please refer to :ref:`arch:Architecture & Customizability`.
 
 One key feature of PRGA is the decoupling of the functional abstraction of an
 FPGA, the underlying configuration memory, and the physical implementation of
@@ -110,12 +114,9 @@ specifying how the MUX/BUFFER tree should be constructed.
 
 This decoupling is enabled by using different `ModuleView` s of the same modules in
 different steps.
-This is covered in more detail in the :ref:`Module View` section.
+This is covered in more detail in the :ref:`arch:Module View` section.
 During the architecture customization step, all modules are customized in
-the `abstract`_ view.
-
-.. _abstract: :py:obj:`ModuleView.abstract`
-.. _design: :py:obj:`ModuleView.design`
+the :ref:`abstract<arch:Module View>` view.
 
 Flow and Passes
 ^^^^^^^^^^^^^^^
@@ -128,16 +129,16 @@ conflict and ordering between ``Pass`` es.
 
 Here's a list of the most commonly used ``Pass`` es:
 
-- `Translation`: This pass generates the `design`_ view for modules in
-  the `abstract`_ view by linking :ref:`Logic Primitive` s and implementing the
+- `Translation`: This pass generates the :ref:`design<arch:Module View>` view for modules in
+  the :ref:`abstract<arch:Module View>` view by linking :ref:`arch:Logic Primitive` s and implementing the
   abstract configuratble connections with switch modules.
 - `SwitchPathAnnotation`: This pass analyzes the switch modules instantiated
-  in the `design`_ view, and annotate the MUX/BUFFER paths back to the
-  `abstract`_ view.
+  in the :ref:`design<arch:Module View>` view, and annotate the MUX/BUFFER paths back to the
+  :ref:`abstract<arch:Module View>` view.
   This information is used by ``FASM`` metadata generation during `VPR`_ script
   generation.
 - ``*.InsertProgCircuitry``: This pass inserts configuration memory into the
-  `design`_ view.
+  :ref:`design<arch:Module View>` view.
   This pass is specific to configuration circuitry types, e.g.
   `Scanchain.InsertProgCircuitry` and `Pktchain.InsertProgCircuitry`.
 - `VPRArchGeneration` and `VPR_RRG_Generation`: These two passes
@@ -145,7 +146,7 @@ Here's a list of the most commonly used ``Pass`` es:
   specification, respectively.
 - `VerilogCollection`: This pass inspects the `Context` object and creates
   RTL generation tasks for all the modules in a `FileRenderer` object.
-  RTL Verilog files are generated based on the `design`_ views.
+  RTL Verilog files are generated based on the :ref:`design<arch:Module View>` views.
 - `YosysScriptsCollection`: This pass inspects the `Context` object and
   creates `Yosys`_ script generation tasks, including the main synthesis script,
   technology mapping script, block RAM inferrence script, and so on.
@@ -179,7 +180,7 @@ are generated in a complete FPGA design flow and can be reused when mapping
 different RTL applications onto the same FPGA.
 Below is an example structure of the generated files:
 
-.. code-block::
+.. code-block:: bash
 
     project/
      +- ctx.pkl                     # pickled (serialized) context
@@ -268,7 +269,7 @@ The following is an example YAML configuration file:
 With this example configuration, `prga.tools.wizard` generates the following
 directories and files:
 
-.. code-block::
+.. code-block:: bash
    
     project/
      +- design/
@@ -319,7 +320,7 @@ Debugging the FPGA and the application at the same time can be very challenging.
 Therefore, PRGA provides an automated, incremental flow to verify the FPGA and
 the application.
 
-`prga.tools.wizard` introduced in the :ref:`Application Development` section
+`prga.tools.wizard` introduced in the :ref:`workflow:Application Development` section
 generates sub-projects for each test.
 To run the post-implementation test, simply run ``make`` in the ``test/test_A``
 directory.

@@ -85,3 +85,6 @@ autodoc_default_options = {
 
 # Napoleon settings
 napoleon_google_docstring = True
+
+# autosectionlabel settings
+autosectionlabel_prefix_document = True
