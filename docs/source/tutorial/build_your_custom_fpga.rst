@@ -66,7 +66,8 @@ a memory module:
 
 .. code-block:: python
     
-    memory = ctx.create_memory("dpram_a8d8", 8, 8).commit()
+    # create a memory primitive:    name,         addr width,   data width
+    memory = ctx.create_memory(     "dpram_a8d8", 8,            8).commit()
 
 PRGA also provides API for adding and using arbitrary Verilog modules in the FPGA,
 for example `Context.build_primitive`. Multi-modal primitives are also supported
@@ -83,6 +84,10 @@ Then, we can describe the CLB/IOB structures in our custom FPGA. Use
 object to build the desired block. After describing
 the desired block, use the ``commit`` method of the builder to commit
 the module into the `Context` database.
+
+In this example we'll be using ``FLE6`` as our basic logic element.
+``FLE6`` contains one fracturable LUT6, one hard adder, and two flipflops.
+The fracturable LUT6 may be used as two LUT5s with shared inputs.
 
 .. code-block:: python
 
@@ -108,10 +113,10 @@ the module into the `Context` database.
     #                                            module to be instantiated, name,        number of instances
     for i, inst in enumerate(builder.instantiate(ctx.primitives["fle6"],    "i_cluster", 2)):
         
-        # connect nets
-        builder.connect( clk,                inst.pins['clk'] )
-        builder.connect( in_[6*i : 6*(i+1)], inst.pins['in']  )
-        builder.connect( inst.pins['out'],   out[2*i : 2*(i+1)] )
+        # connect nets:  driver (source) nets,  drivee (sink) nets
+        builder.connect( clk,                   inst.pins['clk'] )
+        builder.connect( in_[6*i : 6*(i+1)],    inst.pins['in']  )
+        builder.connect( inst.pins['out'],      out[2*i : 2*(i+1)] )
 
         # 'vpr_pack_pattern' is a keyword-only argument. See
         # "https://docs.verilogtorouting.org/en/latest/arch/reference/#tag-%3Cpack_patternname="
@@ -207,7 +212,13 @@ by calling `TileBuilder.fill` and `ArrayBuilder.fill` methods.
         # auto-generate connection boxes and fill connection box patterns
         #              default input FC value,  default output FC value
         builder.fill( (1.,                      1.) )
+
         #   FC values affect how many tracks each block pin is connected to
+        #
+        #   In this example we use ratio-based FC values, so "1." means 100%
+        #   connection, "0.4" means 40% connection. The bigger the FC values,
+        #   the more routable the FPGA is. However, bigger FC values also result
+        #   in more hardware resources, and may slow down the FPGA itself.
 
         # automatically connect ports/pins in the tile
         builder.auto_connect()
@@ -216,6 +227,8 @@ by calling `TileBuilder.fill` and `ArrayBuilder.fill` methods.
         iotiles[ori] = builder.commit()
 
     # Concatenate build, fill, auto-connect and commit
+    #
+    #   We use less
     clbtile = ctx.build_tile(clb).fill( (0.4, 0.25) ).auto_connect().commit()
     bramtile = ctx.build_tile(bram).fill( (0.4, 0.25) ).auto_connect().commit()
 
@@ -232,9 +245,9 @@ and switch box slots:
     
     # Create an array builder
     #                         name,       width, height
-    builder = ctx.build_array('subarray', 3,     3,     set_as_top = False)
+    builder = ctx.build_array('subarray', 4,     4,     set_as_top = False)
     for x, y in product(range(builder.width), range(builder.height)):
-        if x == 1:
+        if x == 2:
             if y % 2 == 0:
                 builder.instantiate(bramtile, (x, y))
         else:
@@ -244,7 +257,7 @@ and switch box slots:
     subarray = builder.fill( pattern ).auto_connect().commit()
 
     # Create the top-level array builder
-    builder = ctx.build_array('top', 8, 8, set_as_top = True)
+    builder = ctx.build_array('top', 10, 10, set_as_top = True)
     for x, y in product(range(builder.width), range(top_height)):
         # leave the corners empty
         if x in (0, builder.width - 1) and y in (0, builder.height - 1):
@@ -261,7 +274,7 @@ and switch box slots:
             builder.instantiate(iotiles[Orientation.north], (x, y))
 
         # subarrays
-        elif x % 3 == 1 and y % 3 == 1:
+        elif x % 4 == 1 and y % 4 == 1:
             builder.instantiate(subarray, (x, y))
 
     # commit the top-level array
@@ -337,3 +350,13 @@ assembler.
 
     # Pickle the context
     ctx.pickle("ctx.pkl")
+
+Run the script
+--------------
+
+To run this Python script, you first need to enable the PRGA virtual environment
+(see :ref:`quickstart:Run a Quick Test`).
+Then, you may either run the script directly with Python, or run ``make`` inside
+the ``examples/fpga/scanchain/fle6_N2_mem2K_8x8`` directory.
+You may also copy the script to any directory you like, and simply execute
+``python build.py`` in there.

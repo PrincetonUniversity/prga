@@ -84,5 +84,5 @@ jobs:
         uses: ./.github/actions/run_example
         with:
           fpga_path: magic/k4_N2_8x8
-          design_path: bcd2bin/magic_k4_N2_8x8
+          app_path: bcd2bin/magic_k4_N2_8x8
           test: basic

@@ -1,12 +1,12 @@
 name: Run an example
-description: Build an FPGA example, then run an example design on it
+description: Build an FPGA example, then run an example application on it
 inputs:
   fpga_path:
     description: Path to the FPGA example relative to the examples/fpga directory
     required: true
     default: ""
-  design_path:
-    description: Path to the design example relative to the examples/app directory
+  app_path:
+    description: Path to the application example relative to the examples/app directory
     required: true
     default: ""
   test:
@@ -27,40 +27,40 @@ runs:
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.app_path }}
         popd
 
     - name: Run behavioral simulation of the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}/tests/${{ inputs.test }} behav
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.app_path }}/tests/${{ inputs.test }} behav
         popd
 
     - name: Run synthesis for the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}/design syn
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.app_path }}/app syn
         popd
 
     - name: Run post-synthesis simulation of the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}/tests/${{ inputs.test }} postsyn
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.app_path }}/tests/${{ inputs.test }} postsyn
         popd
 
     - name: Run the full RTL-to-bitstream flow for the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}/design
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.app_path }}/app
         popd
 
     - name: Run post-implementation simulation of the application
       shell: bash
       run: |
         pushd ${GITHUB_WORKSPACE}
-        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.design_path }}/tests/${{ inputs.test }} postimpl
+        bash envscr/run make -C ${PWD}/examples/app/${{ inputs.app_path }}/tests/${{ inputs.test }} postimpl
         popd

@@ -87,12 +87,12 @@ To run an application-implementation example, run the following commands:
    # re-activate the virtual environment if you are not in it
    # make sure you build the corresponding FPGA first
 
-   cd examples/target/bcd2bin/scanchain_k4_N2_8x8  # choose one design and one FPGA
-   make                                            # make project
-   make -C design                                  # run RTL-to-bitstream flow
-   make -C tests/basic behav                       # run behavioral verification
-   make -C tests/basic postsyn                     # run post-synthesis verification
-   make -C tests/basic postimpl                    # run post-implementation verification
+   cd examples/app/bcd2bin/scanchain_k4_N2_8x8      # choose one application and one FPGA
+   make                                             # make project
+   make -C design                                   # run RTL-to-bitstream flow
+   make -C tests/basic behav                        # run behavioral verification
+   make -C tests/basic postsyn                      # run post-synthesis verification
+   make -C tests/basic postimpl                     # run post-implementation verification
 
 .. _envscr/install: https://github.com/PrincetonUniversity/prga/blob/release/envscr/install
 .. _envscr/activate: https://github.com/PrincetonUniversity/prga/blob/release/envscr/activate

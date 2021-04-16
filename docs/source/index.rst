@@ -29,7 +29,9 @@ Contents
    :caption: Contents:
 
    quickstart
+   fpga_primer
    workflow
+   arch
    tutorial/index
    API Reference <prga.py/modules>
 
