@@ -13,12 +13,14 @@ Subpackages
    :maxdepth: 4
 
    prga.algorithm
+   prga.app
    prga.core
    prga.integration
    prga.netlist
    prga.passes
    prga.prog
    prga.renderer
+   prga.system
    prga.tools
 
 Submodules

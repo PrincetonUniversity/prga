@@ -1,0 +1,5 @@
+/*/*
+!/src/*.v
+!/src/include
+!/*/Makefile
+!/*/config

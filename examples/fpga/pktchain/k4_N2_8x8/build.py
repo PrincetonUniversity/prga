@@ -3,7 +3,7 @@ from itertools import product
 
 import sys
 
-ctx = Pktchain.new_context( chain_width = 1, phit_width = 4 )
+ctx = Context()
 gbl_clk = ctx.create_global("clk", is_clock = True)
 gbl_clk.bind((0, 1), 0)
 ctx.create_segment('L1', 20, 1)
@@ -60,6 +60,12 @@ for x, y in product(range(builder.width), range(builder.height)):
         builder.instantiate(clbtile, (x, y))
 top = builder.fill( SwitchBoxPattern.cycle_free ).auto_connect().commit()
 
+Flow(
+        VPRArchGeneration('vpr/arch.xml'),
+        VPR_RRG_Generation('vpr/rrg.xml'),
+        YosysScriptsCollection('syn'),
+        ).run(ctx)
+
 def iter_instances(module):
     if module.name == "top":
         for x in range(4):
@@ -69,55 +75,53 @@ def iter_instances(module):
                 for corner in Corner:
                     if (box := module.instances.get( ((x * 2 + xx, 7), corner) )) is not None:
                         yield box
-            yield None
+            yield Pktchain.TERMINATE_LEAF
             for yy in range(3):
                 if (t := module.instances.get( (x * 2, 6 - yy) )) is not None:
                     yield t
                 for corner in Corner:
                     if (box := module.instances.get( ((x * 2, 6 - yy), corner) )) is not None:
                         yield box
-            yield None
+            yield Pktchain.TERMINATE_LEAF
             for yy in range(3):
                 if (t := module.instances.get( (x * 2, 3 - yy) )) is not None:
                     yield t
                 for corner in Corner:
                     if (box := module.instances.get( ((x * 2, 3 - yy), corner) )) is not None:
                         yield box
-            yield None
+            yield Pktchain.TERMINATE_LEAF
             for xx in range(2):
                 if (t := module.instances.get( (x * 2 + xx, 0) )) is not None:
                     yield t
                 for corner in Corner:
                     if (box := module.instances.get( ((x * 2 + xx, 0), corner) )) is not None:
                         yield box
-            yield None
+            yield Pktchain.TERMINATE_LEAF
             for yy in range(3):
                 if (t := module.instances.get( (x * 2 + 1, 1 + yy) )) is not None:
                     yield t
                 for corner in Corner:
                     if (box := module.instances.get( ((x * 2 + 1, 1 + yy), corner) )) is not None:
                         yield box
-            yield None
+            yield Pktchain.TERMINATE_LEAF
             for yy in range(3):
                 if (t := module.instances.get( (x * 2 + 1, 4 + yy) )) is not None:
                     yield t
                 for corner in Corner:
                     if (box := module.instances.get( ((x * 2 + 1, 4 + yy), corner) )) is not None:
                         yield box
-            yield None
-            yield None
+            yield Pktchain.TERMINATE_LEAF
+            yield Pktchain.TERMINATE_BRANCH
     else:
         for i in module.instances.values():
             yield i
 
 Flow(
+        Materialization('pktchain', chain_width = 1, phit_width = 4),
         Translation(),
         SwitchPathAnnotation(),
-        Pktchain.InsertProgCircuitry(iter_instances = iter_instances),
-        VPRArchGeneration('vpr/arch.xml'),
-        VPR_RRG_Generation('vpr/rrg.xml'),
+        ProgCircuitryInsertion(iter_instances = iter_instances),
         VerilogCollection('rtl'),
-        YosysScriptsCollection('syn'),
-        ).run(ctx, Pktchain.new_renderer())
+        ).run(ctx)
 
 ctx.pickle("ctx.pkl" if len(sys.argv) < 2 else sys.argv[1])

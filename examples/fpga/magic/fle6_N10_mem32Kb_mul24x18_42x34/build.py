@@ -3,8 +3,6 @@ from prga import *
 from itertools import product
 import sys
 
-r = Magic.new_renderer()
-    
 try:
     ctx = Context.unpickle("ctx.tmp.pkl")
 
@@ -20,7 +18,7 @@ except FileNotFoundError:
     mul_a_width = 24
     mul_b_width = 18
     
-    ctx = Magic.new_context()
+    ctx = Context()
     
     gbl_clk = ctx.create_global("clk", is_clock = True)
     gbl_clk.bind((0, 1), 0)
@@ -117,20 +115,19 @@ except FileNotFoundError:
     top = builder.fill( pattern ).auto_connect().commit()
     
     Flow(
-            Translation(),
-            SwitchPathAnnotation(),
-            Magic.InsertProgCircuitry(),
             VPRArchGeneration("vpr/arch.xml"),
             VPR_RRG_Generation("vpr/rrg.xml"),
-            # VerilogCollection('rtl'),
-            # YosysScriptsCollection("syn"),
-            ).run(ctx, r)
+            YosysScriptsCollection("syn"),
+            ).run(ctx)
 
     ctx.pickle("ctx.tmp.pkl")
 
 Flow(
+        Materialization('magic'),
+        Translation(),
+        SwitchPathAnnotation(),
+        ProgCircuitryInsertion(),
         VerilogCollection('rtl'),
-        YosysScriptsCollection("syn"),
-        ).run(ctx, r)
+        ).run(ctx)
 
 ctx.pickle(sys.argv[1] if len(sys.argv) > 1 else "ctx.pkl")
