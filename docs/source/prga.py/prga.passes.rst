@@ -23,6 +23,8 @@ Submodules
    prga.passes.annotation
    prga.passes.base
    prga.passes.flow
+   prga.passes.materialization
+   prga.passes.proginsertion
    prga.passes.rtl
    prga.passes.translation
    prga.passes.yosys

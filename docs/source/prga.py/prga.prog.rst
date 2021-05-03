@@ -12,6 +12,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   prga.prog.frame
    prga.prog.magic
    prga.prog.pktchain
    prga.prog.scanchain
