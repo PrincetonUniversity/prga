@@ -3,7 +3,7 @@ from itertools import product
 
 import sys
 
-ctx = Scanchain.new_context(2)
+ctx = Context()
 gbl_clk = ctx.create_global("clk", is_clock = True)
 gbl_clk.bind((0, 1), 0)
 ctx.create_segment('L1', 20, 1)
@@ -20,7 +20,7 @@ clk = builder.create_global(gbl_clk, Orientation.south)
 in_ = builder.create_input("in", 16, Orientation.west)
 out = builder.create_output("out", 8, Orientation.east)
 cin = builder.create_input("cin", 1, Orientation.south)
-for i, inst in enumerate(builder.instantiate(ctx.primitives["grady18"], "i_grady18", 2)):
+for i, inst in enumerate(builder.instantiate(ctx.primitives["grady18:v0"], "i_grady18", 2)):
     builder.connect(clk, inst.pins['clk'])
     builder.connect(in_[8 * i: 8 * (i + 1)], inst.pins['in'])
     builder.connect(inst.pins["cout_fabric"], out[4 * i + 2: 4 * i + 4])
@@ -56,13 +56,14 @@ for x, y in product(range(builder.width), range(builder.height)):
 top = builder.fill( SwitchBoxPattern.cycle_free ).auto_connect().commit()
 
 Flow(
-        Translation(),
-        SwitchPathAnnotation(),
-        Scanchain.InsertProgCircuitry(),
         VPRArchGeneration('vpr/arch.xml'),
         VPR_RRG_Generation('vpr/rrg.xml'),
-        VerilogCollection('rtl'),
         YosysScriptsCollection('syn'),
-        ).run(ctx, Scanchain.new_renderer())
+        Materialization('scanchain', chain_width = 2),
+        Translation(),
+        SwitchPathAnnotation(),
+        ProgCircuitryInsertion(),
+        VerilogCollection('rtl'),
+        ).run(ctx)
 
 ctx.pickle("ctx.pkl" if len(sys.argv) < 2 else sys.argv[1])

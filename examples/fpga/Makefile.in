@@ -1,5 +1,5 @@
 PICKLED_CTX := ctx.pkl
-BACKUP ?= $(shell bin/date "+%Y-%m-%d-%H-%M")
+BACKUP ?= $(shell date "+%Y-%m-%d-%H-%M")
 
 SHELL = /bin/bash
 .SHELLFLAGS = -o pipefail -c
@@ -13,17 +13,18 @@ clean:
 backup:
 	if [[ -d backup-$(BACKUP) ]]; then echo "Backup $(BACKUP) already exists"; exit 1; fi
 	mkdir backup-$(BACKUP)
-	cp $(PICKLED_CTX) backup-$(BACKUP)
-	cp -r rtl backup-$(BACKUP)
-	cp -r syn backup-$(BACKUP)
-	cp -r vpr backup-$(BACKUP)
+	mv $(PICKLED_CTX) backup-$(BACKUP)
+	mv rtl backup-$(BACKUP)
+	mv syn backup-$(BACKUP)
+	mv vpr backup-$(BACKUP)
 
 recover:
 	if [[ ! -d backup-$(BACKUP) ]]; then echo "Backup $(BACKUP) does not exist"; exit 1; fi
-	rm -rf $(PICKLED_CTX) && cp backup-$(BACKUP)/$(PICKLED_CTX) .
-	rm -rf rtl && cp -r backup-$(BACKUP)/rtl .
-	rm -rf syn && cp -r backup-$(BACKUP)/syn .
-	rm -rf vpr && cp -r backup-$(BACKUP)/vpr .
+	rm -rf $(PICKLED_CTX) && mv backup-$(BACKUP)/$(PICKLED_CTX) .
+	rm -rf rtl && mv backup-$(BACKUP)/rtl .
+	rm -rf syn && mv backup-$(BACKUP)/syn .
+	rm -rf vpr && mv backup-$(BACKUP)/vpr .
+	rmdir backup-$(BACKUP)
 
 clean-backup:
 	rm -rf backup-*
