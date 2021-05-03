@@ -3,12 +3,12 @@ from itertools import product
 
 import sys
 
-ctx = Scanchain.new_context()
+ctx = Context()
 gbl_clk = ctx.create_global("clk", is_clock = True)
 gbl_clk.bind((0, 1), 0)
 ctx.create_segment('L2', 20, 2)
 
-memory = ctx.create_memory("ram_a8d8", 8, 8)
+memory = ctx.create_memory(8, 8)
 
 builder = ctx.build_logic_block("clb")
 clk = builder.create_global(gbl_clk, Orientation.south)
@@ -85,17 +85,15 @@ for x, y in product(range(builder.width), range(builder.height)):
         builder.instantiate(subarray, (x, y))
 top = builder.fill( pattern ).auto_connect().commit()
 
-renderer = Scanchain.new_renderer()
-
-flow = Flow(
-        Translation(),
-        SwitchPathAnnotation(),
-        Scanchain.InsertProgCircuitry(),
+Flow(
         VPRArchGeneration('vpr/arch.xml'),
         VPR_RRG_Generation('vpr/rrg.xml'),
-        VerilogCollection('rtl'),
         YosysScriptsCollection('syn'),
-        )
-flow.run(ctx, renderer)
+        Materialization('scanchain', chain_width = 1),
+        Translation(),
+        SwitchPathAnnotation(),
+        ProgCircuitryInsertion(),
+        VerilogCollection('rtl'),
+        ).run(ctx)
 
 ctx.pickle("ctx.pkl" if len(sys.argv) < 2 else sys.argv[1])

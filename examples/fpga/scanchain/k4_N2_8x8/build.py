@@ -3,7 +3,7 @@ from itertools import product
 
 import sys
 
-ctx = Scanchain.new_context()
+ctx = Context()
 gbl_clk = ctx.create_global("clk", is_clock = True)
 gbl_clk.bind((0, 1), 0)
 ctx.create_segment('L1', 20, 1)
@@ -61,13 +61,14 @@ for x, y in product(range(builder.width), range(builder.height)):
 top = builder.fill( SwitchBoxPattern.cycle_free ).auto_connect().commit()
 
 Flow(
-        Translation(),
-        SwitchPathAnnotation(),
-        Scanchain.InsertProgCircuitry(),
         VPRArchGeneration('vpr/arch.xml'),
         VPR_RRG_Generation('vpr/rrg.xml'),
-        VerilogCollection('rtl'),
         YosysScriptsCollection('syn'),
-        ).run(ctx, Scanchain.new_renderer())
+        Materialization('scanchain'),
+        Translation(),
+        SwitchPathAnnotation(),
+        ProgCircuitryInsertion(),
+        VerilogCollection('rtl'),
+        ).run(ctx)
 
 ctx.pickle("ctx.pkl" if len(sys.argv) < 2 else sys.argv[1])

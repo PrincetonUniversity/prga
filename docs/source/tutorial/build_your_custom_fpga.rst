@@ -1,3 +1,4 @@
+
 Build Your Custom FPGA
 ======================
 
@@ -16,13 +17,6 @@ layout and routing resources. It also stores and manages all created/generated
 modules and other information about the FPGA, which are later used by the
 RTL-to-bitstream flow.
 
-To create a `Context` object, call the ``new_context`` class method of a
-configuration circuitry class, for example, `Scanchain`. This is because
-different configuration circuitry needs to initialize the `Context` object
-differently. For example, the configuration cell in a SRAM-based configuration
-circuitry are SRAM cells, while the `Scanchain` configuration circuitry simply
-uses D-Flipflops.
-
 .. code-block:: python
 
     from prga import *
@@ -30,8 +24,8 @@ uses D-Flipflops.
     
     import sys
 
-    # Use single-bit scanchain configuration circuitry
-    ctx = Scanchain.new_context()
+    # create a new context
+    ctx = Context()
 
 After creating the `Context` object, we can start to describe our custom FPGA.
 Here, we first describe the routing resources in the FPGA: the routing wire
@@ -66,8 +60,8 @@ a memory module:
 
 .. code-block:: python
     
-    # create a memory primitive:    name,         addr width,   data width
-    memory = ctx.create_memory(     "dpram_a8d8", 8,            8).commit()
+    # create a memory primitive: addr width,   data width
+    memory = ctx.create_memory(  8,            8 )
 
 PRGA also provides API for adding and using arbitrary Verilog modules in the FPGA,
 for example `Context.build_primitive`. Multi-modal primitives are also supported
@@ -280,44 +274,26 @@ and switch box slots:
     # commit the top-level array
     top = builder.fill( pattern ).auto_connect().commit()
 
-Auto-complete the architecture, generate RTL and other files
+Generate Yosys and VPR scripts
 ------------------------------------------------------------
 
-PRGA uses `Jinja2`_ for generating most files. `Jinja2`_ is a templating
-language/framework for Python. It is fast, lightweight, and also compatible with
-plain text.
+After describing the desired FPGA architecture, we can generate the scripts for
+our RTL-to-bitstream flow.
+Specifically, PRGA generates the `Yosys`_ scripts for synthesizing an
+application for the custom FPGA, and the `VPR`_ scripts for placing and routing
+the synthesized application.
 
-To set up a `Jinja2`_ environment, call the ``new_renderer`` method of the same
-configuration circuitry class used to create the `Context`. This points the
-`Jinja2`_ environment to the correct directories to look for Verilog and other
-templates.
-
-.. _Jinja2: https://jinja.palletsprojects.com/en/2.11.x/
-
-.. code-block:: python
-    
-    renderer = Scanchain.new_renderer()
+.. _Yosys: http://www.clifford.at/yosys
+.. _VPR: https://verilogtorouting.org/
 
 PRGA adopts a pass-based flow to complete, modify, optimize the FPGA
 architecture as well as generate all files for the architecture. A `Flow` object
 is used to manage and run all the passes. It also checks and resolves the
-dependences between the passes. For example, the `VerilogCollection` pass
-requires `Translation` as a dependency. Even if a `Translation` pass is
-added after a `VerilogCollection` pass, it will be executed before the
-`VerilogCollection` pass.
+dependences between the passes.
 
 .. code-block:: python
 
     flow = Flow(
-
-        # This pass converts user-defined modules to Verilog modules
-        Translation(),
-
-        # Analyze how configurable connections are implemented with switches
-        SwitchPathAnnotation(),
-
-        # This pass inserts configuration circuitry into the FPGA
-        Scanchain.InsertProgCircuitry(),
 
         # This pass generates the architecture specification for VPR to place
         # and route designs onto this FPGA
@@ -327,16 +303,73 @@ added after a `VerilogCollection` pass, it will be executed before the
         # to place and route designs onto this FPGA
         VPR_RRG_Generation("vpr/rrg.xml"),
 
-        # This pass create Verilog rendering tasks in the renderer.
-        VerilogCollection('rtl'),
-
         # This pass analyzes the primitives in the FPGA and generates synthesis
         # script for Yosys
         YosysScriptsCollection(r, "syn"),
         )
 
     # Run the flow on our context
-    flow.run(ctx, renderer)
+    flow.run(ctx)
+
+After this step, PRGA should generate the following files:
+
+.. code-block:: bash
+
+    +- syn/
+    |   +- m_adder.lib.v        # behavioral model for logic primitive "adder"
+    |   +- m_adder.techmap.v    # technology mapping rules for logic primitve "adder"
+    |   |
+    |   +- m_ram_1r1w.lib.v     # behavioral model for the block RAM primitive
+    |   +- memory.techmap.v     # technology mapping rules for the block RAM primitive
+    |   +- bram.rule            # block RAM inference rules for Yosys
+    |   |
+    |   +- read_lib.tcl         # Yosys script for reading in the primitives as lib cells
+    |   +- synth.tcl            # Yosys script for synthesizing an application
+    |
+    +- vpr/
+        +- arch.xml             # VPR's architecture description
+        +- rrg.xml              # VPR's routing resource graph
+
+Auto-complete the architecture, generate RTL, and serialize the context
+-----------------------------------------------------------------------
+
+.. PRGA uses `Jinja2`_ for generating most files. `Jinja2`_ is a templating
+   language/framework for Python. It is fast, lightweight, and also compatible with
+   plain text.
+
+.. _Jinja2: https://jinja.palletsprojects.com/en/2.11.x/
+
+We have not yet chosen the programming protocol for the custom FPGA until this
+point in our script.
+This is intended to facilitate early and fast design-space exploration before
+diving into the vast physical optimization space.
+
+To choose the programming protocol and then implement the abstract FPGA
+architecture with synthesizable RTL, run the following pases:
+
+.. code-block:: python
+
+    flow = Flow(
+
+        # This pass chooses the programming protocol, and adds protocol-specific
+        # designs into the context
+        Materialization("scanchain", chain_width = 1),
+
+        # This pass converts user-defined modules to Verilog modules
+        Translation(),
+
+        # Analyze how configurable connections are implemented with switches
+        SwitchPathAnnotation(),
+
+        # This pass inserts configuration circuitry into the FPGA
+        ProgCircuitryInsertion(),
+
+        # This pass create Verilog rendering tasks in the renderer.
+        VerilogCollection('rtl'),
+        )
+
+    # Run the flow on our context
+    flow.run(ctx)
 
 After running the flow, all the models and information about our FPGA are stored
 in the context, and all the file are generated. As the final step, we make a

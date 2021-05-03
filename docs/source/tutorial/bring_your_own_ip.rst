@@ -31,6 +31,15 @@ implementation of `PicoSoC`_.
 .. _PicoRV32: https://github.com/cliffordwolf/picorv32
 .. _PicoSoC: https://github.com/cliffordwolf/picorv32/tree/master/picosoc
 
+.. image:: /_static/images/picosoc.PNG
+   :width: 600px
+   :alt: PicoSoC implemented on an FPGA with a hard PicoRV32 core
+   :align: center
+
+Figure created by `VPR`_.
+
+.. _VPR: https://verilogtorouting.org/
+
 Describe custom primitives
 --------------------------
 

@@ -18,10 +18,7 @@ try:
     ctx = Context.unpickle("ctx.tmp.pkl")
 
 except FileNotFoundError:
-    ctx = Pktchain.new_context(
-            phit_width = PHIT_WIDTH,
-            chain_width = CHAIN_WIDTH,
-            )
+    ctx = Context()
 
     # ============================================================================
     # -- Routing Resources -------------------------------------------------------
@@ -47,7 +44,7 @@ except FileNotFoundError:
 
     clk = builder.create_global(glb_clk,                            Orientation.south)
     in_ = builder.create_input ("in",
-            N * len(ctx.primitives["grady18v2"].ports["in"]) // 2,  Orientation.east)
+            N * len(ctx.primitives["grady18"].ports["in"]) // 2,    Orientation.east)
     ce = builder.create_input  ("ce",   1,                          Orientation.east)
     ci  = builder.create_input ("ci",   1,                          Orientation.south)
     out = builder.create_output("out",  N * 2,                      Orientation.east)
@@ -56,7 +53,7 @@ except FileNotFoundError:
     xbar_i, xbar_o = [], []
     xbar_i.extend(in_)
 
-    for i, inst in enumerate(builder.instantiate(ctx.primitives["grady18v2"], "i_cluster", N)):
+    for i, inst in enumerate(builder.instantiate(ctx.primitives["grady18"], "i_cluster", N)):
         builder.connect(clk,                inst.pins['clk'])
         builder.connect(ce,                 inst.pins["ce"])
         builder.connect(inst.pins['out'],   out[(l := len(inst.pins["out"])) * i: l * (i + 1)])
@@ -155,93 +152,96 @@ except FileNotFoundError:
         builder.instantiate(iotiles[Orientation.east],  (M_LOGIC * W_LOGIC + 1, y + 1))
     top = builder.fill( pattern ).auto_connect().commit()
 
-    # ============================================================================
-    # -- Configuration Chain Injection -------------------------------------------
-    # ============================================================================
-    def iter_instances(module):
-        if module.name == "tile_clb":
-            yield module.instances[0]
-            yield module.instances[Orientation.east, 0]
-        elif module.name.startswith("tile_iob_"):
-            for i in range(NUM_IOB_PER_TILE):
-                yield module.instances[i]
-            for ori in Orientation:
-                if i := module.instances.get( (ori, 0) ):
-                    yield i
-        elif module.name == "tile_bram":
-            yield module.instances[Orientation.east, 0]
-            yield module.instances[Orientation.east, 1]
-            yield module.instances[0]
-        elif module.name == "subarray":
-            for y in range(module.height):
-                for x in range(module.width):
-                    if x > 0 and (i := module.instances.get( ((x, y), Corner.southwest) )): yield i
-                    if i := module.instances.get( (x, y) ): yield i
-                    if i := module.instances.get( ((x, y), Corner.southeast) ): yield i
-                for x in reversed(range(module.width)):
-                    if i := module.instances.get( ((x, y), Corner.northeast) ): yield i
-                    if x > 0 and (i := module.instances.get( ((x, y), Corner.northwest) )): yield i
-            for y in reversed(range(module.height)):
-                if (i := module.instances.get( ((0, y), Corner.northwest) )): yield i
-                if (i := module.instances.get( ((0, y), Corner.southwest) )): yield i
-            yield None
-        elif module.name == "top":
-            # go in a circle to program all IOBs and their neighbouring switch boxes
-            if i:= module.instances.get( ((0, 0), Corner.northeast) ): yield i
-            for y in range(1, N_LOGIC * H_LOGIC + 1):
-                if i := module.instances.get( ((0, y), Corner.southeast) ): yield i
-                if i := module.instances.get(  (0, y)                    ): yield i
-                if i := module.instances.get( ((0, y), Corner.northeast) ): yield i
-            # wrap up and insert leaf router
-            yield None
-            if i:= module.instances.get( ((0, N_LOGIC * H_LOGIC + 1), Corner.southeast) ): yield i
-            for x in range(1, M_LOGIC * W_LOGIC + 1):
-                if i := module.instances.get( ((x, N_LOGIC * H_LOGIC + 1), Corner.southwest) ): yield i
-                if i := module.instances.get(  (x, N_LOGIC * H_LOGIC + 1)                    ): yield i
-                if i := module.instances.get( ((x, N_LOGIC * H_LOGIC + 1), Corner.southeast) ): yield i
-            # wrap up and insert leaf router
-            yield None
-            if i:= module.instances.get( ((M_LOGIC * W_LOGIC + 1, N_LOGIC * H_LOGIC + 1), Corner.southwest) ): yield i
-            for y in reversed(range(1, N_LOGIC * H_LOGIC + 1)):
-                if i := module.instances.get( ((M_LOGIC * W_LOGIC + 1, y), Corner.northwest) ): yield i
-                if i := module.instances.get(  (M_LOGIC * W_LOGIC + 1, y)                    ): yield i
-                if i := module.instances.get( ((M_LOGIC * W_LOGIC + 1, y), Corner.southwest) ): yield i
-            # wrap up and insert leaf router
-            yield None
-            if i:= module.instances.get( ((M_LOGIC * W_LOGIC + 1, 0), Corner.northwest) ): yield i
-            for x in reversed(range(1, M_LOGIC * W_LOGIC + 1)):
-                if i := module.instances.get( ((x, 0), Corner.northeast) ): yield i
-                if i := module.instances.get(  (x, 0)                    ): yield i
-                if i := module.instances.get( ((x, 0), Corner.northwest) ): yield i
-            # wrap up and insert leaf router
-            yield None
-            # wrap up branches and attach to the main chunk
-            yield None
-
-            for x in range(M_LOGIC):
-                yield module.instances[ x * W_LOGIC + 1, 0 * H_LOGIC + 1 ]
-                yield module.instances[ x * W_LOGIC + 1, 2 * H_LOGIC + 1 ]
-                yield module.instances[ x * W_LOGIC + 1, 3 * H_LOGIC + 1 ]
-                yield module.instances[ x * W_LOGIC + 1, 1 * H_LOGIC + 1 ]
-                yield None
-                yield None
-        else:
-            for i in module.instances.values():
-                yield i
-
     Flow(
-        Translation(),
-        SwitchPathAnnotation(),
-        Pktchain.InsertProgCircuitry(iter_instances = iter_instances),
         VPRArchGeneration("vpr/arch.xml"),
         VPR_RRG_Generation("vpr/rrg.xml"),
         YosysScriptsCollection("syn"),
-        ).run(ctx, Pktchain.new_renderer())
+        ).run(ctx)
 
     ctx.pickle("ctx.tmp.pkl")
 
+# ============================================================================
+# -- Configuration Chain Injection -------------------------------------------
+# ============================================================================
+def iter_instances(module):
+    if module.name == "tile_clb":
+        yield module.instances[0]
+        yield module.instances[Orientation.east, 0]
+    elif module.name.startswith("tile_iob_"):
+        for i in range(NUM_IOB_PER_TILE):
+            yield module.instances[i]
+        for ori in Orientation:
+            if i := module.instances.get( (ori, 0) ):
+                yield i
+    elif module.name == "tile_bram":
+        yield module.instances[Orientation.east, 0]
+        yield module.instances[Orientation.east, 1]
+        yield module.instances[0]
+    elif module.name == "subarray":
+        for y in range(module.height):
+            for x in range(module.width):
+                if x > 0 and (i := module.instances.get( ((x, y), Corner.southwest) )): yield i
+                if i := module.instances.get( (x, y) ): yield i
+                if i := module.instances.get( ((x, y), Corner.southeast) ): yield i
+            for x in reversed(range(module.width)):
+                if i := module.instances.get( ((x, y), Corner.northeast) ): yield i
+                if x > 0 and (i := module.instances.get( ((x, y), Corner.northwest) )): yield i
+        for y in reversed(range(module.height)):
+            if (i := module.instances.get( ((0, y), Corner.northwest) )): yield i
+            if (i := module.instances.get( ((0, y), Corner.southwest) )): yield i
+        yield Pktchain.TERMINATE_LEAF
+    elif module.name == "top":
+        # go in a circle to program all IOBs and their neighbouring switch boxes
+        if i:= module.instances.get( ((0, 0), Corner.northeast) ): yield i
+        for y in range(1, N_LOGIC * H_LOGIC + 1):
+            if i := module.instances.get( ((0, y), Corner.southeast) ): yield i
+            if i := module.instances.get(  (0, y)                    ): yield i
+            if i := module.instances.get( ((0, y), Corner.northeast) ): yield i
+        # wrap up and insert leaf router
+        yield Pktchain.TERMINATE_LEAF
+        if i:= module.instances.get( ((0, N_LOGIC * H_LOGIC + 1), Corner.southeast) ): yield i
+        for x in range(1, M_LOGIC * W_LOGIC + 1):
+            if i := module.instances.get( ((x, N_LOGIC * H_LOGIC + 1), Corner.southwest) ): yield i
+            if i := module.instances.get(  (x, N_LOGIC * H_LOGIC + 1)                    ): yield i
+            if i := module.instances.get( ((x, N_LOGIC * H_LOGIC + 1), Corner.southeast) ): yield i
+        # wrap up and insert leaf router
+        yield Pktchain.TERMINATE_LEAF
+        if i:= module.instances.get( ((M_LOGIC * W_LOGIC + 1, N_LOGIC * H_LOGIC + 1), Corner.southwest) ): yield i
+        for y in reversed(range(1, N_LOGIC * H_LOGIC + 1)):
+            if i := module.instances.get( ((M_LOGIC * W_LOGIC + 1, y), Corner.northwest) ): yield i
+            if i := module.instances.get(  (M_LOGIC * W_LOGIC + 1, y)                    ): yield i
+            if i := module.instances.get( ((M_LOGIC * W_LOGIC + 1, y), Corner.southwest) ): yield i
+        # wrap up and insert leaf router
+        yield Pktchain.TERMINATE_LEAF
+        if i:= module.instances.get( ((M_LOGIC * W_LOGIC + 1, 0), Corner.northwest) ): yield i
+        for x in reversed(range(1, M_LOGIC * W_LOGIC + 1)):
+            if i := module.instances.get( ((x, 0), Corner.northeast) ): yield i
+            if i := module.instances.get(  (x, 0)                    ): yield i
+            if i := module.instances.get( ((x, 0), Corner.northwest) ): yield i
+        # wrap up and insert leaf router
+        yield Pktchain.TERMINATE_LEAF
+        # wrap up branches and attach to the main chunk
+        yield Pktchain.TERMINATE_BRANCH
+
+        for x in range(M_LOGIC):
+            yield module.instances[ x * W_LOGIC + 1, 0 * H_LOGIC + 1 ]
+            yield module.instances[ x * W_LOGIC + 1, 2 * H_LOGIC + 1 ]
+            yield module.instances[ x * W_LOGIC + 1, 3 * H_LOGIC + 1 ]
+            yield module.instances[ x * W_LOGIC + 1, 1 * H_LOGIC + 1 ]
+            yield Pktchain.TERMINATE_BRANCH
+    else:
+        for i in module.instances.values():
+            yield i
+
 Flow(
+        Materialization('pktchain',
+            chain_width = CHAIN_WIDTH,
+            phit_width = PHIT_WIDTH,
+            router_fifo_depth_log2 = 8),
+        Translation(),
+        SwitchPathAnnotation(),
+        ProgCircuitryInsertion(iter_instances = iter_instances),
         VerilogCollection("rtl", "include"),
-        ).run(ctx, Pktchain.new_renderer())
+        ).run(ctx)
 
 ctx.pickle("ctx.pkl")

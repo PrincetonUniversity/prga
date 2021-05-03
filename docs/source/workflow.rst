@@ -129,27 +129,32 @@ conflict and ordering between ``Pass`` es.
 
 Here's a list of the most commonly used ``Pass`` es:
 
+- `VPRArchGeneration` and `VPR_RRG_Generation`: These two passes
+  generate the VPR architecture specification and routing resource graph
+  specification, respectively.
+- `YosysScriptsCollection`: This pass inspects the `Context` object and
+  creates `Yosys`_ script generation tasks, including the main synthesis script,
+  technology mapping script, block RAM inferrence script, and so on.
+- `Materialization`: This pass adds the :ref:`design<arch:Module View>` view of
+  the :ref:`arch:Logic Primitive` s.
+  Certain primitives may be implemented differently on different programming
+  protocols, while some primitives are not supported by all programming
+  protocols.
+  For example, initializable memories that may be used as ROMs are only
+  supported by the `Frame`-based programming protocol.
 - `Translation`: This pass generates the :ref:`design<arch:Module View>` view for modules in
   the :ref:`abstract<arch:Module View>` view by linking :ref:`arch:Logic Primitive` s and implementing the
   abstract configuratble connections with switch modules.
 - `SwitchPathAnnotation`: This pass analyzes the switch modules instantiated
   in the :ref:`design<arch:Module View>` view, and annotate the MUX/BUFFER paths back to the
   :ref:`abstract<arch:Module View>` view.
-  This information is used by ``FASM`` metadata generation during `VPR`_ script
-  generation.
-- ``*.InsertProgCircuitry``: This pass inserts configuration memory into the
+  This information is used later by the bitstream generator.
+- `ProgCircuitryInsertion`: This pass inserts configuration memory into the
   :ref:`design<arch:Module View>` view.
   This pass is specific to configuration circuitry types, e.g.
-  `Scanchain.InsertProgCircuitry` and `Pktchain.InsertProgCircuitry`.
-- `VPRArchGeneration` and `VPR_RRG_Generation`: These two passes
-  generate the VPR architecture specification and routing resource graph
-  specification, respectively.
-- `VerilogCollection`: This pass inspects the `Context` object and creates
+  `Scanchain`, `Pktchain` and `Frame`, and only available after
   RTL generation tasks for all the modules in a `FileRenderer` object.
   RTL Verilog files are generated based on the :ref:`design<arch:Module View>` views.
-- `YosysScriptsCollection`: This pass inspects the `Context` object and
-  creates `Yosys`_ script generation tasks, including the main synthesis script,
-  technology mapping script, block RAM inferrence script, and so on.
 
 File Rendering
 ^^^^^^^^^^^^^^

@@ -7,7 +7,7 @@ import os
 # ============================================================================
 # -- Create Context ----------------------------------------------------------
 # ============================================================================
-ctx = Magic.new_context()
+ctx = Context(['src'])
 
 # ============================================================================
 # -- Routing Resources -------------------------------------------------------
@@ -93,11 +93,11 @@ iob = builder.commit()
 
 # -- CLB ---------------------------------------------------------------------
 builder = ctx.build_logic_block("clb")
-grady18v2 = ctx.primitives["grady18v2"]
+grady18 = ctx.primitives["grady18"]
 N = 4
 
-lin = len(grady18v2.ports["in"])
-lout = len(grady18v2.ports["out"])
+lin = len(grady18.ports["in"])
+lout = len(grady18.ports["out"])
 
 clk = builder.create_global(gbl_clk, Orientation.south)
 ce = builder.create_input("ce", 1, Orientation.west)
@@ -108,7 +108,7 @@ cin = builder.create_input("cin", 1, Orientation.south)
 xin, xout = [], []
 xin.extend(in_)
 
-for i, inst in enumerate(builder.instantiate(grady18v2, "i_grady18", N)):
+for i, inst in enumerate(builder.instantiate(grady18, "i_grady18", N)):
     builder.connect(clk, inst.pins['clk'])
     builder.connect(ce, inst.pins['ce'])
     builder.connect(cin, inst.pins["cin"], vpr_pack_patterns = ["carrychain"])
@@ -293,13 +293,14 @@ top = builder.fill( pattern ).auto_connect().commit()
 # -- Workflow ----------------------------------------------------------------
 # ============================================================================
 Flow(
-        Translation(),
-        SwitchPathAnnotation(),
-        Magic.InsertProgCircuitry(),
         VPRArchGeneration('vpr/arch.xml'),
         VPR_RRG_Generation('vpr/rrg.xml'),
-        VerilogCollection('rtl'),
         YosysScriptsCollection('syn'),
-        ).run(ctx, Magic.new_renderer(["src"])) # add `src` into file rendering template search path
+        Materialization("magic"),
+        Translation(),
+        SwitchPathAnnotation(),
+        ProgCircuitryInsertion(),
+        VerilogCollection('rtl'),
+        ).run(ctx, )
 
 ctx.pickle("ctx.pkl" if len(sys.argv) < 2 else sys.argv[1])

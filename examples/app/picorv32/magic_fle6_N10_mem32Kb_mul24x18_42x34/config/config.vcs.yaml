@@ -18,5 +18,5 @@ tests:
         sources:
             - ../../src/picorv32_test_basic.v
         run_flags:
-            - +firmware=${PRGA_ROOT}/examples/target/picorv32/src/firmware.hex
+            - +firmware=${PRGA_ROOT}/examples/app/picorv32/src/firmware.hex
             - +max_cycle=1000000

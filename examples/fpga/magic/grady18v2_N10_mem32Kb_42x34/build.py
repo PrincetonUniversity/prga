@@ -2,8 +2,6 @@ from prga import *
 
 from itertools import product
 import sys
-
-r = Magic.new_renderer()
     
 try:
     ctx = Context.unpickle("ctx.tmp.pkl")
@@ -16,16 +14,15 @@ except FileNotFoundError:
     mem_data_width = 64
     mem_addr_width = 12         # 4K8b
     
-    ctx = Magic.new_context()
+    ctx = Context()
     
     gbl_clk = ctx.create_global("clk", is_clock = True)
     gbl_clk.bind((0, 1), 0)
-    l1 = ctx.create_segment('L1', 40, 1)
-    l4 = ctx.create_segment('L4', 12, 4)
-    l16 = ctx.create_segment('L16', 2, 16)
+    l1 = ctx.create_segment('L1', 80, 1)
+    l4 = ctx.create_segment('L4', 20, 4)
     
     builder = ctx.build_logic_block("clb")
-    grady18v2 = ctx.primitives["grady18v2"]
+    grady18v2 = ctx.primitives["grady18"]
     
     lin = len(grady18v2.ports["in"])
     lout = len(grady18v2.ports["out"])
@@ -35,7 +32,7 @@ except FileNotFoundError:
     in_ = builder.create_input("in", lin * N, Orientation.west)
     out = builder.create_output("out", lout * N, Orientation.east)
     cin = builder.create_input("cin", 1, Orientation.south)
-    for i, inst in enumerate(builder.instantiate(grady18v2, "i_grady18", N)):
+    for i, inst in enumerate(builder.instantiate(grady18v2, "i_ble", N)):
         builder.connect(clk, inst.pins['clk'])
         builder.connect(ce, inst.pins['ce'])
         builder.connect(in_[lin * i: lin * (i + 1)], inst.pins['in'])
@@ -100,20 +97,19 @@ except FileNotFoundError:
     top = builder.fill( pattern ).auto_connect().commit()
     
     Flow(
-            Translation(),
-            SwitchPathAnnotation(),
-            Magic.InsertProgCircuitry(),
             VPRArchGeneration("vpr/arch.xml"),
             VPR_RRG_Generation("vpr/rrg.xml"),
-            # VerilogCollection('rtl'),
-            # YosysScriptsCollection("syn"),
-            ).run(ctx, r)
+            YosysScriptsCollection("syn"),
+            ).run(ctx)
 
     ctx.pickle("ctx.tmp.pkl")
 
 Flow(
+        Materialization('magic'),
+        Translation(),
+        SwitchPathAnnotation(),
+        ProgCircuitryInsertion(),
         VerilogCollection('rtl'),
-        YosysScriptsCollection("syn"),
-        ).run(ctx, r)
+        ).run(ctx)
 
 ctx.pickle(sys.argv[1] if len(sys.argv) > 1 else "ctx.pkl")
