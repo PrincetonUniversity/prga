@@ -1,8 +1,7 @@
 from prga import *
 from itertools import product
-import argparse
 
-import logging, sys
+import logging, sys, argparse
 logging.getLogger("prga").setLevel(logging.DEBUG)
 
 _parser = argparse.ArgumentParser()

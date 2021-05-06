@@ -1,0 +1,27 @@
+context: ${PRGA_ROOT}/examples/fpga/frame/hardpico/ctx.pkl
+compiler: vcs
+app:
+    name: picosoc
+    sources:
+        - ../../src/simpleuart.v
+        - ../../src/spimemio.v
+        - ../../src/picosoc.v
+constraints:
+    io: io.partial
+tests:
+    testbench:
+        sources:
+            - ../../src/hx8kdemo.v
+            - ../../src/spiflash.v
+            - ../../src/hx8kdemo_tb.v
+            - %YOSYS_DATDIR%/ice40/cells_sim.v
+        defines:
+            PRGA_POSTSYN_NO_REGINIT: null
+            PRGA_POSTSYN_NO_MEMINIT: null
+        comp_flags:
+            - +vcs+initreg+random
+        run_flags:
+            - +firmware=${PRGA_ROOT}/examples/app/picosoc/src/hx8kdemo_fw.hex
+            - +max_cycle=1000000
+            - +verbosity=0
+            - +vcs+initreg+0

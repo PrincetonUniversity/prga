@@ -1,0 +1,14 @@
+context: ../../../../fpga/frame/hardpico/ctx.pkl
+compiler: vcs
+app:
+  name: romtest
+  sources: 
+    - ../../src/romtest.v
+  includes:
+    - ../../src/include
+constraints:
+  io: io.partial
+tests:
+  romtest_test:
+    sources:
+      - ../../src/romtest_test.v
