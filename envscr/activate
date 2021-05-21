@@ -61,6 +61,7 @@ else
         export PATH=${PWD}/pyenv/bin:$PATH
 
         info "Activating local-installed pyenv"
+        eval "$( pyenv init --path )"
         eval "$( pyenv init - )"
         info "Local-installed pyenv activated"
     fi
