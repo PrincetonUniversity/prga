@@ -6,6 +6,7 @@
 COMP=gcc
 MAKE_JOBCOUNT=8
 PYTHON_VERSION=3.8.2
+PYENV_VERSION=v2.0.0-rc1
 
 # ============================================================================
 # -- Do not modify below this line -------------------------------------------
@@ -33,14 +34,14 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"/..    # move to PRGA_ROOT
 # find git
 GIT=$( command -v git 2>/dev/null )
 if [ -z "${GIT}" ]; then
-    err "'git' not found" || exit 1
+    err "'git' not found" && exit 1
 fi
 info "Using 'git': ${GIT}"
 
 # find make
 MAKE=$( command -v make 2>/dev/null )
 if [ -z "${MAKE}" ]; then
-    err "'make' not found" || exit 1
+    err "'make' not found" && exit 1
 fi
 info "Using 'make': ${MAKE}"
 
@@ -49,10 +50,10 @@ CMAKE=$( command -v cmake3 2>/dev/null )
 if [ -z "${CMAKE}" ]; then
     CMAKE=$( command -v cmake 2>/dev/null )
     if [ -z "${CMAKE}" ]; then
-        err "'cmake' not found" || exit 1
+        err "'cmake' not found" && exit 1
         exit 1
     elif [[ $( ${CMAKE} --version | cut -d " " -f 3 ) != "3"* ]]; then
-        err "CMake 3.x is required to build VPR" || exit 1
+        err "CMake 3.x is required to build VPR" && exit 1
     fi
 fi
 info "Using 'cmake': ${CMAKE}"
@@ -60,7 +61,7 @@ info "Using 'cmake': ${CMAKE}"
 # find C compiler
 CC=$( command -v ${COMP} 2>/dev/null )
 if [ -z "${CC}" ]; then
-    err "'${COMP}' not found" || exit 1
+    err "'${COMP}' not found" && exit 1
 fi
 info "Using '${COMP}': ${CC}"
 
@@ -71,16 +72,18 @@ else
     if [ ! -f pyenv/bin/pyenv ]; then
         info "'pyenv' not found. Installing 'pyenv' locally to ${PWD}/pyenv"
         ${GIT} clone https://github.com/pyenv/pyenv.git || exit 1
+        cd pyenv && ${GIT} fetch && ${GIT} checkout ${PYENV_VERSION} && cd ..
         info "'pyenv' installed locally to ${PWD}/pyenv"
     else
         info "Locally-installed 'pyenv' found. Updating 'pyenv'"
-        cd pyenv && ${GIT} fetch && ${GIT} pull && cd ..
+        cd pyenv && ${GIT} fetch && ${GIT} checkout ${PYENV_VERSION} && cd ..
         info "'pyenv' updated"
     fi
 
     info "Activating locally-installed 'pyenv'"
     export PYENV_ROOT=${PWD}/pyenv
     export PATH=${PYENV_ROOT}/bin:$PATH
+    eval "$( pyenv init --path )"
     eval "$( pyenv init - )"
     info "'pyenv' activated"
 fi
@@ -91,7 +94,7 @@ env PYTHON_CONFIGURE_OPTS="--enable-shared" CFLAGS="-fPIC" CXXFLAGS="-fPIC" pyen
 info "Python ${PYTHON_VERSION} installed with 'pyenv'"
 pyenv local ${PYTHON_VERSION} || exit 1
 if [[ $( python --version | cut -d " " -f 2 ) != "${PYTHON_VERSION}" ]]; then
-    err "'pyenv' is not choosing the correct Python version" || exit 1
+    err "'pyenv' is not choosing the correct Python version" && exit 1
 fi
 info "Python ${PYTHON_VERSION} chosen as the local version"
 
