@@ -1,0 +1,9 @@
+context: ../../../../fpga/scanchain/mpw5/ctx.pkl
+compiler: vcs
+app:
+  name: %name%
+  sources:
+    - ../../verilog/%file%.v
+    - ../../verilog/dff.v
+constraints:
+  io: io.partial
