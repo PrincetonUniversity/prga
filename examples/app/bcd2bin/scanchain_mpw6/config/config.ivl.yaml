@@ -1,0 +1,12 @@
+context: ../../../../fpga/scanchain/mpw6/ctx.pkl
+compiler: iverilog
+app:
+    name: bcd2bin
+    sources:
+        - ../../src/bcd2bin.v
+constraints:
+    io: io.partial
+tests:
+    basic:
+        sources:
+            - ../../src/bcd2bin_test_basic.v

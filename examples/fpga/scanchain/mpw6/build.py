@@ -6,7 +6,10 @@ from itertools import product
 import sys
 
 # key parameters
-k, N, W, H = 4, 8, 11, 11
+k, N, W, H = 4, 8, 10, 10
+ext_prog_clk = False
+
+print ("[INFO] Using {} prog_clk".format("external" if ext_prog_clk else "internal"))
 
 # secondary parameters
 n_L1 = 12
@@ -143,23 +146,28 @@ Flow(
 def create_io (x,y,subtile,global_ = None):
     return IO( (PortDirection.input_, PortDirection.output), (x, y), subtile, global_ )
 
-ctx.summary.ios = [
+ios = [
         # hard-wired clock
         create_io (0, 1, 0, gbl_clk),
 
-        # west bank: 10 I/Os
+        # west bank: 9 I/Os
         create_io (0, 1, 1),
         create_io (0, 2, 0),
-        create_io (0, 2, 1),
         create_io (0, 3, 0),
+        # create_io (0, 3, 1),
         create_io (0, 4, 0),
         create_io (0, 5, 0),
         create_io (0, 6, 0),
-        create_io (0, 6, 1),
+        ]
+
+if ext_prog_clk:
+    ios.append ( create_io (0, 6, 1) )
+
+ios.extend ([
         create_io (0, 7, 0),
         create_io (0, 8, 0),
 
-        # north bank: 10 I/Os
+        # north bank: 9 I/Os
         create_io (1, H-1, 0),
         create_io (2, H-1, 0),
         create_io (2, H-1, 1),
@@ -168,10 +176,10 @@ ctx.summary.ios = [
         create_io (5, H-1, 0),
         create_io (6, H-1, 0),
         create_io (7, H-1, 0),
-        create_io (7, H-1, 1),
+        # create_io (7, H-1, 1),
         create_io (8, H-1, 1),
 
-        # east bank: 12 I/Os, but less recommended for use
+        # east bank: 13 I/Os, but less recommended for use
         # create_io (9, 8, 1),
         create_io (W-1, 8, 0),
         create_io (W-1, 7, 1),
@@ -180,12 +188,15 @@ ctx.summary.ios = [
         create_io (W-1, 5, 1),
         create_io (W-1, 5, 0),
         create_io (W-1, 4, 0),
+        create_io (W-1, 3, 1),
         create_io (W-1, 3, 0),
         create_io (W-1, 2, 1),
         create_io (W-1, 2, 0),
-        # create_io (9, 1, 1),
+        create_io (W-1, 1, 1),
         create_io (W-1, 1, 0),
-        ]
+        ])
+
+ctx.summary.ios = ios
 
 ctx.pickle("ctx.pkl" if len(sys.argv) < 2 else sys.argv[1])
 
@@ -218,17 +229,30 @@ with open("rtl/Flist.top", 'w') as f:
         f.write("rtl/" + ff + "\n")
 
 # pinout
-s = """      chip-level I/O       |  PRGA top pin  | direction 
+s_ext_clk = """      chip-level I/O       |  PRGA top pin  | direction 
 ---------------------------+----------------+-----------
- user_clk                  | prog_clk       |  I        
- user_clk                  | ipin_x0y1_0    |  I        
- mprj io[37]               | prog_din       |  I        
- mprj io[36]               | prog_done      |  I        
- mprj io[35]               | prog_rst       |  I        
- mprj io[34]               | prog_we        |  I        
+ clock                     | prog_clk       |  I        
+ mprj io[37]               | ipin_x0y1_0    |  I        
+ mprj io[36]               | prog_din       |  I        
+ mprj io[35]               | prog_done      |  I        
+ mprj io[34]               | prog_rst       |  I        
+ mprj io[33]               | prog_we        |  I        
  mprj io[1]                | prog_dout      |  O
  mprj io[0]                | prog_we_o      |  O
 ---------------------------+----------------+-----------"""
+
+s_int_clk = """      chip-level I/O       |  PRGA top pin  | direction 
+---------------------------+----------------+-----------
+ mprj io[37]               | prog_clk       |  I        
+ mprj io[36]               | ipin_x0y1_0    |  I        
+ mprj io[35]               | prog_din       |  I        
+ mprj io[34]               | prog_done      |  I        
+ mprj io[33]               | prog_rst       |  I        
+ mprj io[32]               | prog_we        |  I        
+ mprj io[1]                | prog_dout      |  O
+ mprj io[0]                | prog_we_o      |  O
+---------------------------+----------------+-----------"""
+
 tmpl = """
                            | ipin_x{x}y{y}_{z}    |  I        
  mprj io[{pin:>2d}]               | opin_x{x}y{y}_{z}    |  O        
@@ -236,9 +260,53 @@ tmpl = """
 ---------------------------+----------------+-----------"""
 
 with open("pinout.txt", "w") as f:
-    f.write (s)
+    if ext_prog_clk:
+        f.write (s_ext_clk)
+    else:
+        f.write (s_int_clk)
 
-    for io, id_ in zip(ctx.summary.ios[1:], reversed(range(2, 34))):
+    for io, id_ in zip(ctx.summary.ios[1:], reversed(range(2, 33 if ext_prog_clk else 32))):
         f.write (tmpl.format(pin=id_, x=io.position.x, y=io.position.y, z=io.subtile))
 
     f.write ("\n")
+
+# wrapper connection
+s_int_clk = """
+`define MPRJ_IO_37_I
+`define MPRJ_IO_37_CONN prog_clk
+
+`define MPRJ_IO_36_I
+`define MPRJ_IO_36_CONN ipin_x0y1_0
+
+`define MPRJ_IO_35_I
+`define MPRJ_IO_35_CONN prog_din
+
+`define MPRJ_IO_34_I
+`define MPRJ_IO_34_CONN prog_done
+
+`define MPRJ_IO_33_I
+`define MPRJ_IO_33_CONN prog_rst
+
+`define MPRJ_IO_32_I
+`define MPRJ_IO_32_CONN prog_we
+
+`define MPRJ_IO_1_O
+`define MPRJ_IO_1_CONN  prog_dout
+
+`define MPRJ_IO_0_O
+`define MPRJ_IO_0_CONN  prog_we_o
+"""
+
+tmpl = """
+`define MPRJ_IO_{pin}_IO
+`define MPRJ_IO_{pin}_CONN x{x}y{y}_{z}
+"""
+
+with open("conn.v", "w") as f:
+    if ext_prog_clk:
+        raise RuntimeError ("external prog_clk not supported")
+    else:
+        f.write ( s_int_clk )
+
+    for io, id_ in zip(ctx.summary.ios[1:], reversed(range(2, 33 if ext_prog_clk else 32))):
+        f.write ( tmpl.format ( pin = id_, x = io.position.x, y = io.position.y, z = io.subtile ) )
