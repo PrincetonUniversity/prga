@@ -325,17 +325,15 @@ The path is relative to the script itself.
 .. code-block:: Python
 
    Flow(
-       Translation(),
-       SwitchPathAnnotation(),
-       Magic.InsertProgCircuitry(),
        VPRArchGeneration('vpr/arch.xml'),
        VPR_RRG_Generation('vpr/rrg.xml'),
-       VerilogCollection('rtl'),
        YosysScriptsCollection('syn'),
-       ).run(ctx,
-           # add `src` into file rendering template search path
-           Magic.new_renderer(["src"])
-       )
+       Materialization("magic"),
+       Translation(),
+       SwitchPathAnnotation(),
+       ProgCircuitryInsertion(),
+       VerilogCollection('rtl'),
+       ).run(ctx)
 
 .. _picorv32.v: https://github.com/PrincetonUniversity/prga/blob/release/examples/fpga/magic/hardpico/src/picorv32.v
 .. _dffn.v: https://github.com/PrincetonUniversity/prga/blob/release/examples/fpga/magic/hardpico/src/dffn.v

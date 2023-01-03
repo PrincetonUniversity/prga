@@ -180,10 +180,10 @@ are hardwired, i.e., not routable, but faster.
 
     # Create a direct inter-block connection
     #                 name of the tunnel, from port,         to port,          relative position
-    #
+    ctx.create_tunnel("carrychain",       clb.ports["cout"], clb.ports["cin"], (0, -1))
+
     #   "relative position" is the position of the destination port relative to
     #   the source port (not the blocks)
-    ctx.create_tunnel("carrychain",       clb.ports["cout"], clb.ports["cin"], (0, -1))
 
 After describing all the blocks we want, we can describe the tiles for each
 block. A tile contains one or more block instances and the connection boxes
@@ -221,8 +221,6 @@ by calling `TileBuilder.fill` and `ArrayBuilder.fill` methods.
         iotiles[ori] = builder.commit()
 
     # Concatenate build, fill, auto-connect and commit
-    #
-    #   We use less
     clbtile = ctx.build_tile(clb).fill( (0.4, 0.25) ).auto_connect().commit()
     bramtile = ctx.build_tile(bram).fill( (0.4, 0.25) ).auto_connect().commit()
 
