@@ -35,25 +35,16 @@ jobs:
       - name: Checkout PRGA
         uses: actions/checkout@v2
 
-      # ========================================================
-      # == Restore iverilog from cache, or build from scratch ==
-      # ========================================================
-      - name: Cache iverilog
-        id: cache-ivl
-        uses: actions/cache@v2
-        with:
-          path: iverilog
-          key: iverilog
-
+      # ======================
+      # == Install iverilog ==
+      # ======================
       - name: Checkout iverilog
         uses: actions/checkout@v2
-        if: ${{ ! steps.cache-ivl.outputs.cache-hit }}
         with:
           repository: steveicarus/iverilog
           path: iverilog
 
       - name: Compile iverilog
-        if: ${{ ! steps.cache-ivl.outputs.cache-hit }}
         run: |
           sudo apt-get install gperf autoconf
           pushd iverilog

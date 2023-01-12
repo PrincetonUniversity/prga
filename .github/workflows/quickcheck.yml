@@ -31,7 +31,7 @@ jobs:
       # ========================================================
       - name: Cache iverilog
         id: cache-ivl
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: iverilog
           key: iverilog
@@ -68,7 +68,7 @@ jobs:
       # == Restore VTR ==
       - name: Cache VTR executables
         id: cache-vtr
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             local/bin/vpr
@@ -89,7 +89,7 @@ jobs:
       # == Restore Yosys ==
       - name: Cache Yosys executables and libraries
         id: cache-yosys
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             local/bin/yosys
