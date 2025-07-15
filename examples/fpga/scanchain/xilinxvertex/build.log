@@ -1,0 +1,94 @@
+[INFO] ********************
+[INFO] running pass 'vpr.arch'
+[INFO] pass 'vpr.arch' took 0.038132 seconds
+[INFO] ********************
+[INFO] running pass 'materialization'
+[WARNING] No design view available for primitive 'adder'
+[INFO] pass 'materialization' took 0.004927 seconds
+[INFO] ********************
+[INFO] running pass 'vpr.rrg'
+[INFO]  .. Start RRG meta-data generation
+[INFO]  .. Completed RRG meta-data generation
+[INFO]    .. RRG meta-data generation took 0.003044 seconds
+[INFO]  .. Start constructing coarse-grained routing graph for VPR RRG generation
+[INFO]  .. Completed constructing coarse-grained routing graph for VPR RRG generation
+[INFO]    .. Construction took 0.300524 seconds
+[INFO]  .. Start RRG node generation
+[INFO]    .. 000001K nodes generated
+[INFO]    .. 000002K nodes generated
+[INFO]    .. 000003K nodes generated
+[INFO]    .. 000004K nodes generated
+[INFO]    .. 000005K nodes generated
+[INFO]    .. 000006K nodes generated
+[INFO]  .. Completed RRG node generation
+[INFO]    .. RRG node generation took 0.221202 seconds
+[INFO]    .. 000006.0K nodes generated
+[INFO]  .. Start RRG edge generation
+[INFO]    .. 000001K edges generated
+[INFO]    .. 000002K edges generated
+[INFO]    .. 000003K edges generated
+[INFO]    .. 000004K edges generated
+[INFO]    .. 000005K edges generated
+[INFO]    .. 000006K edges generated
+[INFO]    .. 000007K edges generated
+[INFO]    .. 000008K edges generated
+[INFO]    .. 000009K edges generated
+[INFO]    .. 000010K edges generated
+[INFO]    .. 000011K edges generated
+[INFO]    .. 000012K edges generated
+[INFO]    .. 000013K edges generated
+[INFO]    .. 000014K edges generated
+[INFO]    .. 000015K edges generated
+[INFO]    .. 000016K edges generated
+[INFO]    .. 000017K edges generated
+[INFO]    .. 000018K edges generated
+[INFO]    .. 000019K edges generated
+[INFO]    .. 000020K edges generated
+[INFO]    .. 000021K edges generated
+[INFO]    .. 000022K edges generated
+[INFO]    .. 000023K edges generated
+[INFO]    .. 000024K edges generated
+[INFO]    .. 000025K edges generated
+[INFO]    .. 000026K edges generated
+[INFO]    .. 000027K edges generated
+[INFO]    .. 000028K edges generated
+[INFO]    .. 000029K edges generated
+[INFO]    .. 000030K edges generated
+[INFO]    .. 000031K edges generated
+[INFO]    .. 000032K edges generated
+[INFO]    .. 000033K edges generated
+[INFO]    .. 000034K edges generated
+[INFO]    .. 000035K edges generated
+[INFO]    .. 000036K edges generated
+[INFO]    .. 000037K edges generated
+[INFO]    .. 000038K edges generated
+[INFO]    .. 000039K edges generated
+[INFO]    .. 000040K edges generated
+[INFO]    .. 000041K edges generated
+[INFO]    .. 000042K edges generated
+[INFO]    .. 000043K edges generated
+[INFO]    .. 000044K edges generated
+[INFO]    .. 000045K edges generated
+[INFO]    .. 000046K edges generated
+[INFO]    .. 000047K edges generated
+[INFO]  .. Completed RRG edge generation
+[INFO]    .. RRG edge generation took 6.418373 seconds
+[INFO]    .. 000047.8K edges generated
+[INFO] pass 'vpr.rrg' took 6.946819 seconds
+[INFO] ********************
+[INFO] running pass 'yosys'
+[INFO] pass 'yosys' took 0.000543 seconds
+[INFO] ********************
+[INFO] Rendering files ...
+[INFO]  .. Rendering: syn/m_dffe.techmap.v
+[INFO]  .. Rendering: syn/m_dffe.lib.v
+[INFO]  .. Rendering: syn/m_mux2.lib.v
+[INFO]  .. Rendering: syn/m_adder.techmap.v
+[INFO]  .. Rendering: syn/m_adder.lib.v
+[INFO]  .. Rendering: syn/m_xor2.techmap.v
+[INFO]  .. Rendering: syn/m_xor2.lib.v
+[INFO]  .. Rendering: syn/synth.tcl
+[INFO]  .. Rendering: syn/read_lib.tcl
+[INFO] Completed rendering files ...
+[INFO] File rendering took 0.036496 seconds
+[INFO] Context pickled to ctx.pkl

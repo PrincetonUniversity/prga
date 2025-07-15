@@ -1,0 +1,1242 @@
+<architecture>
+	<layout>
+		<fixed_layout name="top" width="8" height="8">
+			<single priority="1" type="t_io_w" x="0" y="1">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x0y1.i_blk_i0 i_tile_x0y1.i_blk_i1 i_tile_x0y1.i_blk_i2 i_tile_x0y1.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_w" x="0" y="2">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x0y2.i_blk_i0 i_tile_x0y2.i_blk_i1 i_tile_x0y2.i_blk_i2 i_tile_x0y2.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_w" x="0" y="3">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x0y3.i_blk_i0 i_tile_x0y3.i_blk_i1 i_tile_x0y3.i_blk_i2 i_tile_x0y3.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_w" x="0" y="4">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x0y4.i_blk_i0 i_tile_x0y4.i_blk_i1 i_tile_x0y4.i_blk_i2 i_tile_x0y4.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_w" x="0" y="5">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x0y5.i_blk_i0 i_tile_x0y5.i_blk_i1 i_tile_x0y5.i_blk_i2 i_tile_x0y5.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_w" x="0" y="6">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x0y6.i_blk_i0 i_tile_x0y6.i_blk_i1 i_tile_x0y6.i_blk_i2 i_tile_x0y6.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_s" x="1" y="0">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x1y0.i_blk_i0 i_tile_x1y0.i_blk_i1 i_tile_x1y0.i_blk_i2 i_tile_x1y0.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="1" y="1">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x1y1.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="1" y="2">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x1y2.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="1" y="3">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x1y3.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="1" y="4">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x1y4.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="1" y="5">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x1y5.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="1" y="6">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x1y6.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_n" x="1" y="7">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x1y7.i_blk_i0 i_tile_x1y7.i_blk_i1 i_tile_x1y7.i_blk_i2 i_tile_x1y7.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_s" x="2" y="0">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x2y0.i_blk_i0 i_tile_x2y0.i_blk_i1 i_tile_x2y0.i_blk_i2 i_tile_x2y0.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="2" y="1">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x2y1.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="2" y="2">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x2y2.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="2" y="3">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x2y3.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="2" y="4">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x2y4.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="2" y="5">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x2y5.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="2" y="6">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x2y6.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_n" x="2" y="7">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x2y7.i_blk_i0 i_tile_x2y7.i_blk_i1 i_tile_x2y7.i_blk_i2 i_tile_x2y7.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_s" x="3" y="0">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x3y0.i_blk_i0 i_tile_x3y0.i_blk_i1 i_tile_x3y0.i_blk_i2 i_tile_x3y0.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="3" y="1">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x3y1.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="3" y="2">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x3y2.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="3" y="3">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x3y3.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="3" y="4">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x3y4.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="3" y="5">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x3y5.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="3" y="6">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x3y6.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_n" x="3" y="7">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x3y7.i_blk_i0 i_tile_x3y7.i_blk_i1 i_tile_x3y7.i_blk_i2 i_tile_x3y7.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_s" x="4" y="0">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x4y0.i_blk_i0 i_tile_x4y0.i_blk_i1 i_tile_x4y0.i_blk_i2 i_tile_x4y0.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="4" y="1">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x4y1.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="4" y="2">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x4y2.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="4" y="3">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x4y3.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="4" y="4">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x4y4.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="4" y="5">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x4y5.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="4" y="6">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x4y6.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_n" x="4" y="7">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x4y7.i_blk_i0 i_tile_x4y7.i_blk_i1 i_tile_x4y7.i_blk_i2 i_tile_x4y7.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_s" x="5" y="0">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x5y0.i_blk_i0 i_tile_x5y0.i_blk_i1 i_tile_x5y0.i_blk_i2 i_tile_x5y0.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="5" y="1">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x5y1.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="5" y="2">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x5y2.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="5" y="3">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x5y3.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="5" y="4">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x5y4.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="5" y="5">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x5y5.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="5" y="6">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x5y6.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_n" x="5" y="7">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x5y7.i_blk_i0 i_tile_x5y7.i_blk_i1 i_tile_x5y7.i_blk_i2 i_tile_x5y7.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_s" x="6" y="0">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x6y0.i_blk_i0 i_tile_x6y0.i_blk_i1 i_tile_x6y0.i_blk_i2 i_tile_x6y0.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="6" y="1">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x6y1.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="6" y="2">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x6y2.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="6" y="3">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x6y3.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="6" y="4">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x6y4.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="6" y="5">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x6y5.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="tile_clb" x="6" y="6">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x6y6.i_blk</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_n" x="6" y="7">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x6y7.i_blk_i0 i_tile_x6y7.i_blk_i1 i_tile_x6y7.i_blk_i2 i_tile_x6y7.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_e" x="7" y="1">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x7y1.i_blk_i0 i_tile_x7y1.i_blk_i1 i_tile_x7y1.i_blk_i2 i_tile_x7y1.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_e" x="7" y="2">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x7y2.i_blk_i0 i_tile_x7y2.i_blk_i1 i_tile_x7y2.i_blk_i2 i_tile_x7y2.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_e" x="7" y="3">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x7y3.i_blk_i0 i_tile_x7y3.i_blk_i1 i_tile_x7y3.i_blk_i2 i_tile_x7y3.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_e" x="7" y="4">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x7y4.i_blk_i0 i_tile_x7y4.i_blk_i1 i_tile_x7y4.i_blk_i2 i_tile_x7y4.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_e" x="7" y="5">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x7y5.i_blk_i0 i_tile_x7y5.i_blk_i1 i_tile_x7y5.i_blk_i2 i_tile_x7y5.i_blk_i3</meta>
+				</metadata>
+			</single>
+			<single priority="1" type="t_io_e" x="7" y="6">
+				<metadata>
+					<meta name="fasm_prefix">i_tile_x7y6.i_blk_i0 i_tile_x7y6.i_blk_i1 i_tile_x7y6.i_blk_i2 i_tile_x7y6.i_blk_i3</meta>
+				</metadata>
+			</single>
+		</fixed_layout>
+	</layout>
+	<tiles>
+		<tile name="t_io_w" width="1" height="1">
+			<sub_tile name="t_io_w_s0" capacity="4">
+				<input name="outpad" num_pins="1"></input>
+				<output name="inpad" num_pins="1"></output>
+				<fc in_type="frac" in_val="1.0" out_type="frac" out_val="1.0"></fc>
+				<pinlocations pattern="custom">
+					<loc side="right" xoffset="0" yoffset="0">t_io_w_s0.outpad t_io_w_s0.inpad</loc>
+				</pinlocations>
+				<equivalent_sites>
+					<site pb_type="iob" pin_mapping="direct"></site>
+				</equivalent_sites>
+			</sub_tile>
+		</tile>
+		<tile name="t_io_s" width="1" height="1">
+			<sub_tile name="t_io_s_s0" capacity="4">
+				<input name="outpad" num_pins="1"></input>
+				<output name="inpad" num_pins="1"></output>
+				<fc in_type="frac" in_val="1.0" out_type="frac" out_val="1.0"></fc>
+				<pinlocations pattern="custom">
+					<loc side="top" xoffset="0" yoffset="0">t_io_s_s0.outpad t_io_s_s0.inpad</loc>
+				</pinlocations>
+				<equivalent_sites>
+					<site pb_type="iob" pin_mapping="direct"></site>
+				</equivalent_sites>
+			</sub_tile>
+		</tile>
+		<tile name="tile_clb" width="1" height="1">
+			<sub_tile name="tile_clb_s0" capacity="1">
+				<clock name="clk" num_pins="1"></clock>
+				<input name="ina" num_pins="6"></input>
+				<input name="ax" num_pins="1"></input>
+				<input name="cin" num_pins="1"></input>
+				<input name="ce" num_pins="1"></input>
+				<output name="amux" num_pins="1"></output>
+				<output name="a" num_pins="1"></output>
+				<output name="aq" num_pins="1"></output>
+				<input name="inb" num_pins="6"></input>
+				<input name="bx" num_pins="1"></input>
+				<output name="bmux" num_pins="1"></output>
+				<output name="b" num_pins="1"></output>
+				<output name="bq" num_pins="1"></output>
+				<output name="cout" num_pins="1"></output>
+				<fc in_type="frac" in_val="1.0" out_type="frac" out_val="1.0">
+					<fc_override fc_type="frac" fc_val="0" port_name="cin"></fc_override>
+					<fc_override fc_type="frac" fc_val="0" port_name="cout"></fc_override>
+					<fc_override fc_type="frac" fc_val="0" port_name="clk"></fc_override>
+				</fc>
+				<pinlocations pattern="custom">
+					<loc side="top" xoffset="0" yoffset="0">tile_clb_s0.cout</loc>
+					<loc side="right" xoffset="0" yoffset="0">tile_clb_s0.amux tile_clb_s0.a tile_clb_s0.aq tile_clb_s0.bmux tile_clb_s0.b tile_clb_s0.bq</loc>
+					<loc side="bottom" xoffset="0" yoffset="0">tile_clb_s0.clk tile_clb_s0.cin</loc>
+					<loc side="left" xoffset="0" yoffset="0">tile_clb_s0.ina tile_clb_s0.ax tile_clb_s0.ce tile_clb_s0.inb tile_clb_s0.bx</loc>
+				</pinlocations>
+				<equivalent_sites>
+					<site pb_type="clb" pin_mapping="direct"></site>
+				</equivalent_sites>
+			</sub_tile>
+		</tile>
+		<tile name="t_io_n" width="1" height="1">
+			<sub_tile name="t_io_n_s0" capacity="4">
+				<input name="outpad" num_pins="1"></input>
+				<output name="inpad" num_pins="1"></output>
+				<fc in_type="frac" in_val="1.0" out_type="frac" out_val="1.0"></fc>
+				<pinlocations pattern="custom">
+					<loc side="bottom" xoffset="0" yoffset="0">t_io_n_s0.outpad t_io_n_s0.inpad</loc>
+				</pinlocations>
+				<equivalent_sites>
+					<site pb_type="iob" pin_mapping="direct"></site>
+				</equivalent_sites>
+			</sub_tile>
+		</tile>
+		<tile name="t_io_e" width="1" height="1">
+			<sub_tile name="t_io_e_s0" capacity="4">
+				<input name="outpad" num_pins="1"></input>
+				<output name="inpad" num_pins="1"></output>
+				<fc in_type="frac" in_val="1.0" out_type="frac" out_val="1.0"></fc>
+				<pinlocations pattern="custom">
+					<loc side="left" xoffset="0" yoffset="0">t_io_e_s0.outpad t_io_e_s0.inpad</loc>
+				</pinlocations>
+				<equivalent_sites>
+					<site pb_type="iob" pin_mapping="direct"></site>
+				</equivalent_sites>
+			</sub_tile>
+		</tile>
+	</tiles>
+	<complexblocklist>
+		<pb_type name="iob">
+			<input name="outpad" num_pins="1"></input>
+			<output name="inpad" num_pins="1"></output>
+			<pb_type name="io" num_pb="1">
+				<input name="outpad" num_pins="1"></input>
+				<output name="inpad" num_pins="1"></output>
+				<mode name="mode_input">
+					<pb_type name="io_mode_input" num_pb="1">
+						<input name="outpad" num_pins="1"></input>
+						<output name="inpad" num_pins="1"></output>
+						<pb_type name="i_pad" num_pb="1" blif_model=".input">
+							<output name="inpad" num_pins="1"></output>
+							<metadata>
+								<meta name="fasm_prefix">i_pad</meta>
+								<meta name="fasm_features">+</meta>
+							</metadata>
+						</pb_type>
+						<interconnect>
+							<direct name="direct_mode_input_inpad" input="i_pad.inpad" output="io_mode_input.inpad">
+								<metadata>
+									<meta name="fasm_mux">i_pad.inpad : {i_pad.inpad-&gt;inpad}</meta>
+								</metadata>
+							</direct>
+						</interconnect>
+						<metadata>
+							<meta name="fasm_prefix">@mode_input</meta>
+							<meta name="fasm_features">+</meta>
+						</metadata>
+					</pb_type>
+					<interconnect>
+						<direct name="direct_outpad" input="io.outpad" output="io_mode_input.outpad"></direct>
+						<direct name="direct_inpad" input="io_mode_input.inpad" output="io.inpad"></direct>
+					</interconnect>
+				</mode>
+				<mode name="mode_output">
+					<pb_type name="io_mode_output" num_pb="1">
+						<input name="outpad" num_pins="1"></input>
+						<output name="inpad" num_pins="1"></output>
+						<pb_type name="o_pad" num_pb="1" blif_model=".output">
+							<input name="outpad" num_pins="1"></input>
+							<metadata>
+								<meta name="fasm_prefix">o_pad</meta>
+								<meta name="fasm_features">+</meta>
+							</metadata>
+						</pb_type>
+						<interconnect>
+							<direct name="direct_mode_output_o_pad_outpad" input="io_mode_output.outpad" output="o_pad.outpad">
+								<metadata>
+									<meta name="fasm_mux">io_mode_output.outpad : {outpad-&gt;o_pad.outpad}</meta>
+								</metadata>
+							</direct>
+						</interconnect>
+						<metadata>
+							<meta name="fasm_prefix">@mode_output</meta>
+							<meta name="fasm_features">+</meta>
+						</metadata>
+					</pb_type>
+					<interconnect>
+						<direct name="direct_outpad" input="io.outpad" output="io_mode_output.outpad"></direct>
+						<direct name="direct_inpad" input="io_mode_output.inpad" output="io.inpad"></direct>
+					</interconnect>
+				</mode>
+				<metadata>
+					<meta name="fasm_prefix">io</meta>
+					<meta name="fasm_features">+</meta>
+				</metadata>
+			</pb_type>
+			<interconnect>
+				<direct name="direct_inpad" input="io.inpad" output="iob.inpad">
+					<metadata>
+						<meta name="fasm_mux">io.inpad : {io.inpad-&gt;inpad}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_io_outpad" input="iob.outpad" output="io.outpad">
+					<metadata>
+						<meta name="fasm_mux">iob.outpad : {outpad-&gt;io.outpad}</meta>
+					</metadata>
+				</direct>
+			</interconnect>
+			<metadata>
+				<meta name="fasm_features">+</meta>
+			</metadata>
+		</pb_type>
+		<pb_type name="clb">
+			<clock name="clk" num_pins="1"></clock>
+			<input name="ina" num_pins="6"></input>
+			<input name="ax" num_pins="1"></input>
+			<input name="cin" num_pins="1"></input>
+			<input name="ce" num_pins="1"></input>
+			<output name="amux" num_pins="1"></output>
+			<output name="a" num_pins="1"></output>
+			<output name="aq" num_pins="1"></output>
+			<input name="inb" num_pins="6"></input>
+			<input name="bx" num_pins="1"></input>
+			<output name="bmux" num_pins="1"></output>
+			<output name="b" num_pins="1"></output>
+			<output name="bq" num_pins="1"></output>
+			<output name="cout" num_pins="1"></output>
+			<pb_type name="clust" num_pb="1">
+				<clock name="clk" num_pins="1"></clock>
+				<input name="ina" num_pins="6"></input>
+				<input name="ax" num_pins="1"></input>
+				<input name="cin" num_pins="1"></input>
+				<output name="amux" num_pins="1"></output>
+				<output name="a" num_pins="1"></output>
+				<output name="aq" num_pins="1"></output>
+				<output name="cout" num_pins="1"></output>
+				<input name="ce" num_pins="1"></input>
+				<input name="inb" num_pins="6"></input>
+				<input name="bx" num_pins="1"></input>
+				<output name="bmux" num_pins="1"></output>
+				<output name="b" num_pins="1"></output>
+				<output name="bq" num_pins="1"></output>
+				<pb_type name="i_mux_8" num_pb="1" blif_model=".subckt m_mux2">
+					<input name="i0" num_pins="1"></input>
+					<input name="i1" num_pins="1"></input>
+					<input name="sel" num_pins="1"></input>
+					<output name="y" num_pins="1"></output>
+					<delay_constant max="1e-10" in_port="i_mux_8.i0" out_port="i_mux_8.y"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_mux_8.i1" out_port="i_mux_8.y"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_mux_8.sel" out_port="i_mux_8.y"></delay_constant>
+					<metadata>
+						<meta name="fasm_prefix">i_mux_8</meta>
+						<meta name="fasm_features">+</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_mux_9" num_pb="1" blif_model=".subckt m_mux2">
+					<input name="i0" num_pins="1"></input>
+					<input name="i1" num_pins="1"></input>
+					<input name="sel" num_pins="1"></input>
+					<output name="y" num_pins="1"></output>
+					<delay_constant max="1e-10" in_port="i_mux_9.i0" out_port="i_mux_9.y"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_mux_9.i1" out_port="i_mux_9.y"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_mux_9.sel" out_port="i_mux_9.y"></delay_constant>
+					<metadata>
+						<meta name="fasm_prefix">i_mux_9</meta>
+						<meta name="fasm_features">+</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_lut5_3" num_pb="1">
+					<input name="in" num_pins="5"></input>
+					<output name="out" num_pins="1"></output>
+					<pb_type name="i_lut5_3_lut" num_pb="1" blif_model=".names" class="lut">
+						<input name="in" num_pins="5" port_class="lut_in"></input>
+						<output name="out" num_pins="1" port_class="lut_out"></output>
+						<delay_constant max="1e-10" in_port="i_lut5_3_lut.in" out_port="i_lut5_3_lut.out"></delay_constant>
+					</pb_type>
+					<interconnect>
+						<direct name="direct_in" input="i_lut5_3.in" output="i_lut5_3_lut.in"></direct>
+						<direct name="direct_out" input="i_lut5_3_lut.out" output="i_lut5_3.out"></direct>
+					</interconnect>
+					<metadata>
+						<meta name="fasm_prefix">i_lut5_3</meta>
+						<meta name="fasm_features">+</meta>
+						<meta name="fasm_type">LUT</meta>
+						<meta name="fasm_lut">LUT[31:0] = i_lut5_3_lut[0]</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_lut5_4" num_pb="1">
+					<input name="in" num_pins="5"></input>
+					<output name="out" num_pins="1"></output>
+					<pb_type name="i_lut5_4_lut" num_pb="1" blif_model=".names" class="lut">
+						<input name="in" num_pins="5" port_class="lut_in"></input>
+						<output name="out" num_pins="1" port_class="lut_out"></output>
+						<delay_constant max="1e-10" in_port="i_lut5_4_lut.in" out_port="i_lut5_4_lut.out"></delay_constant>
+					</pb_type>
+					<interconnect>
+						<direct name="direct_in" input="i_lut5_4.in" output="i_lut5_4_lut.in"></direct>
+						<direct name="direct_out" input="i_lut5_4_lut.out" output="i_lut5_4.out"></direct>
+					</interconnect>
+					<metadata>
+						<meta name="fasm_prefix">i_lut5_4</meta>
+						<meta name="fasm_features">+</meta>
+						<meta name="fasm_type">LUT</meta>
+						<meta name="fasm_lut">LUT[31:0] = i_lut5_4_lut[0]</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_mux" num_pb="1" blif_model=".subckt m_mux2">
+					<input name="i0" num_pins="1"></input>
+					<input name="i1" num_pins="1"></input>
+					<input name="sel" num_pins="1"></input>
+					<output name="y" num_pins="1"></output>
+					<delay_constant max="1e-10" in_port="i_mux.i0" out_port="i_mux.y"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_mux.i1" out_port="i_mux.y"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_mux.sel" out_port="i_mux.y"></delay_constant>
+					<metadata>
+						<meta name="fasm_prefix">i_mux</meta>
+						<meta name="fasm_features">+</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_mux_1" num_pb="1" blif_model=".subckt m_mux2">
+					<input name="i0" num_pins="1"></input>
+					<input name="i1" num_pins="1"></input>
+					<input name="sel" num_pins="1"></input>
+					<output name="y" num_pins="1"></output>
+					<delay_constant max="1e-10" in_port="i_mux_1.i0" out_port="i_mux_1.y"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_mux_1.i1" out_port="i_mux_1.y"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_mux_1.sel" out_port="i_mux_1.y"></delay_constant>
+					<metadata>
+						<meta name="fasm_prefix">i_mux_1</meta>
+						<meta name="fasm_features">+</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_adder" num_pb="1" blif_model=".subckt m_adder">
+					<input name="a" num_pins="1"></input>
+					<input name="b" num_pins="1"></input>
+					<input name="cin" num_pins="1"></input>
+					<input name="cin_fabric" num_pins="1"></input>
+					<output name="cout" num_pins="1"></output>
+					<output name="s" num_pins="1"></output>
+					<output name="cout_fabric" num_pins="1"></output>
+					<delay_constant max="1e-10" in_port="i_adder.a" out_port="i_adder.cout"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.b" out_port="i_adder.cout"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.cin" out_port="i_adder.cout"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.cin_fabric" out_port="i_adder.cout"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.a" out_port="i_adder.s"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.b" out_port="i_adder.s"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.cin" out_port="i_adder.s"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.cin_fabric" out_port="i_adder.s"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.a" out_port="i_adder.cout_fabric"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.b" out_port="i_adder.cout_fabric"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.cin" out_port="i_adder.cout_fabric"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_adder.cin_fabric" out_port="i_adder.cout_fabric"></delay_constant>
+					<metadata>
+						<meta name="fasm_prefix">i_adder</meta>
+						<meta name="fasm_features">+</meta>
+						<meta name="fasm_params">CIN_MODE[1:0] = CIN_MODE</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_lut5" num_pb="1">
+					<input name="in" num_pins="5"></input>
+					<output name="out" num_pins="1"></output>
+					<pb_type name="i_lut5_lut" num_pb="1" blif_model=".names" class="lut">
+						<input name="in" num_pins="5" port_class="lut_in"></input>
+						<output name="out" num_pins="1" port_class="lut_out"></output>
+						<delay_constant max="1e-10" in_port="i_lut5_lut.in" out_port="i_lut5_lut.out"></delay_constant>
+					</pb_type>
+					<interconnect>
+						<direct name="direct_in" input="i_lut5.in" output="i_lut5_lut.in"></direct>
+						<direct name="direct_out" input="i_lut5_lut.out" output="i_lut5.out"></direct>
+					</interconnect>
+					<metadata>
+						<meta name="fasm_prefix">i_lut5</meta>
+						<meta name="fasm_features">+</meta>
+						<meta name="fasm_type">LUT</meta>
+						<meta name="fasm_lut">LUT[31:0] = i_lut5_lut[0]</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_lut5_1" num_pb="1">
+					<input name="in" num_pins="5"></input>
+					<output name="out" num_pins="1"></output>
+					<pb_type name="i_lut5_1_lut" num_pb="1" blif_model=".names" class="lut">
+						<input name="in" num_pins="5" port_class="lut_in"></input>
+						<output name="out" num_pins="1" port_class="lut_out"></output>
+						<delay_constant max="1e-10" in_port="i_lut5_1_lut.in" out_port="i_lut5_1_lut.out"></delay_constant>
+					</pb_type>
+					<interconnect>
+						<direct name="direct_in" input="i_lut5_1.in" output="i_lut5_1_lut.in"></direct>
+						<direct name="direct_out" input="i_lut5_1_lut.out" output="i_lut5_1.out"></direct>
+					</interconnect>
+					<metadata>
+						<meta name="fasm_prefix">i_lut5_1</meta>
+						<meta name="fasm_features">+</meta>
+						<meta name="fasm_type">LUT</meta>
+						<meta name="fasm_lut">LUT[31:0] = i_lut5_1_lut[0]</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_xor2" num_pb="1" blif_model=".subckt m_xor2">
+					<input name="a" num_pins="1"></input>
+					<input name="b" num_pins="1"></input>
+					<output name="c" num_pins="1"></output>
+					<delay_constant max="1e-10" in_port="i_xor2.a" out_port="i_xor2.c"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_xor2.b" out_port="i_xor2.c"></delay_constant>
+					<metadata>
+						<meta name="fasm_prefix">i_xor2</meta>
+						<meta name="fasm_features">+</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_flipflop" num_pb="1" blif_model=".subckt m_dffe">
+					<clock name="C" num_pins="1"></clock>
+					<input name="D" num_pins="1"></input>
+					<input name="E" num_pins="1"></input>
+					<output name="Q" num_pins="1"></output>
+					<T_setup value="1e-10" port="i_flipflop.D" clock="C"></T_setup>
+					<T_setup value="1e-10" port="i_flipflop.E" clock="C"></T_setup>
+					<T_clock_to_Q max="1e-10" port="i_flipflop.Q" clock="C"></T_clock_to_Q>
+					<metadata>
+						<meta name="fasm_prefix">i_flipflop</meta>
+						<meta name="fasm_features">+</meta>
+						<meta name="fasm_params">ENABLE_CE[0:0] = ENABLE_CE</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_flipflop1" num_pb="1" blif_model=".subckt m_dffe">
+					<clock name="C" num_pins="1"></clock>
+					<input name="D" num_pins="1"></input>
+					<input name="E" num_pins="1"></input>
+					<output name="Q" num_pins="1"></output>
+					<T_setup value="1e-10" port="i_flipflop1.D" clock="C"></T_setup>
+					<T_setup value="1e-10" port="i_flipflop1.E" clock="C"></T_setup>
+					<T_clock_to_Q max="1e-10" port="i_flipflop1.Q" clock="C"></T_clock_to_Q>
+					<metadata>
+						<meta name="fasm_prefix">i_flipflop1</meta>
+						<meta name="fasm_features">+</meta>
+						<meta name="fasm_params">ENABLE_CE[0:0] = ENABLE_CE</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_xor2_1" num_pb="1" blif_model=".subckt m_xor2">
+					<input name="a" num_pins="1"></input>
+					<input name="b" num_pins="1"></input>
+					<output name="c" num_pins="1"></output>
+					<delay_constant max="1e-10" in_port="i_xor2_1.a" out_port="i_xor2_1.c"></delay_constant>
+					<delay_constant max="1e-10" in_port="i_xor2_1.b" out_port="i_xor2_1.c"></delay_constant>
+					<metadata>
+						<meta name="fasm_prefix">i_xor2_1</meta>
+						<meta name="fasm_features">+</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_flipflop_3" num_pb="1" blif_model=".subckt m_dffe">
+					<clock name="C" num_pins="1"></clock>
+					<input name="D" num_pins="1"></input>
+					<input name="E" num_pins="1"></input>
+					<output name="Q" num_pins="1"></output>
+					<T_setup value="1e-10" port="i_flipflop_3.D" clock="C"></T_setup>
+					<T_setup value="1e-10" port="i_flipflop_3.E" clock="C"></T_setup>
+					<T_clock_to_Q max="1e-10" port="i_flipflop_3.Q" clock="C"></T_clock_to_Q>
+					<metadata>
+						<meta name="fasm_prefix">i_flipflop_3</meta>
+						<meta name="fasm_features">+</meta>
+						<meta name="fasm_params">ENABLE_CE[0:0] = ENABLE_CE</meta>
+					</metadata>
+				</pb_type>
+				<pb_type name="i_flipflop_4" num_pb="1" blif_model=".subckt m_dffe">
+					<clock name="C" num_pins="1"></clock>
+					<input name="D" num_pins="1"></input>
+					<input name="E" num_pins="1"></input>
+					<output name="Q" num_pins="1"></output>
+					<T_setup value="1e-10" port="i_flipflop_4.D" clock="C"></T_setup>
+					<T_setup value="1e-10" port="i_flipflop_4.E" clock="C"></T_setup>
+					<T_clock_to_Q max="1e-10" port="i_flipflop_4.Q" clock="C"></T_clock_to_Q>
+					<metadata>
+						<meta name="fasm_prefix">i_flipflop_4</meta>
+						<meta name="fasm_features">+</meta>
+						<meta name="fasm_params">ENABLE_CE[0:0] = ENABLE_CE</meta>
+					</metadata>
+				</pb_type>
+				<interconnect>
+					<mux name="mux_amux" input="i_xor2.c i_flipflop.Q i_mux_1.y i_mux_9.y i_lut5_1.out i_mux.y" output="clust.amux">
+						<metadata>
+							<meta name="fasm_mux">
+								i_xor2.c : {i_xor2.c-&gt;amux}
+								i_flipflop.Q : {i_flipflop.Q-&gt;amux}
+								i_mux_1.y : {i_mux_1.y-&gt;amux}
+								i_mux_9.y : {i_mux_9.y-&gt;amux}
+								i_lut5_1.out : {i_lut5_1.out-&gt;amux}
+								i_mux.y : {i_mux.y-&gt;amux}
+							</meta>
+						</metadata>
+					</mux>
+					<direct name="direct_a" input="i_mux.y" output="clust.a">
+						<metadata>
+							<meta name="fasm_mux">i_mux.y : {i_mux.y-&gt;a}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_aq" input="i_flipflop1.Q" output="clust.aq">
+						<metadata>
+							<meta name="fasm_mux">i_flipflop1.Q : {i_flipflop1.Q-&gt;aq}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_cout" input="i_mux_8.y" output="clust.cout">
+						<metadata>
+							<meta name="fasm_mux">i_mux_8.y : {i_mux_8.y-&gt;cout}</meta>
+						</metadata>
+					</direct>
+					<mux name="mux_bmux" input="i_xor2_1.c i_flipflop_3.Q i_mux_9.y i_lut5_4.out i_mux_8.y" output="clust.bmux">
+						<metadata>
+							<meta name="fasm_mux">
+								i_xor2_1.c : {i_xor2_1.c-&gt;bmux}
+								i_flipflop_3.Q : {i_flipflop_3.Q-&gt;bmux}
+								i_mux_9.y : {i_mux_9.y-&gt;bmux}
+								i_lut5_4.out : {i_lut5_4.out-&gt;bmux}
+								i_mux_8.y : {i_mux_8.y-&gt;bmux}
+							</meta>
+						</metadata>
+					</mux>
+					<direct name="direct_b" input="i_mux_9.y" output="clust.b">
+						<metadata>
+							<meta name="fasm_mux">i_mux_9.y : {i_mux_9.y-&gt;b}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_bq" input="i_flipflop_4.Q" output="clust.bq">
+						<metadata>
+							<meta name="fasm_mux">i_flipflop_4.Q : {i_flipflop_4.Q-&gt;bq}</meta>
+						</metadata>
+					</direct>
+					<mux name="mux_i_mux_8_i0" input="clust.bx i_mux_1.y" output="i_mux_8.i0">
+						<metadata>
+							<meta name="fasm_mux">
+								clust.bx : {bx-&gt;i_mux_8.i0}
+								i_mux_1.y : {i_mux_1.y-&gt;i_mux_8.i0}
+							</meta>
+						</metadata>
+					</mux>
+					<mux name="mux_i_mux_8_i1" input="clust.bx i_lut5_4.out" output="i_mux_8.i1">
+						<metadata>
+							<meta name="fasm_mux">
+								clust.bx : {bx-&gt;i_mux_8.i1}
+								i_lut5_4.out : {i_lut5_4.out-&gt;i_mux_8.i1}
+							</meta>
+						</metadata>
+					</mux>
+					<direct name="direct_i_mux_8_sel" input="i_mux_9.y" output="i_mux_8.sel">
+						<metadata>
+							<meta name="fasm_mux">i_mux_9.y : {i_mux_9.y-&gt;i_mux_8.sel}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_mux_9_i0" input="i_lut5_3.out" output="i_mux_9.i0">
+						<metadata>
+							<meta name="fasm_mux">i_lut5_3.out : {i_lut5_3.out-&gt;i_mux_9.i0}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_mux_9_i1" input="i_lut5_4.out" output="i_mux_9.i1">
+						<metadata>
+							<meta name="fasm_mux">i_lut5_4.out : {i_lut5_4.out-&gt;i_mux_9.i1}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_mux_9_sel" input="clust.inb[5]" output="i_mux_9.sel">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[5] : {inb[5]-&gt;i_mux_9.sel}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_3_in_0" input="clust.inb[0]" output="i_lut5_3.in[0]">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[0] : {inb[0]-&gt;i_lut5_3.in[0]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_3_in_1" input="clust.inb[1]" output="i_lut5_3.in[1]">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[1] : {inb[1]-&gt;i_lut5_3.in[1]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_3_in_2" input="clust.inb[2]" output="i_lut5_3.in[2]">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[2] : {inb[2]-&gt;i_lut5_3.in[2]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_3_in_3" input="clust.inb[3]" output="i_lut5_3.in[3]">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[3] : {inb[3]-&gt;i_lut5_3.in[3]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_3_in_4" input="clust.inb[4]" output="i_lut5_3.in[4]">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[4] : {inb[4]-&gt;i_lut5_3.in[4]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_4_in_0" input="clust.inb[0]" output="i_lut5_4.in[0]">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[0] : {inb[0]-&gt;i_lut5_4.in[0]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_4_in_1" input="clust.inb[1]" output="i_lut5_4.in[1]">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[1] : {inb[1]-&gt;i_lut5_4.in[1]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_4_in_2" input="clust.inb[2]" output="i_lut5_4.in[2]">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[2] : {inb[2]-&gt;i_lut5_4.in[2]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_4_in_3" input="clust.inb[3]" output="i_lut5_4.in[3]">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[3] : {inb[3]-&gt;i_lut5_4.in[3]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_4_in_4" input="clust.inb[4]" output="i_lut5_4.in[4]">
+						<metadata>
+							<meta name="fasm_mux">clust.inb[4] : {inb[4]-&gt;i_lut5_4.in[4]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_mux_i0" input="i_lut5.out" output="i_mux.i0">
+						<metadata>
+							<meta name="fasm_mux">i_lut5.out : {i_lut5.out-&gt;i_mux.i0}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_mux_i1" input="i_lut5_1.out" output="i_mux.i1">
+						<metadata>
+							<meta name="fasm_mux">i_lut5_1.out : {i_lut5_1.out-&gt;i_mux.i1}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_mux_sel" input="clust.ina[5]" output="i_mux.sel">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[5] : {ina[5]-&gt;i_mux.sel}</meta>
+						</metadata>
+					</direct>
+					<mux name="mux_i_mux_1_i0" input="clust.ax clust.cin" output="i_mux_1.i0">
+						<metadata>
+							<meta name="fasm_mux">
+								clust.ax : {ax-&gt;i_mux_1.i0}
+								clust.cin : {cin-&gt;i_mux_1.i0}
+							</meta>
+						</metadata>
+					</mux>
+					<mux name="mux_i_mux_1_i1" input="clust.ax i_lut5_1.out" output="i_mux_1.i1">
+						<metadata>
+							<meta name="fasm_mux">
+								clust.ax : {ax-&gt;i_mux_1.i1}
+								i_lut5_1.out : {i_lut5_1.out-&gt;i_mux_1.i1}
+							</meta>
+						</metadata>
+					</mux>
+					<direct name="direct_i_mux_1_sel" input="i_mux.y" output="i_mux_1.sel">
+						<metadata>
+							<meta name="fasm_mux">i_mux.y : {i_mux.y-&gt;i_mux_1.sel}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_adder_cin" input="clust.cin" output="i_adder.cin">
+						<pack_pattern name="carrychain" in_port="clust.cin" out_port="i_adder.cin"></pack_pattern>
+						<metadata>
+							<meta name="fasm_mux">clust.cin : {cin-&gt;i_adder.cin}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_in_0" input="clust.ina[0]" output="i_lut5.in[0]">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[0] : {ina[0]-&gt;i_lut5.in[0]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_in_1" input="clust.ina[1]" output="i_lut5.in[1]">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[1] : {ina[1]-&gt;i_lut5.in[1]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_in_2" input="clust.ina[2]" output="i_lut5.in[2]">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[2] : {ina[2]-&gt;i_lut5.in[2]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_in_3" input="clust.ina[3]" output="i_lut5.in[3]">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[3] : {ina[3]-&gt;i_lut5.in[3]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_in_4" input="clust.ina[4]" output="i_lut5.in[4]">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[4] : {ina[4]-&gt;i_lut5.in[4]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_1_in_0" input="clust.ina[0]" output="i_lut5_1.in[0]">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[0] : {ina[0]-&gt;i_lut5_1.in[0]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_1_in_1" input="clust.ina[1]" output="i_lut5_1.in[1]">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[1] : {ina[1]-&gt;i_lut5_1.in[1]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_1_in_2" input="clust.ina[2]" output="i_lut5_1.in[2]">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[2] : {ina[2]-&gt;i_lut5_1.in[2]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_1_in_3" input="clust.ina[3]" output="i_lut5_1.in[3]">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[3] : {ina[3]-&gt;i_lut5_1.in[3]}</meta>
+						</metadata>
+					</direct>
+					<direct name="direct_i_lut5_1_in_4" input="clust.ina[4]" output="i_lut5_1.in[4]">
+						<metadata>
+							<meta name="fasm_mux">clust.ina[4] : {ina[4]-&gt;i_lut5_1.in[4]}</meta>
+						</metadata>
+					</direct>
+					<mux name="mux_i_xor2_a" input="clust.ax clust.cin" output="i_xor2.a">
+						<metadata>
+							<meta name="fasm_mux">
+								clust.ax : {ax-&gt;i_xor2.a}
+								clust.cin : {cin-&gt;i_xor2.a}
+							</meta>
+						</metadata>
+					</mux>
+					<direct name="direct_i_xor2_b" input="i_mux.y" output="i_xor2.b">
+						<metadata>
+							<meta name="fasm_mux">i_mux.y : {i_mux.y-&gt;i_xor2.b}</meta>
+						</metadata>
+					</direct>
+					<mux name="mux_i_flipflop_D" input="clust.ax i_lut5_1.out" output="i_flipflop.D">
+						<metadata>
+							<meta name="fasm_mux">
+								clust.ax : {ax-&gt;i_flipflop.D}
+								i_lut5_1.out : {i_lut5_1.out-&gt;i_flipflop.D}
+							</meta>
+						</metadata>
+					</mux>
+					<direct name="direct_i_flipflop1_C" input="clust.clk" output="i_flipflop1.C">
+						<metadata>
+							<meta name="fasm_mux">clust.clk : {clk-&gt;i_flipflop1.C}</meta>
+						</metadata>
+					</direct>
+					<mux name="mux_i_flipflop1_D" input="i_lut5_1.out i_mux.y i_xor2.c clust.ax" output="i_flipflop1.D">
+						<metadata>
+							<meta name="fasm_mux">
+								i_lut5_1.out : {i_lut5_1.out-&gt;i_flipflop1.D}
+								i_mux.y : {i_mux.y-&gt;i_flipflop1.D}
+								i_xor2.c : {i_xor2.c-&gt;i_flipflop1.D}
+								clust.ax : {ax-&gt;i_flipflop1.D}
+							</meta>
+						</metadata>
+					</mux>
+					<direct name="direct_i_flipflop1_E" input="clust.ce" output="i_flipflop1.E">
+						<metadata>
+							<meta name="fasm_mux">clust.ce : {ce-&gt;i_flipflop1.E}</meta>
+						</metadata>
+					</direct>
+					<mux name="mux_i_xor2_1_a" input="clust.bx i_mux_1.y" output="i_xor2_1.a">
+						<metadata>
+							<meta name="fasm_mux">
+								clust.bx : {bx-&gt;i_xor2_1.a}
+								i_mux_1.y : {i_mux_1.y-&gt;i_xor2_1.a}
+							</meta>
+						</metadata>
+					</mux>
+					<direct name="direct_i_xor2_1_b" input="i_mux_9.y" output="i_xor2_1.b">
+						<metadata>
+							<meta name="fasm_mux">i_mux_9.y : {i_mux_9.y-&gt;i_xor2_1.b}</meta>
+						</metadata>
+					</direct>
+					<mux name="mux_i_flipflop_3_D" input="clust.bx i_lut5_4.out" output="i_flipflop_3.D">
+						<metadata>
+							<meta name="fasm_mux">
+								clust.bx : {bx-&gt;i_flipflop_3.D}
+								i_lut5_4.out : {i_lut5_4.out-&gt;i_flipflop_3.D}
+							</meta>
+						</metadata>
+					</mux>
+					<direct name="direct_i_flipflop_4_C" input="clust.clk" output="i_flipflop_4.C">
+						<metadata>
+							<meta name="fasm_mux">clust.clk : {clk-&gt;i_flipflop_4.C}</meta>
+						</metadata>
+					</direct>
+					<mux name="mux_i_flipflop_4_D" input="i_lut5_4.out i_mux_9.y i_xor2_1.c clust.bx" output="i_flipflop_4.D">
+						<metadata>
+							<meta name="fasm_mux">
+								i_lut5_4.out : {i_lut5_4.out-&gt;i_flipflop_4.D}
+								i_mux_9.y : {i_mux_9.y-&gt;i_flipflop_4.D}
+								i_xor2_1.c : {i_xor2_1.c-&gt;i_flipflop_4.D}
+								clust.bx : {bx-&gt;i_flipflop_4.D}
+							</meta>
+						</metadata>
+					</mux>
+					<direct name="direct_i_flipflop_4_E" input="clust.ce" output="i_flipflop_4.E">
+						<metadata>
+							<meta name="fasm_mux">clust.ce : {ce-&gt;i_flipflop_4.E}</meta>
+						</metadata>
+					</direct>
+				</interconnect>
+				<metadata>
+					<meta name="fasm_prefix">clust</meta>
+					<meta name="fasm_features">+</meta>
+				</metadata>
+			</pb_type>
+			<interconnect>
+				<mux name="mux_amux" input="clust.amux clust.bmux" output="clb.amux">
+					<metadata>
+						<meta name="fasm_mux">
+							clust.amux : {clust.amux-&gt;amux}
+							clust.bmux : {clust.bmux-&gt;amux}
+						</meta>
+					</metadata>
+				</mux>
+				<direct name="direct_a" input="clust.a" output="clb.a">
+					<metadata>
+						<meta name="fasm_mux">clust.a : {clust.a-&gt;a}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_aq" input="clust.aq" output="clb.aq">
+					<metadata>
+						<meta name="fasm_mux">clust.aq : {clust.aq-&gt;aq}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_b" input="clust.b" output="clb.b">
+					<metadata>
+						<meta name="fasm_mux">clust.b : {clust.b-&gt;b}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_bq" input="clust.bq" output="clb.bq">
+					<metadata>
+						<meta name="fasm_mux">clust.bq : {clust.bq-&gt;bq}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_cout" input="clust.cout" output="clb.cout">
+					<pack_pattern name="carrychain" in_port="clust.cout" out_port="clb.cout"></pack_pattern>
+					<metadata>
+						<meta name="fasm_mux">clust.cout : {clust.cout-&gt;cout}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_clk" input="clb.clk" output="clust.clk">
+					<metadata>
+						<meta name="fasm_mux">clb.clk : {clk-&gt;clust.clk}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_ina_0" input="clb.ina[0]" output="clust.ina[0]">
+					<metadata>
+						<meta name="fasm_mux">clb.ina[0] : {ina[0]-&gt;clust.ina[0]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_ina_1" input="clb.ina[1]" output="clust.ina[1]">
+					<metadata>
+						<meta name="fasm_mux">clb.ina[1] : {ina[1]-&gt;clust.ina[1]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_ina_2" input="clb.ina[2]" output="clust.ina[2]">
+					<metadata>
+						<meta name="fasm_mux">clb.ina[2] : {ina[2]-&gt;clust.ina[2]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_ina_3" input="clb.ina[3]" output="clust.ina[3]">
+					<metadata>
+						<meta name="fasm_mux">clb.ina[3] : {ina[3]-&gt;clust.ina[3]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_ina_4" input="clb.ina[4]" output="clust.ina[4]">
+					<metadata>
+						<meta name="fasm_mux">clb.ina[4] : {ina[4]-&gt;clust.ina[4]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_ina_5" input="clb.ina[5]" output="clust.ina[5]">
+					<metadata>
+						<meta name="fasm_mux">clb.ina[5] : {ina[5]-&gt;clust.ina[5]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_ax" input="clb.ax" output="clust.ax">
+					<metadata>
+						<meta name="fasm_mux">clb.ax : {ax-&gt;clust.ax}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_cin" input="clb.cin" output="clust.cin">
+					<metadata>
+						<meta name="fasm_mux">clb.cin : {cin-&gt;clust.cin}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_inb_0" input="clb.inb[0]" output="clust.inb[0]">
+					<metadata>
+						<meta name="fasm_mux">clb.inb[0] : {inb[0]-&gt;clust.inb[0]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_inb_1" input="clb.inb[1]" output="clust.inb[1]">
+					<metadata>
+						<meta name="fasm_mux">clb.inb[1] : {inb[1]-&gt;clust.inb[1]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_inb_2" input="clb.inb[2]" output="clust.inb[2]">
+					<metadata>
+						<meta name="fasm_mux">clb.inb[2] : {inb[2]-&gt;clust.inb[2]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_inb_3" input="clb.inb[3]" output="clust.inb[3]">
+					<metadata>
+						<meta name="fasm_mux">clb.inb[3] : {inb[3]-&gt;clust.inb[3]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_inb_4" input="clb.inb[4]" output="clust.inb[4]">
+					<metadata>
+						<meta name="fasm_mux">clb.inb[4] : {inb[4]-&gt;clust.inb[4]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_inb_5" input="clb.inb[5]" output="clust.inb[5]">
+					<metadata>
+						<meta name="fasm_mux">clb.inb[5] : {inb[5]-&gt;clust.inb[5]}</meta>
+					</metadata>
+				</direct>
+				<direct name="direct_clust_bx" input="clb.bx" output="clust.bx">
+					<metadata>
+						<meta name="fasm_mux">clb.bx : {bx-&gt;clust.bx}</meta>
+					</metadata>
+				</direct>
+			</interconnect>
+			<metadata>
+				<meta name="fasm_features">+</meta>
+			</metadata>
+		</pb_type>
+	</complexblocklist>
+	<directlist>
+		<direct name="carrychain" from_pin="tile_clb.cout" to_pin="tile_clb.cin" x_offset="0" y_offset="1" z_offset="0"></direct>
+	</directlist>
+	<models>
+		<model name="m_xor2">
+			<output_ports>
+				<port name="c"></port>
+			</output_ports>
+			<input_ports>
+				<port name="a" combinational_sink_ports="c"></port>
+				<port name="b" combinational_sink_ports="c"></port>
+			</input_ports>
+		</model>
+		<model name="m_adder">
+			<output_ports>
+				<port name="cout"></port>
+				<port name="s"></port>
+				<port name="cout_fabric"></port>
+			</output_ports>
+			<input_ports>
+				<port name="a" combinational_sink_ports="cout s cout_fabric"></port>
+				<port name="b" combinational_sink_ports="cout s cout_fabric"></port>
+				<port name="cin" combinational_sink_ports="cout s cout_fabric"></port>
+				<port name="cin_fabric" combinational_sink_ports="cout s cout_fabric"></port>
+			</input_ports>
+		</model>
+		<model name="m_mux2">
+			<output_ports>
+				<port name="y"></port>
+			</output_ports>
+			<input_ports>
+				<port name="i0" combinational_sink_ports="y"></port>
+				<port name="i1" combinational_sink_ports="y"></port>
+				<port name="sel" combinational_sink_ports="y"></port>
+			</input_ports>
+		</model>
+		<model name="m_dffe">
+			<output_ports>
+				<port name="Q" clock="C"></port>
+			</output_ports>
+			<input_ports>
+				<port name="C" is_clock="1"></port>
+				<port name="D" clock="C"></port>
+				<port name="E" clock="C"></port>
+			</input_ports>
+		</model>
+	</models>
+	<device>
+		<sizing R_minW_nmos="0.0" R_minW_pmos="0.0"></sizing>
+		<connection_block input_switch_name="default"></connection_block>
+		<area grid_logic_tile_area="0.0"></area>
+		<switch_block type="wilton" fs="3"></switch_block>
+		<default_fc in_type="frac" in_val="1.0" out_type="frac" out_val="1.0"></default_fc>
+		<chan_width_distr>
+			<x distr="uniform" peak="1.0"></x>
+			<y distr="uniform" peak="1.0"></y>
+		</chan_width_distr>
+	</device>
+	<switchlist>
+		<switch type="mux" name="default" R="0" Cin="0" Cout="0" Tdel="1e-10" mux_trans_size="0" buf_size="0"></switch>
+	</switchlist>
+	<segmentlist>
+		<segment name="L2" freq="1" length="2" type="unidir" Rmetal="0" Cmetal="0">
+			<mux name="default"></mux>
+			<sb type="pattern">1 1 1</sb>
+			<cb type="pattern">1 1</cb>
+		</segment>
+	</segmentlist>
+</architecture>

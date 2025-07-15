@@ -7,7 +7,7 @@ ctx = Context()
 gbl_clk = ctx.create_global("clk", is_clock = True)
 gbl_clk.bind((0, 1), 0)
 ctx.create_segment('L1', 20, 1)
-
+ctx.registry.install_model("xilinxvertex6:v0", _install_m_xilinxvertex6)
 builder = ctx.build_io_block("iob")
 o = builder.create_input("outpad", 1)
 i = builder.create_output("inpad", 1)

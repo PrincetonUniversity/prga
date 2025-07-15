@@ -71,12 +71,7 @@ top = builder.fill( pattern ).auto_connect().commit()
 Flow(
         VPRArchGeneration('vpr/arch.xml'),
         VPR_RRG_Generation('vpr/rrg.xml'),
-        YosysScriptsCollection('syn'),
-        Materialization('scanchain', chain_width = 4),
-        Translation(),
-        SwitchPathAnnotation(),
-        ProgCircuitryInsertion(),
-        VerilogCollection('rtl'),
+        YosysScriptsCollection('syn')
         ).run(ctx)
 
 ctx.pickle("ctx.pkl" if len(sys.argv) < 2 else sys.argv[1])

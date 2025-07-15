@@ -65,10 +65,7 @@ Flow(
         VPR_RRG_Generation('vpr/rrg.xml'),
         YosysScriptsCollection('syn'),
         Materialization('scanchain'),
-        Translation(),
-        SwitchPathAnnotation(),
-        ProgCircuitryInsertion(),
-        VerilogCollection('rtl'),
+      
         ).run(ctx)
 
 ctx.pickle("ctx.pkl" if len(sys.argv) < 2 else sys.argv[1])
